@@ -51,3 +51,7 @@ Thumbs.db
 # Build directory
 .next/
 .env
+.env.development.example
+.env.production.example
+.vscode/
+coverage/
