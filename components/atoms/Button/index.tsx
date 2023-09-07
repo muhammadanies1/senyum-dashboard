@@ -157,11 +157,11 @@ const Button = React.forwardRef<HTMLButtonElement, Props>((props, ref) => {
 	const padding = useMemo(() => {
 		switch (size) {
 			case "sm":
-				return "p-2";
+				return "px-2";
 			case "md":
-				return "py-2 px-3";
+				return "px-3";
 			default:
-				return "p-3";
+				return "px-4";
 		}
 	}, [size]);
 
