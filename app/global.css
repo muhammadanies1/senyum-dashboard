@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+	.btn {
+		@apply rounded-lg font-semibold h-10 disabled:bg-light-30 border focus:outline focus:outline-[3px] flex items-center;
+	}
+
+	.btn.sm {
+		@apply h-8 text-xs p-2;
+	}
+
+	.btn.md {
+		@apply h-10 text-sm p-3;
+	}
+
+	.btn.lg {
+		@apply h-12 text-base px-4 py-3;
+	}
+
+	.btn.primary {
+		@apply text-white bg-primary-80 border-primary-80 hover:bg-primary-70 hover:border-primary-70 focus:outline-primary-30 focus:bg-primary-100;
+	}
+
+	.btn.secondary {
+		@apply text-white bg-secondary-80 border-secondary-80 hover:bg-secondary-80 hover:border-secondary-80 focus:outline-secondary-10 focus:bg-secondary-100;
+	}
+
+	.btn.primary.bordered {
+		@apply text-primary-80 bg-white hover:bg-primary-10 focus:outline-primary-40;
+	}
+}
