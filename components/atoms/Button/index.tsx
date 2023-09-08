@@ -1,5 +1,3 @@
-import "./button.module.css";
-
 import React, {ButtonHTMLAttributes} from "react";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
