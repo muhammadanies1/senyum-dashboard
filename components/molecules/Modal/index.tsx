@@ -38,6 +38,21 @@ const Modal = (props: Props) => {
 		}
 	}, [isShow]);
 
+	useEffect(() => {
+		const keypressHandler = (e: KeyboardEvent) => {
+			if (e.key === "Escape" && isShow && onClickBackground) {
+				onClickBackground();
+			}
+		};
+
+		window.addEventListener("keypress", keypressHandler);
+
+		return () => {
+			window.removeEventListener("keypress", keypressHandler);
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isShow]);
+
 	return (
 		<React.Fragment>
 			{createPortal(

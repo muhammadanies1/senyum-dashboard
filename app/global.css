@@ -47,7 +47,7 @@
 	}
 
 	.modal-body {
-		@apply p-4 overflow-y-auto h-[60vh];
+		@apply p-4 overflow-y-auto max-h-[60vh];
 	}
 
 	.modal-close-btn {

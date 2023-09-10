@@ -1,6 +1,6 @@
 import React from "react";
 
-import {fireEvent, render, waitFor} from "@testing-library/react";
+import {act, fireEvent, render, waitFor} from "@testing-library/react";
 
 import Modal from "./";
 
@@ -53,5 +53,20 @@ describe("Modal component", () => {
 			fireEvent.click(modalBackground);
 			expect(onClickBackground).toHaveBeenCalledTimes(1);
 		});
+	});
+
+	it("should close the modal when Escape key is pressed", async () => {
+		const onClose = jest.fn();
+		const {getByTestId, findByTestId, debug} = render(
+			<Modal isShow={true} data-testid="modal" onClickBackground={onClose}>
+				<div data-testid="modal-content">Modal Content</div>
+			</Modal>,
+		);
+
+		act(() => {
+			fireEvent.keyPress(document, {key: "Escape"});
+		});
+
+		expect(onClose).toHaveBeenCalledTimes(1);
 	});
 });
