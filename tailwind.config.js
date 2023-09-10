@@ -12,7 +12,9 @@ module.exports = {
 		extend: {
 			colors: {
 				light: {
+					20: "#EAEBEB",
 					30: "#D3D4D4",
+					60: "#929393",
 					80: "#777777",
 				},
 				primary: {
@@ -27,6 +29,9 @@ module.exports = {
 					10: "#FEEDDF",
 					80: "#F87304",
 					100: "#D16104",
+				},
+				dark: {
+					40: "#292929",
 				},
 			},
 		},
