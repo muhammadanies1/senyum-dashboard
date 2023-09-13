@@ -57,7 +57,7 @@ describe("Modal component", () => {
 
 	it("should close the modal when Escape key is pressed", async () => {
 		const onClose = jest.fn();
-		const {getByTestId, findByTestId, debug} = render(
+		render(
 			<Modal isShow={true} data-testid="modal" onClickBackground={onClose}>
 				<div data-testid="modal-content">Modal Content</div>
 			</Modal>,
@@ -68,5 +68,16 @@ describe("Modal component", () => {
 		});
 
 		expect(onClose).toHaveBeenCalledTimes(1);
+	});
+
+	it("applies custom classNames", () => {
+		const {getByTestId} = render(
+			<Modal isShow={true} data-testid="modal" className="custom-class">
+				<div data-testid="modal-content">Modal Content</div>
+			</Modal>,
+		);
+
+		const modal = getByTestId("modal");
+		expect(modal).toHaveClass("custom-class");
 	});
 });

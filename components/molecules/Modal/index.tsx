@@ -11,7 +11,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
 };
 
 const Modal = (props: Props) => {
-	const {isShow, onClickBackground, ...attrs} = props;
+	const {isShow, onClickBackground, className, ...attrs} = props;
 
 	const modalBgRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +63,7 @@ const Modal = (props: Props) => {
 						ref={modalBgRef}
 					>
 						<div
-							className="modal"
+							className={"modal".concat(className ? " " + className : "")}
 							ref={modalRef}
 							onClick={(e) => e.stopPropagation()}
 							{...attrs}
