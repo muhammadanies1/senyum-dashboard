@@ -33,7 +33,6 @@
 	}
 
 	/* ===== MODAL ===== */
-
 	.modal-bg {
 		@apply fixed inset-0 z-10 transition-all duration-200 ease-in-out bg-black/40 px-4 lg:px-0 hidden;
 	}
@@ -61,5 +60,13 @@
 	/* ===== LABEL ===== */
 	.label {
 		@apply text-sm font-semibold text-dark-40;
+	}
+
+	/* ===== INPUT ===== */
+	.input {
+		@apply h-12 px-3 py-3.5 border rounded-lg border-light-30 focus:border-primary-80 outline-none disabled:bg-light-20 disabled:border-light-20 disabled:text-light-60;
+	}
+	.border.error {
+		@apply border-red-80;
 	}
 }
