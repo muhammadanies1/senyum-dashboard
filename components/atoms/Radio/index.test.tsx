@@ -1,14 +1,18 @@
-import {render, fireEvent} from "@testing-library/react";
+import {render, fireEvent, getByTestId} from "@testing-library/react";
 import React from "react";
 
 import Radio from "./";
 
 describe("Radio Component", () => {
 	it("renders with default props", () => {
-		const {getByText, getByRole} = render(<Radio label="Radio Label" />);
+		const {getByTestId, getByText, getByRole} = render(
+			<Radio label="Radio Label" />,
+		);
+		const radioId = getByTestId("radio-label");
 		const radioLabel = getByText("Radio Label");
 		const radioInput = getByRole("radio");
 
+		expect(radioId).toHaveClass("radio-label md");
 		expect(radioLabel).toBeInTheDocument();
 		expect(radioInput).toBeInTheDocument();
 		expect(radioInput).not.toBeChecked();

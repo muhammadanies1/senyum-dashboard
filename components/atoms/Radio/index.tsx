@@ -4,6 +4,7 @@ type Props = ButtonHTMLAttributes<HTMLInputElement> & {
 	radioContainerStyle?: React.CSSProperties;
 	radioOuterCircleClassName?: string;
 	radioInnerCircleClassName?: string;
+	size?: "sm" | "md" | "lg";
 	className?: string;
 	disabled?: boolean;
 	checked?: boolean;
@@ -15,6 +16,7 @@ const Radio = React.forwardRef<HTMLInputElement, Props>((props: Props, ref) => {
 		radioOuterCircleClassName,
 		radioInnerCircleClassName,
 		radioContainerStyle,
+		size = "md",
 		className,
 		disabled,
 		checked,
@@ -54,25 +56,27 @@ const Radio = React.forwardRef<HTMLInputElement, Props>((props: Props, ref) => {
 
 	return (
 		<label
-			className={`relative cursor-pointer select-none flex pl-8 font-semibold`.concat(
-				className ? " " + className : "",
-			)}
+			className={`radio-label`
+				.concat(className ? " " + className : "")
+				.concat(size ? " " + size : "")}
 			style={style}
+			data-testid="radio-label"
 		>
 			{label}
 			<input
 				disabled={disabled}
 				type="radio"
-				className={`absolute top-0 left-0 h-0 w-0 appearance-none`}
+				className={`radio`}
 				{...attrs}
 				ref={ref}
 			/>
 			<span
-				className={`absolute top-0 left-0 h-6 w-6 rounded-full`
+				className={`radio-outer-circle`
 					.concat(!checked ? " border" : "")
 					.concat(
 						radioOuterCircleClassName ? " " + radioOuterCircleClassName : "",
-					)}
+					)
+					.concat(size ? " " + size : "")}
 				style={{
 					backgroundColor: outerCircleColor,
 					borderColor: outerCircleBorderColor,
@@ -80,9 +84,11 @@ const Radio = React.forwardRef<HTMLInputElement, Props>((props: Props, ref) => {
 				}}
 			></span>
 			<span
-				className={`h-4 w-4 absolute top-1 left-1 rounded-full`.concat(
-					radioInnerCircleClassName ? " " + radioInnerCircleClassName : "",
-				)}
+				className={`radio-inner-circle`
+					.concat(
+						radioInnerCircleClassName ? " " + radioInnerCircleClassName : "",
+					)
+					.concat(size ? " " + size : " ")}
 				style={{backgroundColor: innerCircleColor}}
 			></span>
 		</label>
