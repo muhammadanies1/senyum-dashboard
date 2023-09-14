@@ -66,7 +66,33 @@
 	.input {
 		@apply h-12 px-3 py-3.5 border rounded-lg border-light-30 focus:border-primary-80 outline-none disabled:bg-light-20 disabled:border-light-20 disabled:text-light-60;
 	}
+
 	.border.error {
 		@apply border-red-80;
+	}
+
+	/* ===== BADGE ===== */
+	.badge {
+		@apply h-[26px] p-1 rounded-xl text-center font-semibold text-sm leading-[18px];
+	}
+
+	.badge.sm {
+		@apply w-[120px];
+	}
+
+	.badge.md {
+		@apply w-[150px];
+	}
+
+	.badge.success {
+		@apply bg-green-10 text-green-80;
+	}
+
+	.badge.pending {
+		@apply bg-yellow-20 text-yellow-100;
+	}
+
+	.badge.error {
+		@apply bg-red-10 text-red-80;
 	}
 }
