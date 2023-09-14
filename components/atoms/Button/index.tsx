@@ -1,17 +1,19 @@
 import React, {ButtonHTMLAttributes} from "react";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-	variant?: "primary" | "secondary";
-	bordered?: boolean;
+	variant?: "primary" | "secondary" | "danger";
 	size?: "sm" | "md" | "lg";
+	transparent?: boolean;
+	bordered?: boolean;
 };
 
 const Button = React.forwardRef<HTMLButtonElement, Props>((props, ref) => {
 	const {
-		size = "md",
 		variant = "primary",
-		bordered,
+		size = "md",
+		transparent,
 		className,
+		bordered,
 		...attrs
 	} = props;
 
@@ -20,7 +22,8 @@ const Button = React.forwardRef<HTMLButtonElement, Props>((props, ref) => {
 			className={"btn"
 				.concat(variant ? ` ${variant}` : "")
 				.concat(size ? ` ${size}` : "")
-				.concat(bordered ? ` bordered` : "")}
+				.concat(bordered ? ` bordered` : "")
+				.concat(transparent ? " transparent" : "")}
 			{...attrs}
 			ref={ref}
 		/>
