@@ -23,7 +23,8 @@ const Button = React.forwardRef<HTMLButtonElement, Props>((props, ref) => {
 				.concat(variant ? ` ${variant}` : "")
 				.concat(size ? ` ${size}` : "")
 				.concat(bordered ? ` bordered` : "")
-				.concat(transparent ? " transparent" : "")}
+				.concat(transparent ? " transparent" : "")
+				.concat(className ? ` ${className}` : "")}
 			{...attrs}
 			ref={ref}
 		/>
