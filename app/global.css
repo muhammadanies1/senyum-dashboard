@@ -54,7 +54,7 @@
 	}
 
 	.modal {
-		@apply w-full bg-white rounded-xl overflow-hidden transition-all duration-200 ease-in-out max-w-2xl mx-auto transform hidden opacity-0;
+		@apply w-full bg-white rounded-xl overflow-hidden transition-all duration-200 ease-in-out max-w-2xl mx-auto transform scale-0 opacity-0;
 	}
 
 	.modal-header {

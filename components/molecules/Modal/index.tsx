@@ -20,21 +20,28 @@ const Modal = (props: Props) => {
 	useEffect(() => {
 		if (isShow) {
 			document.body.style.overflow = "hidden";
-			modalBgRef.current?.classList.add("block");
-			modalRef.current?.classList.add("block");
+			modalBgRef.current?.classList.add(
+				"flex",
+				"justify-center",
+				"items-center",
+			);
 			setTimeout(() => {
 				modalRef.current?.classList.add("opacity-100");
-				modalRef.current?.classList.add("translate-y-24");
+				modalRef.current?.classList.add("scale-100");
 			}, 100);
 		} else {
 			setTimeout(() => {
-				modalRef.current?.classList.remove("translate-y-24");
+				modalRef.current?.classList.remove("scale-100");
 				modalRef.current?.classList.remove("opacity-100");
 			}, 100);
 			setTimeout(() => {
-				modalBgRef.current?.classList.remove("block");
+				modalBgRef.current?.classList.remove(
+					"flex",
+					"justify-center",
+					"items-center",
+				);
 				document.body.style.overflow = "unset";
-			}, 300);
+			}, 200);
 		}
 	}, [isShow]);
 

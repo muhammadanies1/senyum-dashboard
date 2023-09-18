@@ -5,15 +5,17 @@ import {act, fireEvent, render, waitFor} from "@testing-library/react";
 import Modal from "./";
 
 describe("Modal component", () => {
-	it("should render the modal when isShow is true", () => {
+	it("should render the modal when isShow is true", async () => {
 		const {getByTestId} = render(
 			<Modal isShow={true} data-testid="modal">
 				<div>Modal Content</div>
 			</Modal>,
 		);
 
-		const modal = getByTestId("modal");
-		expect(modal).toHaveClass("block");
+		await waitFor(() => {
+			const modal = getByTestId("modal");
+			expect(modal).toHaveClass("opacity-100 scale-100");
+		});
 	});
 
 	it("should not render the modal when isShow is false", () => {
