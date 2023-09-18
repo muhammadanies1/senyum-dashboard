@@ -170,4 +170,35 @@
 	.form-message.danger {
 		@apply text-red-80;
 	}
+
+	/* ===== NAVBAR ===== */
+	.navbar {
+		box-shadow: 0px 5px 10px 0px rgba(214, 214, 214, 0.2);
+		@apply w-full min-h-[56px] p-3 bg-white;
+	}
+
+	.navbar-inner {
+		@apply flex flex-wrap lg:flex-nowrap justify-between items-center gap-4 max-w-7xl mx-auto;
+	}
+
+	.navbar-menu-container {
+		@apply flex-1 flex justify-end;
+	}
+
+	.menu-toggler {
+		@apply lg:hidden;
+	}
+
+	.navbar-menu {
+		@apply flex flex-wrap lg:flex-nowrap gap-4 lg:gap-6 justify-end items-center w-full;
+	}
+
+	.navbar-menu.collapsed {
+		@apply hidden lg:flex;
+	}
+
+	/* ===== AVATAR ===== */
+	.avatar {
+		@apply w-[32px] h-[32px] flex justify-center items-center bg-[#00549B] text-white rounded-full text-sm font-semibold;
+	}
 }
