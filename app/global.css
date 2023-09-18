@@ -5,7 +5,7 @@
 @layer components {
 	/* ===== BUTTON ===== */
 	.btn {
-		@apply rounded-lg font-semibold w-full h-10 disabled:bg-light-30 border focus:outline focus:outline-[3px] flex items-center justify-center;
+		@apply rounded-lg font-semibold h-10 disabled:bg-light-30 border focus:outline focus:outline-[3px] flex items-center justify-center;
 	}
 
 	.btn.sm {
@@ -80,7 +80,7 @@
 
 	/* ===== INPUT ===== */
 	.input {
-		@apply h-12 px-3 py-3.5 border rounded-lg border-light-30 focus:border-primary-80 outline-none disabled:bg-light-20 disabled:border-light-20 disabled:text-light-60;
+		@apply h-12 px-3 py-3.5 border rounded-lg border-light-30 focus:border-primary-80 outline-none disabled:bg-light-20 disabled:border-light-20 disabled:text-light-60 w-full block;
 	}
 
 	.border.error {
@@ -155,5 +155,19 @@
 
 	.radio-inner-circle.lg {
 		@apply absolute rounded-full top-1 left-1 h-4 w-4;
+	}
+
+	/* ===== FORM GROUP ===== */
+	.form-group {
+		@apply mb-4 last:mb-0;
+	}
+
+	/* ===== FORM MESSAGE ===== */
+	.form-message {
+		@apply text-sm text-light-60 block last:mt-1.5;
+	}
+
+	.form-message.danger {
+		@apply text-red-80;
 	}
 }

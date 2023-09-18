@@ -13,7 +13,7 @@ const Header = (props: Props) => {
 			return false;
 		}
 		return (
-			<button className="modal-close-btn" onClick={handleClose}>
+			<button className="modal-close-btn" onClick={handleClose} type="button">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="16"
