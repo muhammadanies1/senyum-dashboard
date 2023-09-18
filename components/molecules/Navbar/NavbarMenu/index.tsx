@@ -41,7 +41,9 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 						fill="#777777"
 					/>
 				</svg>
-				<span className="font-medium text-dark-40 text-base">Notifikasi</span>
+				<span className="font-medium text-dark-40 text-base lg:hidden">
+					Notifikasi
+				</span>
 			</Link>
 			<Link
 				href="#"
