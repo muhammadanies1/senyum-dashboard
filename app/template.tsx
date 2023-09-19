@@ -1,15 +1,17 @@
-import {FunctionComponent, HTMLAttributes} from "react";
+import React, {FunctionComponent} from "react";
 
 import Navbar from "@/components/molecules/Navbar";
 
-type TemplateProps = HTMLAttributes<HTMLDivElement>;
+type TemplateProps = {
+	children: React.ReactNode;
+};
 
-const Template: FunctionComponent<TemplateProps> = ({children, ...attrs}) => {
+const Template: FunctionComponent<TemplateProps> = ({children}) => {
 	return (
-		<div {...attrs}>
+		<React.Fragment>
 			<Navbar />
-			{children}
-		</div>
+			<div className="wrapper">{children}</div>
+		</React.Fragment>
 	);
 };
 

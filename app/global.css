@@ -75,7 +75,7 @@
 
 	/* ===== LABEL ===== */
 	.label {
-		@apply text-sm font-semibold text-dark-40;
+		@apply text-sm font-semibold text-dark-40 block mb-2;
 	}
 
 	/* ===== INPUT ===== */
@@ -200,5 +200,17 @@
 	/* ===== AVATAR ===== */
 	.avatar {
 		@apply w-[32px] h-[32px] flex justify-center items-center bg-[#00549B] text-white rounded-full text-sm font-semibold;
+	}
+
+	/* ===== CONTAINER ===== */
+	.wrapper {
+		min-height: calc(100vh - 56px);
+		@apply mx-auto;
+	}
+
+	/* ===== LOGIN FORM ===== */
+	.login-form {
+		box-shadow: 0px 4px 10px 0px rgba(119, 119, 119, 0.1);
+		@apply bg-white flex flex-col gap-8 rounded-xl p-6 w-[350px] lg:w-[540px];
 	}
 }
