@@ -213,4 +213,9 @@
 		box-shadow: 0px 4px 10px 0px rgba(119, 119, 119, 0.1);
 		@apply bg-white flex flex-col gap-8 rounded-xl p-6 w-[350px] lg:w-[540px];
 	}
+
+	/* ===== FILTER BUTTON ===== */
+	.filter-button {
+		@apply h-8 w-[100px] p-2 flex items-center justify-center rounded-xl gap-4 bg-primary-10 text-dark-40 font-medium text-base;
+	}
 }
