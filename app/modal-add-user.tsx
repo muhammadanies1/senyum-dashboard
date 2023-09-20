@@ -2,16 +2,19 @@
 
 import React, {HTMLAttributes, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import Image from "next/image";
 import * as yup from "yup";
 
-import Button from "@/components/atoms/Button";
-import FormGroup from "@/components/atoms/FormGroup";
 import FormMessage from "@/components/atoms/FormMessage";
-import Input from "@/components/atoms/Input";
-import Label from "@/components/atoms/Label";
-import Radio from "@/components/atoms/Radio";
+import FormGroup from "@/components/atoms/FormGroup";
 import Modal from "@/components/molecules/Modal";
-import {yupResolver} from "@hookform/resolvers/yup";
+import Button from "@/components/atoms/Button";
+import Label from "@/components/atoms/Label";
+import Input from "@/components/atoms/Input";
+import Radio from "@/components/atoms/Radio";
+
+import CheckCircleIcon from "./check-circle.svg";
 
 const schema = yup.object({
 	username: yup.string().required("Username harus diisi."),
@@ -19,7 +22,10 @@ const schema = yup.object({
 	email: yup
 		.string()
 		.required("Email harus diisi.")
-		.email("Email tidak valid."),
+		.email("Email harus berdomain @bri.co.id")
+		.test("is-bri-email", "Email harus berdomain @bri.co.id", function (value) {
+			return value.endsWith("@bri.co.id");
+		}),
 	type: yup
 		.mixed()
 		.oneOf(["admin", "viewer"], "Tipe user tidak valid.")
@@ -27,7 +33,11 @@ const schema = yup.object({
 	password: yup
 		.string()
 		.required("Password harus diisi.")
-		.min(6, "Password minimal 6 karakter."),
+		.min(8, "Password minimal 8 karakter.")
+		.matches(
+			/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+			"Password harus mempunyai setidaknya satu huruf, satu angka, dan satu simbol.",
+		),
 });
 
 type Props = HTMLAttributes<HTMLDivElement>;
@@ -102,7 +112,13 @@ const ModalAddUser = (props: Props) => {
 										variant={error ? "error" : undefined}
 									/>
 									{error?.message ? (
-										<FormMessage variant="danger">{error?.message}</FormMessage>
+										<FormMessage
+											id="username-error-message"
+											data-testid="username-error-message"
+											variant="danger"
+										>
+											{error?.message}
+										</FormMessage>
 									) : (
 										false
 									)}
@@ -129,7 +145,13 @@ const ModalAddUser = (props: Props) => {
 										variant={error ? "error" : undefined}
 									/>
 									{error?.message ? (
-										<FormMessage variant="danger">{error?.message}</FormMessage>
+										<FormMessage
+											id="name-error-message"
+											data-testid="name-error-message"
+											variant="danger"
+										>
+											{error?.message}
+										</FormMessage>
 									) : (
 										false
 									)}
@@ -157,7 +179,14 @@ const ModalAddUser = (props: Props) => {
 										variant={error ? "error" : undefined}
 									/>
 									{error?.message ? (
-										<FormMessage variant="danger">{error?.message}</FormMessage>
+										<FormMessage
+											id="email-error-message"
+											data-testid="email-error-message"
+											aria-label="email-error-message"
+											variant="danger"
+										>
+											{error?.message}
+										</FormMessage>
 									) : (
 										false
 									)}
@@ -199,7 +228,13 @@ const ModalAddUser = (props: Props) => {
 										/>
 									</div>
 									{error?.message ? (
-										<FormMessage variant="danger">{error?.message}</FormMessage>
+										<FormMessage
+											id="usertype-error-message"
+											data-testid="usertype-error-message"
+											variant="danger"
+										>
+											{error?.message}
+										</FormMessage>
 									) : (
 										false
 									)}
@@ -210,7 +245,7 @@ const ModalAddUser = (props: Props) => {
 							control={control}
 							name="password"
 							render={({field, fieldState: {error}}) => (
-								<FormGroup>
+								<FormGroup className="relative">
 									<Label
 										htmlFor="password"
 										aria-label="Password Label"
@@ -222,16 +257,32 @@ const ModalAddUser = (props: Props) => {
 										id="password"
 										data-testid="password"
 										placeholder="Password"
-										type="password"
 										{...field}
 										variant={error ? "error" : undefined}
+										className="relative"
 									/>
 									{error?.message ? (
-										<FormMessage variant="danger" className="mt-1.5">
+										<FormMessage
+											id="password-error-message"
+											data-testid="password-error-message"
+											aria-label="password-error-message"
+											variant="danger"
+											className="mt-1.5"
+										>
 											{error?.message}
 										</FormMessage>
 									) : (
-										false
+										field.value && (
+											<Image
+												id="password-check-circle"
+												data-testid="password-check-circle"
+												src={CheckCircleIcon}
+												alt="check-circle"
+												width={16}
+												height={16}
+												className="absolute top-11 right-4"
+											/>
+										)
 									)}
 									<FormMessage>
 										Min. 8 karakter serta merupakan kombinasi huruf, angka dan
