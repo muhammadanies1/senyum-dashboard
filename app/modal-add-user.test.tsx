@@ -1,50 +1,103 @@
-import {render, screen, waitFor} from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import React from "react";
+
+import {fireEvent, render, waitFor} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import ModalAddUser from "./modal-add-user";
 
-window.alert = jest.fn();
+describe("ModalAddUser", () => {
+	it("renders the 'Tambah User' button", () => {
+		const {getByTestId} = render(<ModalAddUser />);
+		const showModalButton = getByTestId("show-modal-btn");
 
-describe("ModalAddUser component", () => {
-	it("renders the 'Add user' button", () => {
-		render(<ModalAddUser />);
-		const addButton = screen.getByTestId("show-add-user-modal-btn");
-		expect(addButton).toBeInTheDocument();
+		expect(showModalButton).toBeInTheDocument();
 	});
 
-	it("opens the modal when the 'Add user' button is clicked", () => {
-		render(<ModalAddUser />);
-		const addButton = screen.getByTestId("show-add-user-modal-btn");
-		const submitButton = screen.getByTestId("submit-add-user-modal-btn");
-		userEvent.click(addButton);
+	it("opens the modal when the 'Tambah User' button is clicked", async () => {
+		const {getByTestId} = render(<ModalAddUser />);
+		const modal = getByTestId("modal-form");
+		const showModalButton = getByTestId("show-modal-btn");
+		const submitButton = getByTestId("submit-modal-btn");
+		const usernameInput = getByTestId("username");
+		const passwordInput = getByTestId("password");
+		const emailInput = getByTestId("email");
+		const nameInput = getByTestId("name");
 
-		const modal = screen.getByTestId("modal-form");
-		expect(modal).toBeInTheDocument();
+		expect(modal).not.toHaveClass("opacity-100");
+
+		userEvent.click(showModalButton);
+		await waitFor(() => {
+			expect(modal).toHaveClass("opacity-100");
+		});
+
+		expect(usernameInput).toHaveValue("");
+		expect(nameInput).toHaveValue("");
+		expect(emailInput).toHaveValue("");
+		expect(passwordInput).toHaveValue("");
 		expect(submitButton).toBeDisabled();
 	});
 
-	it("closes the modal when the close button is clicked", () => {
-		const {getByTestId, queryByTestId} = render(<ModalAddUser />);
-		const addButton = getByTestId("show-add-user-modal-btn");
-		userEvent.click(addButton);
+	it("closes the modal when the close button is clicked", async () => {
+		const {getByTestId} = render(<ModalAddUser />);
+		const showModalButton = getByTestId("show-modal-btn");
+		const modal = getByTestId("modal-form");
 
-		const closeButton =
+		expect(modal).not.toHaveClass("opacity-100");
+
+		userEvent.click(showModalButton);
+		await waitFor(() => {
+			expect(modal).toHaveClass("opacity-100");
+		});
+
+		const closeModalButton =
 			getByTestId("modal-header").querySelector(".modal-close-btn");
-		if (!closeButton) {
+		if (!closeModalButton) {
 			throw new Error("Element does not exist.");
 		}
-		userEvent.click(closeButton);
+		userEvent.click(closeModalButton);
 
-		const modal = queryByTestId("modal-form");
+		await waitFor(() => {
+			expect(modal).not.toHaveClass("opacity-100");
+		});
+	});
+
+	it("closes the modal when the background is clicked", async () => {
+		const {getByTestId} = render(<ModalAddUser />);
+		const showModalButton = getByTestId("show-modal-btn");
+		const modal = getByTestId("modal-form");
+
 		expect(modal).not.toHaveClass("opacity-100");
+
+		userEvent.click(showModalButton);
+		await waitFor(() => {
+			expect(modal).toHaveClass("opacity-100");
+		});
+
+		await waitFor(() => {
+			const modalBackground = modal.parentNode;
+			if (!modalBackground) {
+				throw new Error("Element does not exist.");
+			}
+			fireEvent.click(modalBackground);
+		});
+
+		await waitFor(() => {
+			expect(modal).not.toHaveClass("opacity-100");
+		});
 	});
 
 	it("displays validation errors when submitting empty inputs", async () => {
 		const {findByTestId, getByTestId} = render(<ModalAddUser />);
-		const addButton = getByTestId("show-add-user-modal-btn");
-		const submitButton = getByTestId("submit-add-user-modal-btn");
-		userEvent.click(addButton);
+		const showModalButton = getByTestId("show-modal-btn");
+		const submitButton = getByTestId("submit-modal-btn");
+		const modal = getByTestId("modal-form");
+
+		expect(modal).not.toHaveClass("opacity-100");
+
+		userEvent.click(showModalButton);
+		await waitFor(() => {
+			expect(modal).toHaveClass("opacity-100");
+		});
 
 		const usernameInput = getByTestId("username");
 		const nameInput = getByTestId("name");
@@ -66,8 +119,15 @@ describe("ModalAddUser component", () => {
 
 	it("displays validation errors when submitting an invalid email or password", async () => {
 		const {findByTestId, getByTestId} = render(<ModalAddUser />);
-		const addButton = getByTestId("show-add-user-modal-btn");
-		userEvent.click(addButton);
+		const showModalButton = getByTestId("show-modal-btn");
+		const modal = getByTestId("modal-form");
+
+		expect(modal).not.toHaveClass("opacity-100");
+
+		userEvent.click(showModalButton);
+		await waitFor(() => {
+			expect(modal).toHaveClass("opacity-100");
+		});
 
 		const emailInput = getByTestId("email");
 		const passwordInput = getByTestId("password");
@@ -81,35 +141,47 @@ describe("ModalAddUser component", () => {
 	});
 
 	it("submits the form with valid data", async () => {
-		const {getByTestId, queryByTestId} = render(<ModalAddUser />);
-		const addButton = getByTestId("show-add-user-modal-btn");
-		const modal = queryByTestId("modal-form");
+		const {getByTestId} = render(<ModalAddUser />);
+		const showModalButton = getByTestId("show-modal-btn");
+		const modal = getByTestId("modal-form");
 
 		expect(modal).not.toHaveClass("opacity-100");
 
-		userEvent.click(addButton);
-
-		const usernameInput = getByTestId("username");
-		userEvent.type(usernameInput, "testuser");
-
-		const nameInput = getByTestId("name");
-		userEvent.type(nameInput, "Test User");
-
-		const emailInput = getByTestId("email");
-		userEvent.type(emailInput, "testuser@bri.co.id");
-
-		const adminRadio = getByTestId("radio-admin");
-		userEvent.click(adminRadio);
-
-		const passwordInput = getByTestId("password");
-		userEvent.type(passwordInput, "Password123!");
-		userEvent.keyboard("{Tab}");
-
+		userEvent.click(showModalButton);
 		await waitFor(() => {
-			expect(getByTestId("password-check-circle")).toBeVisible();
+			expect(modal).toHaveClass("opacity-100");
 		});
 
-		const submitButton = getByTestId("submit-add-user-modal-btn");
+		const usernameInput = getByTestId("username");
+		const nameInput = getByTestId("name");
+		const emailInput = getByTestId("email");
+		const adminRadio = getByTestId("radio-admin");
+		const passwordInput = getByTestId("password");
+
+		userEvent.type(usernameInput, "testuser");
+		userEvent.type(nameInput, "Test User");
+		userEvent.type(emailInput, "testuser@bri.co.id");
+		userEvent.click(adminRadio);
+		await waitFor(() => {
+			expect(adminRadio).toBeChecked();
+		});
+		userEvent.type(passwordInput, "Password123!");
+
+		const showPasswordButton = getByTestId("show-password-btn");
+		userEvent.click(showPasswordButton);
+		await waitFor(() => {
+			expect(passwordInput).toHaveAttribute("type", "password");
+		});
+
+		userEvent.click(showPasswordButton);
+		await waitFor(() => {
+			expect(passwordInput).toHaveAttribute("type", "text");
+		});
+
+		const submitButton = getByTestId("submit-modal-btn");
+		await waitFor(() => {
+			expect(submitButton).toHaveAttribute("disabled", "");
+		});
 		userEvent.click(submitButton);
 
 		userEvent.clear(passwordInput);

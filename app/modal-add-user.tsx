@@ -1,20 +1,22 @@
 "use client";
 
+import Image from "next/image";
 import React, {HTMLAttributes, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
-import {yupResolver} from "@hookform/resolvers/yup";
-import Image from "next/image";
 import * as yup from "yup";
 
-import FormMessage from "@/components/atoms/FormMessage";
-import FormGroup from "@/components/atoms/FormGroup";
-import Modal from "@/components/molecules/Modal";
 import Button from "@/components/atoms/Button";
-import Label from "@/components/atoms/Label";
+import FormGroup from "@/components/atoms/FormGroup";
+import FormMessage from "@/components/atoms/FormMessage";
 import Input from "@/components/atoms/Input";
+import Label from "@/components/atoms/Label";
 import Radio from "@/components/atoms/Radio";
+import Modal from "@/components/molecules/Modal";
+import {yupResolver} from "@hookform/resolvers/yup";
 
-import CheckCircleIcon from "./check-circle.svg";
+import HideVisibleIcon from "./eye-hide.svg";
+import EyeVisibleIcon from "./eye-visible.svg";
+import PlusCircleIcon from "./plus-circle.svg";
 
 const schema = yup.object({
 	username: yup.string().required("Username harus diisi."),
@@ -43,6 +45,7 @@ const schema = yup.object({
 type Props = HTMLAttributes<HTMLDivElement>;
 
 const ModalAddUser = (props: Props) => {
+	const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
 	const [isShow, setIsShow] = useState<boolean>(false);
 
 	const {
@@ -61,6 +64,10 @@ const ModalAddUser = (props: Props) => {
 		mode: "all",
 	});
 
+	const handleIsShowPassword = () => {
+		setIsShowPassword((state) => !state);
+	};
+
 	const submitForm = (data: yup.InferType<typeof schema>) => {
 		alert(`data: ${JSON.stringify(data)}`);
 		setIsShow((state) => !state);
@@ -69,10 +76,14 @@ const ModalAddUser = (props: Props) => {
 	return (
 		<>
 			<Button
+				id="show-modal-btn"
+				data-testid="show-modal-btn"
 				onClick={() => setIsShow(true)}
-				data-testid="show-add-user-modal-btn"
+				bordered
+				className="w-[200px] gap-2"
 			>
-				Add user
+				<Image src={PlusCircleIcon} alt="plus-circle" />
+				<span className="font-bold">Tambah User</span>
 			</Button>
 
 			<Modal
@@ -245,7 +256,7 @@ const ModalAddUser = (props: Props) => {
 							control={control}
 							name="password"
 							render={({field, fieldState: {error}}) => (
-								<FormGroup className="relative">
+								<FormGroup>
 									<Label
 										htmlFor="password"
 										aria-label="Password Label"
@@ -253,14 +264,40 @@ const ModalAddUser = (props: Props) => {
 									>
 										Password
 									</Label>
-									<Input
-										id="password"
-										data-testid="password"
-										placeholder="Password"
-										{...field}
-										variant={error ? "error" : undefined}
-										className="relative"
-									/>
+									<div className="relative">
+										<Input
+											id="password"
+											data-testid="password"
+											placeholder="Password"
+											type={isShowPassword ? "text" : "password"}
+											{...field}
+											variant={error ? "error" : undefined}
+											className={"relative".concat(field.value ? " pr-10" : "")}
+										/>
+										{isShowPassword ? (
+											<Image
+												id="show-password-btn"
+												data-testid="show-password-btn"
+												src={EyeVisibleIcon}
+												alt="check-circle"
+												width={16}
+												height={16}
+												className="absolute top-[18px] right-3 hover:cursor-pointer"
+												onClick={handleIsShowPassword}
+											/>
+										) : (
+											<Image
+												id="show-password-btn"
+												data-testid="show-password-btn"
+												src={HideVisibleIcon}
+												alt="check-circle"
+												width={16}
+												height={16}
+												className="absolute top-[18px] right-3 hover:cursor-pointer"
+												onClick={handleIsShowPassword}
+											/>
+										)}
+									</div>
 									{error?.message ? (
 										<FormMessage
 											id="password-error-message"
@@ -272,17 +309,7 @@ const ModalAddUser = (props: Props) => {
 											{error?.message}
 										</FormMessage>
 									) : (
-										field.value && (
-											<Image
-												id="password-check-circle"
-												data-testid="password-check-circle"
-												src={CheckCircleIcon}
-												alt="check-circle"
-												width={16}
-												height={16}
-												className="absolute top-11 right-4"
-											/>
-										)
+										false
 									)}
 									<FormMessage>
 										Min. 8 karakter serta merupakan kombinasi huruf, angka dan
@@ -295,8 +322,8 @@ const ModalAddUser = (props: Props) => {
 					<Modal.Footer id="modal-footer" data-testid="modal-footer">
 						<div>
 							<Button
-								id="submit-add-user-modal-btn"
-								data-testid="submit-add-user-modal-btn"
+								id="submit-modal-btn"
+								data-testid="submit-modal-btn"
 								variant="primary"
 								className="w-full"
 								disabled={!isValid}
