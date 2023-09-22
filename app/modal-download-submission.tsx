@@ -1,18 +1,17 @@
 "use client";
 
+import Image from "next/image";
 import React, {HTMLAttributes, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
-import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import FormMessage from "@/components/atoms/FormMessage";
 import FormGroup from "@/components/atoms/FormGroup";
-import Modal from "../components/molecules/Modal";
+import Label from "@/components/atoms/Label";
+import {yupResolver} from "@hookform/resolvers/yup";
+
 import Button from "../components/atoms/Button";
 import Radio from "../components/atoms/Radio";
-import Label from "@/components/atoms/Label";
-import Image from "next/image";
-
+import Modal from "../components/molecules/Modal";
 import DownloadIcon from "./download.svg";
 
 const schema = yup.object({
@@ -47,8 +46,8 @@ const ModalDownloadSubmission = (props: Props) => {
 	return (
 		<>
 			<Button
-				id="show-modal-btn"
-				data-testid="show-modal-btn"
+				id="show-modal-download-btn"
+				data-testid="show-modal-download-btn"
 				onClick={() => setIsShow(true)}
 				transparent
 				className="gap-2 items-center justify-center"
@@ -62,6 +61,7 @@ const ModalDownloadSubmission = (props: Props) => {
 				data-testid="modal-form"
 				isShow={isShow}
 				className="w-[482px]"
+				containerClassName="z-20"
 				onClickBackground={() => setIsShow((state) => !state)}
 			>
 				<form className="flex flex-col" onSubmit={handleSubmit(submitForm)}>
@@ -108,19 +108,14 @@ const ModalDownloadSubmission = (props: Props) => {
 											onChange={onChange}
 										/>
 									</div>
-									{error?.message ? (
-										<FormMessage variant="danger">{error?.message}</FormMessage>
-									) : (
-										false
-									)}
 								</FormGroup>
 							)}
 						/>
 					</Modal.Body>
 					<Modal.Footer id="modal-footer" data-testid="modal-footer">
 						<Button
-							id="submit-modal-btn"
-							data-testid="submit-modal-btn"
+							id="submit-modal-download-btn"
+							data-testid="submit-modal-download-btn"
 							className="w-full"
 							disabled={!isValid}
 						>
