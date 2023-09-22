@@ -7,11 +7,13 @@ import Header from "./Header";
 
 type Props = HTMLAttributes<HTMLDivElement> & {
 	isShow: boolean;
+	containerClassName?: string;
 	onClickBackground?: () => void;
 };
 
 const Modal = (props: Props) => {
-	const {isShow, onClickBackground, className, ...attrs} = props;
+	const {isShow, onClickBackground, containerClassName, className, ...attrs} =
+		props;
 
 	const modalBgRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +67,9 @@ const Modal = (props: Props) => {
 			{createPortal(
 				<React.Fragment>
 					<div
-						className="modal-bg"
+						className={"modal-bg".concat(
+							containerClassName ? " " + containerClassName : "",
+						)}
 						onClick={onClickBackground}
 						ref={modalBgRef}
 					>
