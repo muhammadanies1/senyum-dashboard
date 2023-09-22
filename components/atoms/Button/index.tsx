@@ -21,7 +21,9 @@ const Button = React.forwardRef<HTMLButtonElement, Props>((props, ref) => {
 		<button
 			className={"btn"
 				.concat(variant ? ` ${variant}` : "")
-				.concat(size ? ` ${size}` : "")
+				.concat(size === "sm" ? " sm" : "")
+				.concat(size === "md" ? " md" : "")
+				.concat(size === "lg" ? " lg" : "")
 				.concat(bordered ? ` bordered` : "")
 				.concat(transparent ? " transparent" : "")
 				.concat(className ? ` ${className}` : "")}
