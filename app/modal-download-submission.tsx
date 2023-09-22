@@ -57,8 +57,8 @@ const ModalDownloadSubmission = (props: Props) => {
 			</Button>
 
 			<Modal
-				id="modal-form"
-				data-testid="modal-form"
+				id="modal-download-form"
+				data-testid="modal-download-form"
 				isShow={isShow}
 				className="w-[482px]"
 				containerClassName="z-20"
@@ -66,14 +66,17 @@ const ModalDownloadSubmission = (props: Props) => {
 			>
 				<form className="flex flex-col" onSubmit={handleSubmit(submitForm)}>
 					<Modal.Header
-						id="modal-header"
-						data-testid="modal-header"
+						id="modal-download-header"
+						data-testid="modal-download-header"
 						dismissable
 						handleClose={() => setIsShow((state) => !state)}
 					>
 						Download Data Pengajuan
 					</Modal.Header>
-					<Modal.Body id="modal-body" data-testid="modal-body">
+					<Modal.Body
+						id="modal-download-body"
+						data-testid="modal-download-body"
+					>
 						<Controller
 							control={control}
 							name="format"
@@ -112,7 +115,10 @@ const ModalDownloadSubmission = (props: Props) => {
 							)}
 						/>
 					</Modal.Body>
-					<Modal.Footer id="modal-footer" data-testid="modal-footer">
+					<Modal.Footer
+						id="modal-download-footer"
+						data-testid="modal-download-footer"
+					>
 						<Button
 							id="submit-modal-download-btn"
 							data-testid="submit-modal-download-btn"

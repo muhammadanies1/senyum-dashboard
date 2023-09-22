@@ -19,9 +19,9 @@ describe("ModalDownloadSubmission", () => {
 		const {getByTestId} = render(<ModalDownloadSubmission />);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
 		const showModalButton = getByTestId("show-modal-download-btn");
+		const modal = getByTestId("modal-download-form");
 		const xlsRadio = getByTestId("radio-xls");
 		const csvRadio = getByTestId("radio-csv");
-		const modal = getByTestId("modal-form");
 
 		expect(modal).not.toHaveClass("opacity-100");
 
@@ -38,7 +38,7 @@ describe("ModalDownloadSubmission", () => {
 	it("closes the modal when the close button is clicked", async () => {
 		const {getByTestId, queryByTestId} = render(<ModalDownloadSubmission />);
 		const showModalButton = getByTestId("show-modal-download-btn");
-		const modal = queryByTestId("modal-form");
+		const modal = queryByTestId("modal-download-form");
 
 		expect(modal).not.toHaveClass("opacity-100");
 
@@ -47,8 +47,9 @@ describe("ModalDownloadSubmission", () => {
 			expect(modal).toHaveClass("opacity-100");
 		});
 
-		const closeModalButton =
-			getByTestId("modal-header").querySelector(".modal-close-btn");
+		const closeModalButton = getByTestId("modal-download-header").querySelector(
+			".modal-close-btn",
+		);
 		if (!closeModalButton) {
 			throw new Error("Element does not exist.");
 		}
@@ -62,7 +63,7 @@ describe("ModalDownloadSubmission", () => {
 	it("closes the modal when the background is clicked", async () => {
 		const {getByTestId} = render(<ModalDownloadSubmission />);
 		const showModalButton = getByTestId("show-modal-download-btn");
-		const modal = getByTestId("modal-form");
+		const modal = getByTestId("modal-download-form");
 
 		expect(modal).not.toHaveClass("opacity-100");
 
@@ -88,9 +89,9 @@ describe("ModalDownloadSubmission", () => {
 		const {getByTestId, queryByTestId} = render(<ModalDownloadSubmission />);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
 		const showModalButton = getByTestId("show-modal-download-btn");
+		const modal = queryByTestId("modal-download-form");
 		const xlsRadio = getByTestId("radio-xls");
 		const csvRadio = getByTestId("radio-csv");
-		const modal = queryByTestId("modal-form");
 
 		expect(modal).not.toHaveClass("opacity-100");
 
