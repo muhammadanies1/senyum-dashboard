@@ -2,11 +2,21 @@ import React from "react";
 
 import {render} from "@testing-library/react";
 
+import {NavbarContext} from "../";
 import NavbarMenu from "./";
 
 describe("NavbarMenu component", () => {
 	it("renders without errors", () => {
-		render(<NavbarMenu />);
+		render(
+			<NavbarContext.Provider
+				value={{
+					isExpand: false,
+					userName: "John Doe",
+				}}
+			>
+				<NavbarMenu />
+			</NavbarContext.Provider>,
+		);
 	});
 
 	it("renders notification link", () => {
@@ -22,28 +32,78 @@ describe("NavbarMenu component", () => {
 	});
 
 	it("renders the username", () => {
-		const {getByText} = render(<NavbarMenu userName="John Doe" />);
+		const {getByText} = render(
+			<NavbarContext.Provider
+				value={{
+					isExpand: false,
+					userName: "John Doe",
+				}}
+			>
+				<NavbarMenu />
+			</NavbarContext.Provider>,
+		);
 		const usernameElement = getByText("John Doe");
 		expect(usernameElement).toBeInTheDocument();
 	});
 
 	it("renders the avatar", () => {
-		const {getByAltText, getByTitle} = render(
-			<NavbarMenu userName="John Doe" />,
+		const {getByTitle} = render(
+			<NavbarContext.Provider
+				value={{
+					isExpand: false,
+					userName: "John Doe",
+				}}
+			>
+				<NavbarMenu />
+			</NavbarContext.Provider>,
 		);
 		const avatarElement = getByTitle("John Doe Avatar");
 		expect(avatarElement).toBeInTheDocument();
 	});
 
 	it("collapses when isExpand prop is false", () => {
-		const {container} = render(<NavbarMenu isExpand={false} />);
+		const {container} = render(
+			<NavbarContext.Provider
+				value={{
+					isExpand: false,
+					userName: "John Doe",
+				}}
+			>
+				<NavbarMenu />
+			</NavbarContext.Provider>,
+		);
 		const navbarMenu = container.querySelector(".navbar-menu");
 		expect(navbarMenu).toHaveClass("collapsed");
 	});
 
 	it("does not collapse when isExpand prop is true", () => {
-		const {container} = render(<NavbarMenu isExpand={true} />);
+		const {container} = render(
+			<NavbarContext.Provider
+				value={{
+					isExpand: true,
+					userName: "John Doe",
+				}}
+			>
+				<NavbarMenu />
+			</NavbarContext.Provider>,
+		);
 		const navbarMenu = container.querySelector(".navbar-menu");
 		expect(navbarMenu).not.toHaveClass("collapsed");
+	});
+
+	it("renders with custom className", () => {
+		const {container} = render(
+			<NavbarContext.Provider
+				value={{
+					isExpand: true,
+					userName: "John Doe",
+				}}
+			>
+				<NavbarMenu className="custom-class" />
+			</NavbarContext.Provider>,
+		);
+
+		const navbarMenu = container.querySelector(".navbar-menu");
+		expect(navbarMenu).toHaveClass("custom-class");
 	});
 });

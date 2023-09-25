@@ -16,19 +16,19 @@ describe("Navbar component", () => {
 	});
 
 	it("renders the NavbarMenu component", () => {
-		const {getByTestId} = render(<Navbar />);
+		const {getByTestId} = render(<Navbar isLoggedIn />);
 		const navbarMenu = getByTestId("navbar-menu");
 		expect(navbarMenu).toBeInTheDocument();
 	});
 
 	it("initially renders the menu as collapsed", () => {
-		const {getByTestId} = render(<Navbar />);
+		const {getByTestId} = render(<Navbar isLoggedIn />);
 		const navbarMenu = getByTestId("navbar-menu");
 		expect(navbarMenu).toHaveClass("collapsed");
 	});
 
 	it("expands the menu when the button is clicked", () => {
-		const {getByTestId} = render(<Navbar />);
+		const {getByTestId} = render(<Navbar isLoggedIn />);
 		const menuButton = getByTestId("menu-toggler");
 		const navbarMenu = getByTestId("navbar-menu");
 
@@ -43,7 +43,7 @@ describe("Navbar component", () => {
 	});
 
 	it("collapses the menu when the button is clicked twice", () => {
-		const {getByTestId, getByRole} = render(<Navbar />);
+		const {getByTestId} = render(<Navbar isLoggedIn />);
 		const menuButton = getByTestId("menu-toggler");
 		const navbarMenu = getByTestId("navbar-menu");
 

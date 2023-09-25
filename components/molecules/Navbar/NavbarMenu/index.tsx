@@ -1,18 +1,18 @@
 import Link from "next/link";
-import React, {FunctionComponent, HTMLAttributes} from "react";
+import React, {FunctionComponent, HTMLAttributes, useContext} from "react";
 
 import Avatar from "@/components/atoms/Avatar";
 
-type NavbarMenuProps = HTMLAttributes<HTMLDivElement> & {
-	userName?: string;
-	isExpand?: boolean;
-};
+import {NavbarContext} from "../";
+
+type NavbarMenuProps = HTMLAttributes<HTMLDivElement>;
 
 const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 	className,
-	isExpand,
 	...attrs
 }) => {
+	const {isExpand, userName} = useContext(NavbarContext);
+
 	return (
 		<div
 			className={"navbar-menu"
@@ -51,7 +51,7 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 				title="Profile"
 			>
 				<span className="font-medium text-dark-40 text-base order-2 lg:order-1">
-					John Doe
+					{userName}
 				</span>
 				<Avatar
 					name="John Doe Tes"

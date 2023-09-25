@@ -195,7 +195,7 @@
 	}
 
 	.menu-toggler {
-		@apply lg:hidden;
+		@apply lg:hidden text-light-80;
 	}
 
 	.navbar-menu {
