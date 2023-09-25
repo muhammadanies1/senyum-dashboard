@@ -4,6 +4,12 @@ import {render} from "@testing-library/react";
 
 import Login from "./page";
 
+jest.mock("next/navigation", () => ({
+	useRouter: () => ({
+		...jest.requireActual("next/navigation").useRouter,
+	}),
+}));
+
 describe("Login Component", () => {
 	it("renders the Login form", () => {
 		const {getByTestId} = render(<Login />);

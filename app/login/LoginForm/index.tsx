@@ -1,19 +1,26 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import React, {FunctionComponent, HTMLAttributes} from "react";
+import {useRouter} from "next/navigation";
+import React, {
+	FunctionComponent,
+	HTMLAttributes,
+	useCallback,
+	useState,
+} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
 import Button from "@/components/atoms/Button";
 import FormGroup from "@/components/atoms/FormGroup";
+import FormIcon from "@/components/atoms/FormIcon";
 import FormMessage from "@/components/atoms/FormMessage";
 import Input from "@/components/atoms/Input";
 import Label from "@/components/atoms/Label";
+import Toast from "@/components/molecules/Toast";
+import {ApiResponse} from "@/types/ApiResponse";
+import {faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 import {yupResolver} from "@hookform/resolvers/yup";
-
-import EyeVisibleIcon from "./eye-visible.svg";
 
 type LoginFormProps = HTMLAttributes<HTMLDivElement>;
 
@@ -29,6 +36,16 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 	className,
 	...attrs
 }) => {
+	const [isShowToast, setIsShowToast] = useState<boolean>(false);
+
+	const [toastMessage, setToastMessage] = useState<string>();
+
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
+
+	const router = useRouter();
+
 	const {
 		control,
 		handleSubmit,
@@ -42,13 +59,49 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 		mode: "all",
 	});
 
-	const onSubmit = (data: yup.InferType<typeof schema>) => {
-		alert(JSON.stringify(data));
+	const fetchLogin = useCallback(
+		async (data: yup.InferType<typeof schema>) => {
+			setIsShowToast(false);
+			setToastMessage(undefined);
+
+			try {
+				setIsLoading(true);
+				const res = await fetch("/api/login", {
+					method: "POST",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				});
+
+				if (!res.ok) {
+					const errRes = JSON.parse(await res.text());
+					throw errRes;
+				}
+				router.push("/");
+			} catch (error) {
+				const errorData: ApiResponse = error as ApiResponse;
+				if (errorData.responseDescription === "RESOURCE_NOT_FOUND") {
+					setIsShowToast(true);
+					setToastMessage("Username atau password tidak valid.");
+				}
+			}
+			setIsLoading(false);
+		},
+		[router],
+	);
+
+	const onSubmit = async (data: yup.InferType<typeof schema>) => {
+		let timeout: NodeJS.Timeout | undefined = undefined;
+		timeout && clearTimeout(timeout);
+		timeout = setTimeout(() => {
+			fetchLogin(data);
+		}, 200);
 	};
 
 	return (
 		<div
-			data-testid="login-form"
 			className={"login-form".concat(className ? ` ${className}` : "")}
 			{...attrs}
 		>
@@ -64,9 +117,16 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 								id="username"
 								{...field}
 								variant={error ? "error" : undefined}
+								data-testid="username"
 							/>
 							{error ? (
-								<FormMessage variant="danger">{error.message}</FormMessage>
+								<FormMessage
+									variant="danger"
+									id="username-error-message"
+									data-testid="username-error-message"
+								>
+									{error.message}
+								</FormMessage>
 							) : (
 								false
 							)}
@@ -79,29 +139,29 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 					render={({field, fieldState: {error}}) => (
 						<FormGroup>
 							<Label htmlFor="password">Password</Label>
-							<div className="relative">
+							<FormIcon
+								icon={isUnmaskPassword ? faEyeSlash : faEye}
+								iconWrapperTag="button"
+								onClickIcon={() => setIsUnmaskPassword((state) => !state)}
+								data-testid="password-form-icon"
+							>
 								<Input
 									id="password"
-									type="password"
+									type={isUnmaskPassword ? "text" : "password"}
 									{...field}
 									variant={error ? "error" : undefined}
 									className="pr-10"
 									data-testid="password"
 								/>
-								<button
-									type="button"
-									className="absolute w-5 h-5 top-3.5 right-3 z-10"
-								>
-									<Image
-										src={EyeVisibleIcon}
-										alt="eye-visible"
-										width={20}
-										height={20}
-									/>
-								</button>
-							</div>
+							</FormIcon>
 							{error ? (
-								<FormMessage variant="danger">{error.message}</FormMessage>
+								<FormMessage
+									variant="danger"
+									id="password-error-message"
+									data-testid="password-error-message"
+								>
+									{error.message}
+								</FormMessage>
 							) : (
 								false
 							)}
@@ -109,7 +169,12 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 					)}
 				/>
 				<div className="text-right mt-4">
-					<Link href="#" className="text-primary-80 text-sm font-medium">
+					<Link
+						id="forgot-password"
+						data-testid="forgot-password"
+						href="#"
+						className="text-primary-80 text-sm font-medium"
+					>
 						Lupa Password?
 					</Link>
 				</div>
@@ -118,12 +183,23 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 					size="lg"
 					variant="primary"
 					className="w-full mt-4"
-					disabled={!isValid}
+					disabled={!isValid || isLoading}
 					data-testid="submit-btn"
 				>
 					Masuk
 				</Button>
 			</form>
+
+			<Toast
+				id="toast"
+				data-testid="toast"
+				isShow={isShowToast}
+				handleClose={() => {
+					setIsShowToast(false);
+				}}
+			>
+				{toastMessage}
+			</Toast>
 		</div>
 	);
 };

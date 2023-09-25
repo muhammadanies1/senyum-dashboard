@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
+    "test:watch": "jest --watch",
     "format": "npx prettier . --write",
     "prepare": "husky install"
   },
@@ -27,6 +28,11 @@
   },
   "homepage": "https://bitbucket.org/bridce/senyum-dashboard#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-brands-svg-icons": "^6.4.2",
+    "@fortawesome/free-regular-svg-icons": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@hookform/resolvers": "^3.3.1",
     "@testing-library/user-event": "^14.5.1",
     "next": "^13.4.19",
