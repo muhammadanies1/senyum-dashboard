@@ -13,7 +13,7 @@ RUN npm install -f
 RUN npm run build
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get -y -q install tzdata && \
+RUN apt-get -y -q install tzdata curl && \
     apt -y autoremove && \
     rm -rf /var/lib/apt/lists/*
 
