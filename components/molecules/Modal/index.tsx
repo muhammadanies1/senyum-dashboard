@@ -19,6 +19,12 @@ const Modal = (props: Props) => {
 
 	const modalRef = useRef<HTMLDivElement>(null);
 
+	const [isMounted, setIsMounted] = useState<boolean>(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
 	useEffect(() => {
 		if (isShow) {
 			document.body.style.overflow = "hidden";
@@ -61,6 +67,10 @@ const Modal = (props: Props) => {
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isShow]);
+
+	if (!isMounted) {
+		return false;
+	}
 
 	return (
 		<React.Fragment>

@@ -3,6 +3,7 @@ import React, {
 	HTMLAttributes,
 	useEffect,
 	useRef,
+	useState,
 } from "react";
 import {createPortal} from "react-dom";
 
@@ -20,6 +21,8 @@ const Toast: FunctionComponent<ToastProps> = ({
 }) => {
 	const toastContainerRef = useRef<HTMLDivElement>(null);
 
+	const [isMounted, setIsMounted] = useState<boolean>(false);
+
 	useEffect(() => {
 		if (isShow) {
 			toastContainerRef.current?.classList.add("flex");
@@ -35,6 +38,14 @@ const Toast: FunctionComponent<ToastProps> = ({
 			}, 50);
 		}
 	}, [isShow]);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
+	if (!isMounted) {
+		return false;
+	}
 
 	return (
 		<React.Fragment>
