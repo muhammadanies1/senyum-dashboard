@@ -53,6 +53,9 @@ module.exports = {
 					40: "#292929",
 				},
 			},
+			boxShadow: {
+				"level-2": "0px 8px 20px 0px rgba(119, 119, 119, 0.10)",
+			},
 		},
 	},
 	plugins: [],
