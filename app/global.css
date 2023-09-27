@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "~@fortawesome/fontawesome-free/css/all.css";
 
 @layer components {
 	/* ===== BUTTON ===== */
@@ -214,7 +215,26 @@
 	/* ===== CONTAINER ===== */
 	.wrapper {
 		min-height: calc(100vh - 56px);
-		@apply mx-auto;
+		@apply mx-auto bg-[#EFF3F6];
+	}
+
+	.inner-wrapper {
+		min-height: calc(100vh - 56px);
+		@apply flex;
+	}
+
+	/* ===== SIDEBAR ===== */
+	.sidebar {
+		width: 268px;
+		@apply bg-white rounded-r-2xl h-full p-4 flex flex-col gap-4;
+	}
+
+	.sidebar .menu {
+		@apply flex flex-row items-center gap-2 rounded-lg bg-white py-4 pr-4 h-11 w-full font-semibold text-light-80 text-sm;
+	}
+
+	.sidebar .menu.active {
+		@apply bg-primary-80 text-white pl-4;
 	}
 
 	/* ===== LOGIN FORM ===== */
@@ -243,5 +263,137 @@
 	/* ===== FILTER BUTTON ===== */
 	.filter-button {
 		@apply h-8 w-[100px] p-2 flex items-center justify-center rounded-xl gap-4 bg-primary-10 text-dark-40 font-medium text-base;
+	}
+
+	/* ==== SIDEBAR MENU ITEM ==== */
+	.sidebar-menu-item {
+		@apply flex flex-row items-center gap-2 cursor-pointer rounded-lg bg-white p-4 h-11 w-full font-semibold text-light-80 text-sm;
+	}
+
+	.sidebar-menu-item.active {
+		@apply bg-primary-80 text-white;
+	}
+
+	/* ===== CHECKBOX ===== */
+	.checkbox-label {
+		@apply flex gap-2 items-center;
+	}
+
+	.checkbox-label input {
+		display: none;
+	}
+
+	.checkbox-outer {
+		border-width: 1.5 !important;
+		@apply w-6 h-6 border border-light-80 bg-white rounded-[3px] relative;
+	}
+
+	.checkbox-label input:checked ~ .checkbox-outer {
+		@apply bg-primary-80 border-primary-80;
+	}
+
+	.checkbox-checkmark {
+		top: 2px !important;
+		right: 7px !important;
+		@apply w-2 h-3.5 border-b-2 border-r-2 transform rotate-45 absolute top-0.5 hidden;
+	}
+
+	.checkbox-label input:checked ~ .checkbox-outer .checkbox-checkmark {
+		@apply block;
+	}
+
+	.checkbox-label .text {
+		@apply text-sm font-semibold text-dark-40;
+	}
+
+	/* ===== FILTER ADMIN ===== */
+	.dropdown-outer-container {
+		@apply relative inline-block text-left;
+	}
+
+	.container-dropdown {
+		@apply flex flex-col gap-4;
+	}
+
+	.header-filter-admin {
+		@apply flex justify-between items-center;
+	}
+
+	.header-filter-admin-name {
+		@apply font-bold text-xl text-dark-40;
+	}
+
+	.header-filter-admin-action {
+		@apply font-semibold text-base text-primary-80 cursor-pointer;
+	}
+
+	.container-dropdown hr {
+		@apply w-full border border-[#EAEBEB];
+	}
+
+	.container-filter-date {
+		@apply flex flex-col gap-2.5;
+	}
+
+	.container-filter-date .label-date,
+	.container-filter-partner .label-partner {
+		@apply font-semibold text-base text-dark-40;
+	}
+
+	.container-date-range {
+		@apply flex justify-between;
+	}
+
+	.container-date-range .from,
+	.container-date-range .until {
+		@apply w-[9.75rem] flex flex-col gap-2;
+	}
+
+	.container-date-range .from .text,
+	.container-date-range .until .text {
+		@apply font-medium text-xs text-dark-40;
+	}
+
+	.container-filter-partner {
+		@apply flex flex-col py-2 gap-2;
+	}
+
+	.container-filter-partner .container-items {
+		@apply flex flex-col gap-2;
+	}
+
+	.container-filter-partner .container-items .row {
+		@apply flex flex-row;
+	}
+	.container-filter-partner .container-items .row .items {
+		@apply flex flex-row w-[10.25rem] gap-2 items-center;
+	}
+
+	/* ===== TABLE ===== */
+	.table-container {
+		@apply w-full overflow-x-auto;
+	}
+
+	.table {
+		@apply w-full;
+	}
+
+	.table th,
+	.table td {
+		@apply p-4 border-b border-gray-200 text-sm font-semibold text-left;
+	}
+
+	.table th {
+		@apply text-light-50;
+	}
+
+	/* ===== CARD ===== */
+	.card {
+		@apply bg-white rounded-xl p-4;
+	}
+
+	/* ===== PAGE TITLE ===== */
+	.page-title {
+		@apply font-bold text-xl text-dark-40;
 	}
 }

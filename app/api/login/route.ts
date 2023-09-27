@@ -30,8 +30,8 @@ export async function POST(request: Request) {
 		);
 
 		if (!apiResponse.ok) {
-			const errorResponse = await apiResponse.json();
-			return NextResponse.json(errorResponse, {status: 400});
+			const errorResponse = JSON.parse(await apiResponse.json());
+			return NextResponse.json(errorResponse, {status: apiResponse.status});
 		}
 
 		const data: LoginResponse = await apiResponse.json();
@@ -42,13 +42,13 @@ export async function POST(request: Request) {
 
 		res.cookies.set({
 			name: "TOKEN",
-			value: `TOKEN=${data.data.accessToken}`,
+			value: data.data.accessToken,
 			path: "/",
 		});
 
 		res.cookies.set({
 			name: "REFRESH_TOKEN",
-			value: `TOKEN=${data.data.accessToken}`,
+			value: data.data.accessToken,
 			path: "/",
 		});
 
