@@ -52,6 +52,10 @@ module.exports = {
 					20: "#525252",
 					40: "#292929",
 				},
+				blue: {
+					10: "#CCE8FF",
+					80: "#1078CA",
+				},
 			},
 			boxShadow: {
 				"level-2": "0px 8px 20px 0px rgba(119, 119, 119, 0.10)",

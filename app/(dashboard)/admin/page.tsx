@@ -1,11 +1,13 @@
 "use client";
 
 import {UserCollectionResponse} from "app/api/user/route";
+import ModalDeleteUser from "app/modal-delete-user";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import ReactPaginate from "react-paginate";
 
 import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
+import FilterUser from "@/components/atoms/FilterUser";
 import Input from "@/components/atoms/Input";
 import PageTitle from "@/components/atoms/PageTitle";
 import Table from "@/components/atoms/Table";
@@ -13,39 +15,49 @@ import TableContainer from "@/components/atoms/TableContainer";
 
 const Admin = () => {
 	const [data, setData] = useState<UserCollectionResponse>();
+	const [page, setPage] = useState<number>(1);
+	const [isShowModalDelete, setIsShowModalDelete] = useState<boolean>(false);
 
-	const fetchData = useCallback(async () => {
-		try {
-			const res = await fetch("/api/user?page=1&limit=20", {
-				method: "GET",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-			});
+	const fetchData = useCallback(
+		async (page: number) => {
+			try {
+				const res = await fetch(`/api/user?page=${page}&limit=10`, {
+					method: "GET",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+					},
+				});
 
-			if (!res.ok) {
-				const errRes = JSON.parse(await res.text());
-				throw errRes;
-			}
+				if (!res.ok) {
+					const errRes = JSON.parse(await res.text());
+					throw errRes;
+				}
 
-			setData(await res.json());
-		} catch (error) {}
-	}, []);
+				setData(await res.json());
+			} catch (error) {}
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[data, page],
+	);
 
-	const handlePageClick = useCallback((event: {selected: number}) => {
-		console.log(event.selected);
-	}, []);
+	const handlePageClick = useCallback(
+		(event: {selected: number}) => {
+			setPage(event.selected + 1);
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[page],
+	);
 
 	const pageCount = useMemo(() => {
 		const total = data?.data.recordsFiltered || 0;
-		return total / 20;
+		return total / 10;
 	}, [data?.data.recordsFiltered]);
 
 	useEffect(() => {
-		fetchData();
+		fetchData(page);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [page]);
 
 	return (
 		<Card className="flex flex-col gap-6">
@@ -58,20 +70,17 @@ const Admin = () => {
 			</div>
 
 			<div className="flex justify-between items-center">
-				<Input placeholder="Cari Nama/NIK/No Telp" className="w-[25.875rem]" />
+				<Input
+					placeholder="Cari Username/Nama/Email"
+					className="w-[25.875rem]"
+				/>
 			</div>
 
 			<div className="flex gap-4 items-center">
-				<span className="font-medium text-base text-dark-20"> Filter </span>
-				<div className="border border-light-30 text-xs font-semibold text-light-70 rounded-xl w-[98px] h-[32px] bg-light-10 flex justify-center items-center">
-					<span> Super Admin </span>
-				</div>
-				<div className="border border-light-30 text-xs font-semibold text-light-70 rounded-xl w-[98px] h-[32px] bg-light-10 flex justify-center items-center">
-					<span> Admin </span>
-				</div>
-				<div className="border border-light-30 text-xs font-semibold text-light-70 rounded-xl w-[98px] h-[32px] bg-light-10 flex justify-center items-center">
-					<span> Viewer </span>
-				</div>
+				<span className="title-filter"> Filter </span>
+				<FilterUser>Super Admin</FilterUser>
+				<FilterUser>Admin</FilterUser>
+				<FilterUser>Viewer</FilterUser>
 			</div>
 
 			<TableContainer>
@@ -108,12 +117,15 @@ const Admin = () => {
 				</Table>
 			</TableContainer>
 			<ReactPaginate
+				className="container-pagination"
+				pageLinkClassName="page-link"
+				activeClassName="page-active"
 				breakLabel="..."
-				nextLabel="next >"
+				nextLabel={null}
 				onPageChange={handlePageClick}
 				pageRangeDisplayed={5}
 				pageCount={pageCount}
-				previousLabel="< previous"
+				previousLabel={null}
 				renderOnZeroPageCount={null}
 			/>
 		</Card>
