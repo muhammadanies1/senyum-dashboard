@@ -31,10 +31,27 @@ export async function POST(request: Request) {
 
 		if (!apiResponse.ok) {
 			const errorResponse = JSON.parse(await apiResponse.text());
+			console.log(
+				JSON.stringify({
+					status: apiResponse.ok,
+					url: apiResponse.url,
+					body: requestData,
+					error: errorResponse,
+				}),
+			);
 			return NextResponse.json(errorResponse, {status: apiResponse.status});
 		}
 
 		const data: LoginResponse = await apiResponse.json();
+
+		console.log(
+			JSON.stringify({
+				status: apiResponse.ok,
+				url: apiResponse.url,
+				body: requestData,
+				data,
+			}),
+		);
 
 		const res = NextResponse.json(data, {
 			status: apiResponse.status,
