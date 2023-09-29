@@ -1,5 +1,6 @@
+import {AxiosResponse, isAxiosError} from "axios";
+import axiosInstance from "config/axios";
 import {NextResponse} from "next/server";
-import fetch from "node-fetch";
 
 import {ApiResponse} from "@/types/ApiResponse";
 
@@ -18,60 +19,33 @@ export type LoginResponse = ApiResponse<ResponseData>;
 export async function POST(request: Request) {
 	try {
 		const requestData: LoginPayload = await request.json();
-		const apiResponse = await fetch(
-			process.env.API_BFF_URL + "/api/v1/users-dashboard/login",
-			{
-				method: "POST",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(requestData),
-			},
+		const apiResponse: AxiosResponse<LoginResponse> = await axiosInstance.post(
+			"/api/v1/users-dashboard/login",
+			requestData,
 		);
 
-		if (!apiResponse.ok) {
-			const errorResponse = JSON.parse(await apiResponse.text());
-			console.log(
-				JSON.stringify({
-					status: apiResponse.ok,
-					url: apiResponse.url,
-					body: requestData,
-					error: errorResponse,
-				}),
-			);
-			return NextResponse.json(errorResponse, {status: apiResponse.status});
-		}
-
-		const data: LoginResponse = (await apiResponse.json()) as LoginResponse;
-
-		console.log(
-			JSON.stringify({
-				status: apiResponse.ok,
-				url: apiResponse.url,
-				body: requestData,
-				data,
-			}),
-		);
-
-		const res = NextResponse.json(data, {
+		const res = NextResponse.json(apiResponse.data, {
 			status: apiResponse.status,
 		});
 
 		res.cookies.set({
 			name: "TOKEN",
-			value: data.data.accessToken,
+			value: apiResponse.data.data.accessToken,
 			path: "/",
 		});
 
 		res.cookies.set({
 			name: "REFRESH_TOKEN",
-			value: data.data.accessToken,
+			value: apiResponse.data.data.refreshToken,
 			path: "/",
 		});
 
 		return res;
 	} catch (error) {
-		throw error;
+		if (isAxiosError(error)) {
+			return NextResponse.json(error, {
+				status: error.response?.status,
+			});
+		}
 	}
 }
