@@ -168,12 +168,28 @@
 	}
 
 	/* ===== FORM ICON ===== */
-	.form-icon-wrapper {
+	.form-icon {
 		@apply relative;
 	}
 
-	.form-icon-wrapper .icon-wrapper {
+	.form-icon .icon {
 		@apply absolute w-5 h-5 top-3.5 right-3 z-10 text-light-80 flex items-center justify-center;
+	}
+
+	.form-icon.icon-left .icon {
+		@apply left-3;
+	}
+
+	.form-icon.icon-left .input {
+		@apply pl-10;
+	}
+
+	.form-icon.icon-right .icon {
+		@apply right-3;
+	}
+
+	.form-icon.icon-right .input {
+		@apply pr-10;
 	}
 
 	/* ===== FORM MESSAGE ===== */
@@ -310,6 +326,15 @@
 		@apply text-sm font-semibold text-dark-40;
 	}
 
+	/* CHECKBOX FILTER */
+	.checkbox-filter {
+		@apply border border-light-30 text-xs font-semibold text-light-70 rounded-xl w-[98px] h-[32px] bg-light-10 flex justify-center items-center cursor-pointer select-none;
+	}
+
+	.checkbox-filter.active {
+		@apply border border-blue-80 text-xs font-semibold text-blue-80 rounded-xl w-[98px] h-[32px] bg-blue-10 flex justify-center items-center cursor-pointer;
+	}
+
 	/* ===== FILTER ADMIN ===== */
 	.dropdown-outer-container {
 		@apply relative inline-block text-left;
@@ -399,19 +424,6 @@
 	/* ===== PAGE TITLE ===== */
 	.page-title {
 		@apply font-bold text-xl text-dark-40;
-	}
-
-	/* ===== FILTER USER ===== */
-	.title-filter {
-		@apply font-medium text-base text-dark-20;
-	}
-
-	.filter-user {
-		@apply border border-light-30 text-xs font-semibold text-light-70 rounded-xl w-[98px] h-[32px] bg-light-10 flex justify-center items-center cursor-pointer;
-	}
-
-	.filter-user.active {
-		@apply border border-blue-80 text-xs font-semibold text-blue-80 rounded-xl w-[98px] h-[32px] bg-blue-10 flex justify-center items-center cursor-pointer;
 	}
 
 	/* ===== PAGINATION ===== */

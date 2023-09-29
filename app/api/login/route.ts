@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 		);
 
 		if (!apiResponse.ok) {
-			const errorResponse = JSON.parse(await apiResponse.json());
+			const errorResponse = JSON.parse(await apiResponse.text());
 			return NextResponse.json(errorResponse, {status: apiResponse.status});
 		}
 
