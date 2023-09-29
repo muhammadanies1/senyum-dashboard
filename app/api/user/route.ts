@@ -53,6 +53,13 @@ export async function GET(req: NextRequest) {
 
 		if (!apiResponse.ok) {
 			const errorResponse = JSON.parse(await apiResponse.text());
+			console.log(
+				JSON.stringify({
+					status: apiResponse.ok,
+					url: apiResponse.url,
+					error: errorResponse,
+				}),
+			);
 			return NextResponse.json(errorResponse, {status: apiResponse.status});
 		}
 

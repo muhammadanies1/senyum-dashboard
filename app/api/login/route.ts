@@ -31,6 +31,14 @@ export async function POST(request: Request) {
 
 		if (!apiResponse.ok) {
 			const errorResponse = JSON.parse(await apiResponse.text());
+			console.log(
+				JSON.stringify({
+					status: apiResponse.ok,
+					url: apiResponse.url,
+					body: requestData,
+					error: errorResponse,
+				}),
+			);
 			return NextResponse.json(errorResponse, {status: apiResponse.status});
 		}
 
