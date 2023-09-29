@@ -58,9 +58,18 @@ export async function GET(req: NextRequest) {
 
 		const data: UserCollectionResponse = await apiResponse.json();
 
+		console.log(
+			JSON.stringify({
+				status: apiResponse.ok,
+				url: apiResponse.url,
+				data,
+			}),
+		);
+
 		const res = NextResponse.json(data, {
 			status: apiResponse.status,
 		});
+
 		return res;
 	} catch (error) {
 		throw error;
