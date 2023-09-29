@@ -12,9 +12,12 @@ module.exports = {
 		extend: {
 			colors: {
 				light: {
+					10: "#F8F9F9",
 					20: "#EAEBEB",
 					30: "#D3D4D4",
+					50: "#A3A3A3",
 					60: "#929393",
+					70: "#848484",
 					80: "#777777",
 				},
 				primary: {
@@ -46,8 +49,16 @@ module.exports = {
 				},
 				dark: {
 					10: "#666666",
+					20: "#525252",
 					40: "#292929",
 				},
+				blue: {
+					10: "#CCE8FF",
+					80: "#1078CA",
+				},
+			},
+			boxShadow: {
+				"level-2": "0px 8px 20px 0px rgba(119, 119, 119, 0.10)",
 			},
 		},
 	},

@@ -19,7 +19,6 @@ import Input from "@/components/atoms/Input";
 import Label from "@/components/atoms/Label";
 import Toast from "@/components/molecules/Toast";
 import {ApiResponse} from "@/types/ApiResponse";
-import {faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 type LoginFormProps = HTMLAttributes<HTMLDivElement>;
@@ -139,12 +138,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 					render={({field, fieldState: {error}}) => (
 						<FormGroup>
 							<Label htmlFor="password">Password</Label>
-							<FormIcon
-								icon={isUnmaskPassword ? faEyeSlash : faEye}
-								iconWrapperTag="button"
-								onClickIcon={() => setIsUnmaskPassword((state) => !state)}
-								data-testid="password-form-icon"
-							>
+							<FormIcon data-testid="password-form-icon">
 								<Input
 									id="password"
 									type={isUnmaskPassword ? "text" : "password"}
@@ -153,6 +147,17 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 									className="pr-10"
 									data-testid="password"
 								/>
+								<button
+									className="icon"
+									type="button"
+									onClick={() => setIsUnmaskPassword(!isUnmaskPassword)}
+								>
+									{isUnmaskPassword ? (
+										<i className="fas fa-eye-slash"></i>
+									) : (
+										<i className="fas fa-eye"></i>
+									)}
+								</button>
 							</FormIcon>
 							{error ? (
 								<FormMessage

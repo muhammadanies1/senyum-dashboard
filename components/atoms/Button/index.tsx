@@ -1,7 +1,7 @@
 import React, {ButtonHTMLAttributes} from "react";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-	variant?: "primary" | "secondary" | "danger";
+	variant?: "primary" | "secondary" | "danger" | "primary-outline";
 	size?: "sm" | "md" | "lg";
 	transparent?: boolean;
 	bordered?: boolean;
