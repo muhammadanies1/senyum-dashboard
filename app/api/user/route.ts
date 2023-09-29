@@ -1,6 +1,7 @@
+import {AxiosResponse, isAxiosError} from "axios";
+import axiosInstance from "config/axios";
 import {cookies} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
-import fetch from "node-fetch";
 
 import {ApiResponse} from "@/types/ApiResponse";
 import {PaginationResponse} from "@/types/PaginationResponse";
@@ -43,44 +44,23 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
-		const apiResponse = await fetch(url, {
-			method: "GET",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-				Authorization: decodeURIComponent(token?.value || ""),
-			},
-		});
+		const apiResponse: AxiosResponse<UserCollectionResponse> =
+			await axiosInstance.get(url, {
+				headers: {
+					Authorization: token?.value,
+				},
+			});
 
-		if (!apiResponse.ok) {
-			const errorResponse = JSON.parse(await apiResponse.text());
-			console.log(
-				JSON.stringify({
-					status: apiResponse.ok,
-					url: apiResponse.url,
-					error: errorResponse,
-				}),
-			);
-			return NextResponse.json(errorResponse, {status: apiResponse.status});
-		}
-
-		const data: UserCollectionResponse =
-			(await apiResponse.json()) as UserCollectionResponse;
-
-		console.log(
-			JSON.stringify({
-				status: apiResponse.ok,
-				url: apiResponse.url,
-				data,
-			}),
-		);
-
-		const res = NextResponse.json(data, {
+		const res = NextResponse.json(apiResponse.data, {
 			status: apiResponse.status,
 		});
 
 		return res;
 	} catch (error) {
-		throw error;
+		if (isAxiosError(error)) {
+			return NextResponse.json(error, {
+				status: error.response?.status,
+			});
+		}
 	}
 }
