@@ -4,6 +4,7 @@ const axiosInstance = axios.create({
 	baseURL: process.env.API_BFF_URL,
 	headers: {
 		"Content-Type": "application/json",
+		Connection: "keep-alive",
 	},
 });
 
