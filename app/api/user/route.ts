@@ -1,5 +1,6 @@
 import {cookies} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
+import fetch from "node-fetch";
 
 import {ApiResponse} from "@/types/ApiResponse";
 import {PaginationResponse} from "@/types/PaginationResponse";
@@ -63,7 +64,8 @@ export async function GET(req: NextRequest) {
 			return NextResponse.json(errorResponse, {status: apiResponse.status});
 		}
 
-		const data: UserCollectionResponse = await apiResponse.json();
+		const data: UserCollectionResponse =
+			(await apiResponse.json()) as UserCollectionResponse;
 
 		console.log(
 			JSON.stringify({

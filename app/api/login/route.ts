@@ -1,4 +1,5 @@
 import {NextResponse} from "next/server";
+import fetch from "node-fetch";
 
 import {ApiResponse} from "@/types/ApiResponse";
 
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
 			return NextResponse.json(errorResponse, {status: apiResponse.status});
 		}
 
-		const data: LoginResponse = await apiResponse.json();
+		const data: LoginResponse = (await apiResponse.json()) as LoginResponse;
 
 		console.log(
 			JSON.stringify({
