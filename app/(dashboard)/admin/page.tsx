@@ -1,14 +1,12 @@
 "use client";
 
-import {UserCollectionResponse} from "app/api/user/route";
-import {Fragment, useCallback, useEffect, useMemo, useState} from "react";
+import {AxiosResponse} from "axios";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 
-import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
-import FilterUser from "@/components/atoms/FilterUser";
 import FormGroup from "@/components/atoms/FormGroup";
 import FormIcon from "@/components/atoms/FormIcon";
 import FormMessage from "@/components/atoms/FormMessage";
@@ -17,7 +15,12 @@ import Label from "@/components/atoms/Label";
 import PageTitle from "@/components/atoms/PageTitle";
 import Table from "@/components/atoms/Table";
 import TableContainer from "@/components/atoms/TableContainer";
+import axiosInstance from "@/config/client/axios";
+import {UserCollectionParams} from "@/types/UserCollectionParams";
+import {UserCollectionResponse} from "@/types/UserCollectionResponse";
 import {yupResolver} from "@hookform/resolvers/yup";
+
+import ModalAddUser from "./add-user";
 
 const schema = yup.object({
 	search: yup.string().optional(),
@@ -28,8 +31,13 @@ const schema = yup.object({
 });
 
 const Admin = () => {
+	const [params, setParams] = useState<UserCollectionParams>({
+		page: 1,
+		limit: 10,
+	});
+
 	const [data, setData] = useState<UserCollectionResponse>();
-	const [page, setPage] = useState<number>(1);
+
 	const [isShowModalDelete, setIsShowModalDelete] = useState<boolean>(false);
 
 	const {control, handleSubmit, watch} = useForm({
@@ -43,22 +51,14 @@ const Admin = () => {
 		resolver: yupResolver(schema),
 	});
 
-	const fetchData = useCallback(async (page: number) => {
+	const fetchData = useCallback(async (params: UserCollectionParams) => {
 		try {
-			const res = await fetch(`/api/user?page=${page}&limit=10`, {
-				method: "GET",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-			});
+			const res: AxiosResponse<UserCollectionResponse> =
+				await axiosInstance.get("/api/user", {
+					params,
+				});
 
-			if (!res.ok) {
-				const errRes = JSON.parse(await res.text());
-				throw errRes;
-			}
-
-			setData(await res.json());
+			setData(res.data);
 		} catch (error) {}
 	}, []);
 
@@ -66,19 +66,25 @@ const Admin = () => {
 		console.log(data);
 	}, []);
 
-	const handlePageClick = useCallback((event: {selected: number}) => {
-		setPage(event.selected + 1);
-	}, []);
+	const handlePageClick = useCallback(
+		(event: {selected: number}) => {
+			const newParams = {...params, page: event.selected + 1};
+			setParams(newParams);
+
+			fetchData(newParams);
+		},
+		[fetchData, params],
+	);
 
 	const pageCount = useMemo(() => {
 		const total = data?.data.recordsFiltered || 0;
-		return total / 10;
+		return Math.ceil(total / 10);
 	}, [data?.data.recordsFiltered]);
 
 	useEffect(() => {
-		fetchData(page);
+		fetchData(params);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [page]);
+	}, []);
 
 	return (
 		<Card className="flex flex-col gap-6">
@@ -89,10 +95,17 @@ const Admin = () => {
 			>
 				<div className="flex justify-between items-center">
 					<PageTitle>Tabel User</PageTitle>
-					<Button variant="primary-outline" className="gap-2" type="button">
-						<i className="fa fa-circle-plus"></i>
-						Tambah User
-					</Button>
+					<ModalAddUser
+						onSuccess={() =>
+							fetchData({
+								...params,
+								page: 1,
+								search: undefined,
+								userId: undefined,
+								sortBy: undefined,
+							})
+						}
+					/>
 				</div>
 
 				<Controller

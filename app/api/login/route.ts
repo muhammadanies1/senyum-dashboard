@@ -1,5 +1,5 @@
 import {AxiosResponse, isAxiosError} from "axios";
-import axiosInstance from "config/axios";
+import axiosInstance from "config/server/axios";
 import {NextResponse} from "next/server";
 
 import {ApiResponse} from "@/types/ApiResponse";

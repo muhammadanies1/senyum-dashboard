@@ -20,6 +20,8 @@ const config: Config = {
 			"<rootDir>/__mocks__/fileMock.js",
 		"\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js",
 		"^@/components/(.*)$": "<rootDir>/components/$1",
+		"^@/mocks/(.*)$": "<rootDir>/mocks/$1",
+		"^@/config/(.*)$": "<rootDir>/config/$1",
 	},
 	collectCoverage: true,
 	testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.next/"],

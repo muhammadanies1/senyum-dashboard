@@ -1,22 +1,28 @@
 "use client";
 
-import Image from "next/image";
-import React, {HTMLAttributes, useState} from "react";
+import {nanoid} from "nanoid";
+import React, {
+	Fragment,
+	FunctionComponent,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
 import Button from "@/components/atoms/Button";
 import FormGroup from "@/components/atoms/FormGroup";
+import FormIcon from "@/components/atoms/FormIcon";
 import FormMessage from "@/components/atoms/FormMessage";
 import Input from "@/components/atoms/Input";
 import Label from "@/components/atoms/Label";
 import Radio from "@/components/atoms/Radio";
 import Modal from "@/components/molecules/Modal";
+import axiosInstance from "@/config/client/axios";
+import {CreateUserPayload} from "@/types/CreateUserPayload";
 import {yupResolver} from "@hookform/resolvers/yup";
-
-import HideVisibleIcon from "./eye-hide.svg";
-import EyeVisibleIcon from "./eye-visible.svg";
-import PlusCircleIcon from "./plus-circle.svg";
 
 const schema = yup.object({
 	username: yup.string().required("Username harus diisi."),
@@ -24,14 +30,22 @@ const schema = yup.object({
 	email: yup
 		.string()
 		.required("Email harus diisi.")
-		.email("Email harus berdomain @bri.co.id")
-		.test("is-bri-email", "Email harus berdomain @bri.co.id", function (value) {
-			return value.endsWith("@bri.co.id");
-		}),
-	type: yup
+		.email("Email harus berdomain @work.bri.co.id")
+		.test(
+			"is-bri-email",
+			"Email harus berdomain @work.bri.co.id",
+			function (value) {
+				return value.endsWith("@work.bri.co.id");
+			},
+		),
+	phoneNumber: yup
+		.string()
+		.required("Nomor Telepon harus diisi.")
+		.matches(/^\d+$/, "Nomor Telepon hanya boleh mengandung angka."),
+	userTypeId: yup
 		.mixed()
-		.oneOf(["admin", "viewer"], "Tipe user tidak valid.")
-		.required("Tipe user harus diisi."),
+		.oneOf(["ADMIN", "VIEWER"], "Tipe user tidak valid.")
+		.required("Tipe User harus dipilih."),
 	password: yup
 		.string()
 		.required("Password harus diisi.")
@@ -40,50 +54,110 @@ const schema = yup.object({
 			/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
 			"Password harus mempunyai setidaknya satu huruf, satu angka, dan satu simbol.",
 		),
+	passwordConfirm: yup
+		.string()
+		.required("Konfirmasi Password harus diisi.")
+		.oneOf(
+			[yup.ref("password")],
+			"Konfirmasi Password harus sama dengan Password.",
+		),
 });
 
-type Props = HTMLAttributes<HTMLDivElement>;
+type AddUserProps = {
+	onSuccess: () => Promise<void>;
+};
 
-const ModalAddUser = (props: Props) => {
-	const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
+const initialValue: yup.InferType<typeof schema> = {
+	username: "",
+	name: "",
+	email: "",
+	phoneNumber: "",
+	userTypeId: {},
+	password: "",
+	passwordConfirm: "",
+};
+
+const AddUser: FunctionComponent<AddUserProps> = ({onSuccess}) => {
+	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
+
+	const [isUnmaskPasswordConfirmation, setIsUnmaskPasswordConfirmation] =
+		useState<boolean>(false);
+
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
 	const [isShow, setIsShow] = useState<boolean>(false);
+
+	const clickTimeoutRef = useRef<NodeJS.Timeout>();
 
 	const {
 		control,
 		handleSubmit,
+		reset,
 		formState: {isValid},
 	} = useForm({
-		values: {
-			username: "",
-			name: "",
-			email: "",
-			type: {},
-			password: "",
-		},
+		values: {...initialValue},
 		resolver: yupResolver(schema),
 		mode: "all",
 	});
 
-	const handleIsShowPassword = () => {
-		setIsShowPassword((state) => !state);
+	const createUser = useCallback(
+		async (data: yup.InferType<typeof schema>) => {
+			try {
+				const payload: CreateUserPayload = {
+					...data,
+					deviceId: nanoid(),
+				};
+				setIsLoading(true);
+				await axiosInstance.post("/api/user", payload);
+				setIsShow(false);
+				await onSuccess();
+			} catch (error) {}
+			setIsLoading(false);
+		},
+		[onSuccess],
+	);
+
+	const submitForm = async (data: yup.InferType<typeof schema>) => {
+		let timeout: NodeJS.Timeout | undefined = undefined;
+		timeout && clearTimeout(timeout);
+		timeout = setTimeout(() => {
+			createUser(data);
+		}, 200);
 	};
 
-	const submitForm = (data: yup.InferType<typeof schema>) => {
-		alert(`data: ${JSON.stringify(data)}`);
-		setIsShow((state) => !state);
-	};
+	const handleClose = useCallback(() => {
+		if (!isLoading) {
+			setIsShow(false);
+		}
+	}, [isLoading]);
+
+	useEffect(() => {
+		if (!isShow) {
+			reset(initialValue);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isShow]);
 
 	return (
-		<>
+		<Fragment>
 			<Button
 				id="show-modal-btn"
 				data-testid="show-modal-btn"
-				onClick={() => setIsShow(true)}
+				onClick={() => {
+					if (clickTimeoutRef.current) {
+						clearTimeout(clickTimeoutRef.current);
+					}
+					clickTimeoutRef.current = setTimeout(() => {
+						setIsShow(true);
+					}, 100);
+				}}
 				bordered
-				className="w-[200px] gap-2"
+				variant="primary-outline"
+				className="gap-2"
+				type="button"
 			>
-				<Image src={PlusCircleIcon} alt="plus-circle" />
-				<span className="font-bold">Tambah User</span>
+				<i className="fa fa-circle-plus"></i>
+				Tambah User
 			</Button>
 
 			<Modal
@@ -91,14 +165,14 @@ const ModalAddUser = (props: Props) => {
 				data-testid="modal-form"
 				isShow={isShow}
 				className="w-[482px]"
-				onClickBackground={() => setIsShow((state) => !state)}
+				onClickBackground={handleClose}
 			>
 				<form className="flex flex-col" onSubmit={handleSubmit(submitForm)}>
 					<Modal.Header
 						id="modal-header"
 						data-testid="modal-header"
 						dismissable
-						handleClose={() => setIsShow((state) => !state)}
+						handleClose={handleClose}
 					>
 						Tambah User
 					</Modal.Header>
@@ -206,7 +280,40 @@ const ModalAddUser = (props: Props) => {
 						/>
 						<Controller
 							control={control}
-							name="type"
+							name="phoneNumber"
+							render={({field, fieldState: {error}}) => (
+								<FormGroup>
+									<Label
+										htmlFor="phone-number"
+										aria-label="Phone Number Label"
+										data-testid="label-phone-number"
+									>
+										Nomor Telepon
+									</Label>
+									<Input
+										id="phone-number"
+										data-testid="phone-number"
+										placeholder="Nomor Telepon"
+										{...field}
+										variant={error ? "error" : undefined}
+									/>
+									{error?.message ? (
+										<FormMessage
+											id="phone-number-error-message"
+											data-testid="phone-number-error-message"
+											variant="danger"
+										>
+											{error?.message}
+										</FormMessage>
+									) : (
+										false
+									)}
+								</FormGroup>
+							)}
+						/>
+						<Controller
+							control={control}
+							name="userTypeId"
 							render={({field: {value, onChange}, fieldState: {error}}) => (
 								<FormGroup>
 									<Label
@@ -223,8 +330,8 @@ const ModalAddUser = (props: Props) => {
 											data-testid="radio-admin"
 											name="usertype-option"
 											className="w-full"
-											value="admin"
-											checked={value === "admin"}
+											value="ADMIN"
+											checked={value === "ADMIN"}
 											onChange={onChange}
 										/>
 										<Radio
@@ -233,8 +340,8 @@ const ModalAddUser = (props: Props) => {
 											data-testid="radio-viewer"
 											name="usertype-option"
 											className="w-full"
-											value="viewer"
-											checked={value === "viewer"}
+											value="VIEWER"
+											checked={value === "VIEWER"}
 											onChange={onChange}
 										/>
 									</div>
@@ -264,40 +371,28 @@ const ModalAddUser = (props: Props) => {
 									>
 										Password
 									</Label>
-									<div className="relative">
+									<FormIcon data-testid="password-form-icon">
 										<Input
 											id="password"
 											data-testid="password"
-											placeholder="Password"
-											type={isShowPassword ? "text" : "password"}
+											type={isUnmaskPassword ? "text" : "password"}
 											{...field}
 											variant={error ? "error" : undefined}
-											className={"relative".concat(field.value ? " pr-10" : "")}
+											className="pr-10"
 										/>
-										{isShowPassword ? (
-											<Image
-												id="show-password-btn"
-												data-testid="show-password-btn"
-												src={EyeVisibleIcon}
-												alt="check-circle"
-												width={16}
-												height={16}
-												className="absolute top-[18px] right-3 hover:cursor-pointer"
-												onClick={handleIsShowPassword}
-											/>
-										) : (
-											<Image
-												id="show-password-btn"
-												data-testid="show-password-btn"
-												src={HideVisibleIcon}
-												alt="check-circle"
-												width={16}
-												height={16}
-												className="absolute top-[18px] right-3 hover:cursor-pointer"
-												onClick={handleIsShowPassword}
-											/>
-										)}
-									</div>
+										<button
+											className="icon"
+											type="button"
+											onClick={() => setIsUnmaskPassword(!isUnmaskPassword)}
+											data-testid="toggle-password-btn"
+										>
+											{isUnmaskPassword ? (
+												<i className="fas fa-eye-slash"></i>
+											) : (
+												<i className="fas fa-eye"></i>
+											)}
+										</button>
+									</FormIcon>
 									{error?.message ? (
 										<FormMessage
 											id="password-error-message"
@@ -318,15 +413,69 @@ const ModalAddUser = (props: Props) => {
 								</FormGroup>
 							)}
 						/>
+						<Controller
+							control={control}
+							name="passwordConfirm"
+							render={({field, fieldState: {error}}) => (
+								<FormGroup>
+									<Label
+										htmlFor="password-confirm"
+										aria-label="Password Confirm Label"
+										data-testid="label-password-confirm"
+									>
+										Konfirmasi Password
+									</Label>
+									<FormIcon data-testid="password-confirm-form-icon">
+										<Input
+											id="password-confirm"
+											data-testid="password-confirm"
+											type={isUnmaskPasswordConfirmation ? "text" : "password"}
+											{...field}
+											variant={error ? "error" : undefined}
+											className="pr-10"
+										/>
+										<button
+											className="icon"
+											type="button"
+											onClick={() =>
+												setIsUnmaskPasswordConfirmation(
+													!isUnmaskPasswordConfirmation,
+												)
+											}
+											data-testid="toggle-password-confirm-btn"
+										>
+											{isUnmaskPassword ? (
+												<i className="fas fa-eye-slash"></i>
+											) : (
+												<i className="fas fa-eye"></i>
+											)}
+										</button>
+									</FormIcon>
+									{error?.message ? (
+										<FormMessage
+											id="password-confirm-error-message"
+											data-testid="password-confirm-error-message"
+											aria-label="password-confirm-error-message"
+											variant="danger"
+											className="mt-1.5"
+										>
+											{error?.message}
+										</FormMessage>
+									) : (
+										false
+									)}
+								</FormGroup>
+							)}
+						/>
 					</Modal.Body>
 					<Modal.Footer id="modal-footer" data-testid="modal-footer">
 						<div>
 							<Button
 								id="submit-modal-btn"
-								data-testid="submit-modal-btn"
+								data-testid="add-user-modal-submit-btn"
 								variant="primary"
 								className="w-full"
-								disabled={!isValid}
+								disabled={!isValid || isLoading}
 							>
 								Tambah User
 							</Button>
@@ -334,8 +483,8 @@ const ModalAddUser = (props: Props) => {
 					</Modal.Footer>
 				</form>
 			</Modal>
-		</>
+		</Fragment>
 	);
 };
 
-export default ModalAddUser;
+export default AddUser;
