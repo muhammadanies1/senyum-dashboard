@@ -6,6 +6,9 @@ COPY . /app
 # directory position
 WORKDIR /app
 
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
+
 # install dependencies
 RUN npm install -f
 
@@ -19,6 +22,8 @@ RUN apt-get -y -q install tzdata curl && \
 
 ENV TZ=Asia/Jakarta
 
+# Expose the port your app runs on (Next.js typically uses port 3000)
+EXPOSE 3000
 
 # Running the app
 CMD ["npm", "start"]
