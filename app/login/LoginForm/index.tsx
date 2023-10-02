@@ -1,5 +1,6 @@
 "use client";
 
+import axios, {AxiosError} from "axios";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import React, {
@@ -18,6 +19,7 @@ import FormMessage from "@/components/atoms/FormMessage";
 import Input from "@/components/atoms/Input";
 import Label from "@/components/atoms/Label";
 import Toast from "@/components/molecules/Toast";
+import axiosInstance from "@/config/client/axios";
 import {ApiResponse} from "@/types/ApiResponse";
 import {yupResolver} from "@hookform/resolvers/yup";
 
@@ -65,25 +67,20 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 
 			try {
 				setIsLoading(true);
-				const res = await fetch("/api/login", {
-					method: "POST",
-					headers: {
-						Accept: "application/json",
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(data),
-				});
-
-				if (!res.ok) {
-					const errRes = JSON.parse(await res.text());
-					throw errRes;
-				}
+				await axiosInstance.post("/api/login", data);
 				router.push("/");
 			} catch (error) {
-				const errorData: ApiResponse = error as ApiResponse;
-				if (errorData.responseDescription === "RESOURCE_NOT_FOUND") {
-					setIsShowToast(true);
-					setToastMessage("Username atau password tidak valid.");
+				if (axios.isAxiosError(error)) {
+					const errorData: AxiosError<ApiResponse> = error;
+					const responseDescription =
+						errorData.response?.data.responseDescription;
+					switch (responseDescription) {
+						case "INVALID_USERNAME_OR_PASSWORD":
+						case "RESOURCE_NOT_FOUND":
+							setIsShowToast(true);
+							setToastMessage("Username atau password tidak valid.");
+							break;
+					}
 				}
 			}
 			setIsLoading(false);
