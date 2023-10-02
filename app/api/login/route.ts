@@ -1,7 +1,7 @@
 import {AxiosResponse, isAxiosError} from "axios";
-import axiosInstance from "config/axios";
 import {NextResponse} from "next/server";
 
+import axiosInstance from "@/config/server/axios";
 import {ApiResponse} from "@/types/ApiResponse";
 
 export type LoginPayload = {

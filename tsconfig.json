@@ -23,7 +23,10 @@
 		"paths": {
 			"@/components/*": ["components/*"],
 			"@/hooks/*": ["hooks/*"],
-			"@/types/*": ["types/*"]
+			"@/types/*": ["types/*"],
+			"@/config/*": ["config/*"],
+			"@/app/*": ["app/*"],
+			"@/mocks/*": ["mocks/*"]
 		},
 		"types": ["jest", "node", "@testing-library/jest-dom"]
 	},

@@ -1,40 +1,12 @@
 import {AxiosResponse, isAxiosError} from "axios";
-import axiosInstance from "config/axios";
-import {cookies} from "next/headers";
 import {NextRequest, NextResponse} from "next/server";
 
-import {ApiResponse} from "@/types/ApiResponse";
-import {PaginationResponse} from "@/types/PaginationResponse";
-
-export type UserCollectionParams = {
-	orderBy?: string;
-	draw?: number;
-	page?: number;
-	limit?: number;
-	userId?: string;
-	search?: string;
-	sortBy?: "asc" | "desc";
-};
-
-export type User = {
-	Password: string;
-	counter: number;
-	createdAt: string;
-	deviceId: string;
-	email: string;
-	id: number;
-	name: string;
-	phoneNumber: string;
-	updatedAt: string;
-	userTypeId: string;
-	username: string;
-};
-
-export type UserCollectionResponse = ApiResponse<PaginationResponse<User[]>>;
+import axiosInstance from "@/config/server/axios";
+import {CreateUserPayload} from "@/types/CreateUserPayload";
+import {CreateUserResponse} from "@/types/CreateUserResponse";
+import {UserCollectionResponse} from "@/types/UserCollectionResponse";
 
 export async function GET(req: NextRequest) {
-	const cookiesStore = cookies();
-	const token = cookiesStore.get("TOKEN");
 	const searchParams = req.url.split("?");
 
 	let url = process.env.API_BFF_URL + "/api/v1/users-dashboard/get";
@@ -45,11 +17,28 @@ export async function GET(req: NextRequest) {
 
 	try {
 		const apiResponse: AxiosResponse<UserCollectionResponse> =
-			await axiosInstance.get(url, {
-				headers: {
-					Authorization: token?.value,
-				},
+			await axiosInstance.get(url);
+
+		const res = NextResponse.json(apiResponse.data, {
+			status: apiResponse.status,
+		});
+
+		return res;
+	} catch (error) {
+		if (isAxiosError(error)) {
+			return NextResponse.json(error, {
+				status: error.response?.status,
 			});
+		}
+	}
+}
+
+export async function POST(req: NextRequest) {
+	try {
+		const requestData: CreateUserPayload = await req.json();
+
+		const apiResponse: AxiosResponse<CreateUserResponse> =
+			await axiosInstance.post("/api/v1/users-dashboard", requestData);
 
 		const res = NextResponse.json(apiResponse.data, {
 			status: apiResponse.status,

@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 
 const axiosInstance = axios.create({
-	baseURL: process.env.API_BFF_URL,
+	baseURL: "/",
 	headers: {
 		"Content-Type": "application/json",
 		Connection: "keep-alive",
@@ -24,8 +24,15 @@ axiosInstance.interceptors.response.use(
 		console.log(response);
 		return response;
 	},
-	function (error) {
-		console.log(error);
+	function (error: AxiosError) {
+		if (error.response?.status === 401) {
+			const cookies = document.cookie.split(";");
+			cookies.forEach((cookie) => {
+				document.cookie = cookie + "=;expires=" + new Date(0).toUTCString();
+			});
+
+			window.location.href = "/login";
+		}
 		return Promise.reject(error);
 	},
 );
