@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 		return res;
 	} catch (error) {
 		if (isAxiosError(error)) {
-			return NextResponse.json(error, {
+			return NextResponse.json(error.response?.data, {
 				status: error.response?.status,
 			});
 		}
