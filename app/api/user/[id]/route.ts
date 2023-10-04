@@ -22,13 +22,10 @@ export async function PATCH(
 		const res = NextResponse.json(apiResponse.data, {
 			status: apiResponse.status,
 		});
-
-		console.log(res);
 		return res;
 	} catch (error) {
-		console.log(error);
 		if (isAxiosError(error)) {
-			return NextResponse.json(error, {
+			return NextResponse.json(error.response?.data, {
 				status: error.response?.status,
 			});
 		}
@@ -55,7 +52,7 @@ export async function DELETE(req: NextRequest) {
 		return res;
 	} catch (error) {
 		if (isAxiosError(error)) {
-			return NextResponse.json(error, {
+			return NextResponse.json(error.response?.data, {
 				status: error.response?.status,
 			});
 		}

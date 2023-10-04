@@ -112,6 +112,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 							<Input
 								id="username"
 								{...field}
+								placeholder="Masukkan Personal Number/NIK"
 								variant={error ? "error" : undefined}
 								data-testid="username"
 							/>
@@ -143,6 +144,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 									variant={error ? "error" : undefined}
 									className="pr-10"
 									data-testid="password"
+									placeholder="Masukkan Password"
 								/>
 								<button
 									className="icon"

@@ -1,8 +1,18 @@
 import React from "react";
 
-import {fireEvent, render} from "@testing-library/react";
+import {fireEvent, render, waitFor} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import Navbar from "./";
+
+const mockedPush = jest.fn();
+
+jest.mock("next/navigation", () => ({
+	useRouter: () => ({
+		...jest.requireActual("next/navigation").useRouter,
+		push: mockedPush,
+	}),
+}));
 
 describe("Navbar component", () => {
 	it("renders without errors", () => {
@@ -53,5 +63,62 @@ describe("Navbar component", () => {
 
 		// Check if the menu is collapsed again
 		expect(navbarMenu).toHaveClass("collapsed");
+	});
+
+	it("close LogoutConfirmationModal when cancel button is clicked", async () => {
+		const {debug, getByTestId, container} = render(<Navbar isLoggedIn />);
+		debug(undefined, 300000);
+
+		const profileDropdown = getByTestId("profile-dropdown");
+		const profileDropdownTogglers =
+			profileDropdown.getElementsByClassName("dropdown-toggler");
+
+		if (!profileDropdownTogglers) {
+			throw new Error("Element does not exist.");
+		}
+
+		const profileDropdownToggler = profileDropdownTogglers[0];
+
+		fireEvent.click(profileDropdownToggler);
+
+		const dropdownMenus =
+			profileDropdown.getElementsByClassName("dropdown-menu");
+		if (!dropdownMenus) {
+			throw new Error("Element does not exist.");
+		}
+		const dropdownMenu = dropdownMenus[0];
+
+		await waitFor(() => {
+			expect(dropdownMenu).toHaveClass("active");
+		});
+
+		const logoutDropdownItem =
+			profileDropdown.getElementsByClassName("dropdown-item");
+
+		if (!logoutDropdownItem) {
+			throw new Error("Element does not exist.");
+		}
+
+		userEvent.click(logoutDropdownItem[0]);
+
+		await waitFor(() => {
+			expect(dropdownMenu).not.toHaveClass("active");
+		});
+
+		const logoutConfirmationModal = getByTestId("logout-confirmation-modal");
+		await waitFor(() => {
+			expect(logoutConfirmationModal.parentElement).toHaveClass(
+				"flex justify-center items-center",
+			);
+		});
+
+		const logoutConfirmationModalLogoutBtn = getByTestId(
+			"logout-confirmation-modal-logout-btn",
+		);
+		fireEvent.click(logoutConfirmationModalLogoutBtn);
+
+		await waitFor(() => {
+			expect(mockedPush).toHaveBeenCalled();
+		});
 	});
 });

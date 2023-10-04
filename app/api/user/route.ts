@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 		return res;
 	} catch (error) {
 		if (isAxiosError(error)) {
-			return NextResponse.json(error, {
+			return NextResponse.json(error.response?.data, {
 				status: error.response?.status,
 			});
 		}
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 		return res;
 	} catch (error) {
 		if (isAxiosError(error)) {
-			return NextResponse.json(error, {
+			return NextResponse.json(error.response?.data, {
 				status: error.response?.status,
 			});
 		}

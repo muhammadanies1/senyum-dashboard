@@ -210,11 +210,11 @@
 	/* ===== NAVBAR ===== */
 	.navbar {
 		box-shadow: 0px 5px 10px 0px rgba(214, 214, 214, 0.2);
-		@apply w-full min-h-[56px] p-3 bg-white;
+		@apply w-full min-h-[56px] py-3 px-4 bg-white;
 	}
 
 	.navbar-inner {
-		@apply flex flex-wrap lg:flex-nowrap justify-between items-center gap-4 max-w-7xl mx-auto;
+		@apply flex flex-wrap lg:flex-nowrap justify-between items-center gap-4 mx-auto;
 	}
 
 	.navbar-menu-container {
@@ -451,5 +451,37 @@
 
 	.page-active {
 		@apply bg-blue-10 w-[24px] h-[24px] flex justify-center items-center rounded;
+	}
+
+	/* ===== LOGOUT CONTAINER ===== */
+	.logout-container {
+		box-shadow: 0px 8px 20px 0px rgba(119, 119, 119, 0.1);
+		color: var(--neutral-light-light-80, #777);
+		@apply absolute bg-white  flex w-36 p-4 rounded-xl right-20 mt-32 cursor-pointer;
+	}
+
+	/* ===== DROPDOWN ===== */
+	.dropdown {
+		@apply relative;
+	}
+
+	.dropdown .dropdown-toggler {
+		@apply flex items-center gap-2;
+	}
+
+	.dropdown .dropdown-menu {
+		@apply z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow lg:w-44 absolute top-8 left-0 lg:left-auto bottom-auto right-auto lg:right-0 overflow-hidden;
+	}
+
+	.dropdown-menu.active {
+		@apply block;
+	}
+
+	.dropdown-menu .dropdown-item {
+		@apply block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer;
+	}
+
+	.dropdown-item.active {
+		@apply bg-gray-100;
 	}
 }
