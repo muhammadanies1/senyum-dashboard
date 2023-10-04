@@ -5,6 +5,12 @@ import {render} from "@testing-library/react";
 import {NavbarContext} from "../";
 import NavbarMenu from "./";
 
+jest.mock("next/navigation", () => ({
+	useRouter: () => ({
+		...jest.requireActual("next/navigation").useRouter,
+	}),
+}));
+
 describe("NavbarMenu component", () => {
 	it("renders without errors", () => {
 		render(
@@ -26,8 +32,8 @@ describe("NavbarMenu component", () => {
 	});
 
 	it("renders profile link", () => {
-		const {getByTitle} = render(<NavbarMenu />);
-		const profileLink = getByTitle("Profile");
+		const {getByTestId} = render(<NavbarMenu />);
+		const profileLink = getByTestId("profile-dropdown");
 		expect(profileLink).toBeInTheDocument();
 	});
 
