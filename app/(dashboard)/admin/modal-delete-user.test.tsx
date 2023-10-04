@@ -1,19 +1,20 @@
+import React from "react";
+
 import {fireEvent, render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 
 import ModalDeleteUser from "./modal-delete-user";
 
 describe("ModalDeleteUser", () => {
 	it("renders the 'Delete user' button", () => {
-		const {getByTestId} = render(<ModalDeleteUser />);
+		const {getByTestId} = render(<ModalDeleteUser idData={1} />);
 		const showModalButton = getByTestId("show-modal-btn");
 
 		expect(showModalButton).toBeInTheDocument();
 	});
 
 	it("opens the modal when the 'Delete user' button is clicked", async () => {
-		const {getByTestId} = render(<ModalDeleteUser />);
+		const {getByTestId} = render(<ModalDeleteUser idData={1} />);
 		const showModalButton = getByTestId("show-modal-btn");
 		const submitButton = getByTestId("submit-modal-btn");
 		const cancelButton = getByTestId("cancel-modal-btn");
@@ -31,7 +32,7 @@ describe("ModalDeleteUser", () => {
 	});
 
 	it("closes the modal when the close button is clicked", async () => {
-		const {getByTestId} = render(<ModalDeleteUser />);
+		const {getByTestId} = render(<ModalDeleteUser idData={1} />);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
 
@@ -55,7 +56,7 @@ describe("ModalDeleteUser", () => {
 	});
 
 	it("closes the modal when the background is clicked", async () => {
-		const {getByTestId} = render(<ModalDeleteUser />);
+		const {getByTestId} = render(<ModalDeleteUser idData={1} />);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
 
@@ -80,7 +81,7 @@ describe("ModalDeleteUser", () => {
 	});
 
 	it("cancel the form", async () => {
-		const {getByTestId} = render(<ModalDeleteUser />);
+		const {getByTestId} = render(<ModalDeleteUser idData={1} />);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
 
@@ -100,7 +101,7 @@ describe("ModalDeleteUser", () => {
 	});
 
 	it("submit the form", async () => {
-		const {getByTestId} = render(<ModalDeleteUser />);
+		const {getByTestId} = render(<ModalDeleteUser idData={1} />);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
 
