@@ -199,6 +199,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 				handleClose={() => {
 					setIsShowToast(false);
 				}}
+				status="error"
 			>
 				{toastMessage}
 			</Toast>

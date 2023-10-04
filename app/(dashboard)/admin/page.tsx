@@ -6,6 +6,7 @@ import {Controller, useForm} from "react-hook-form";
 import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 
+import ModalDeleteUser from "@/app/(dashboard)/admin/modal-delete-user";
 import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
 import FormGroup from "@/components/atoms/FormGroup";
@@ -41,15 +42,11 @@ const Admin = () => {
 	});
 
 	const [data, setData] = useState<UserCollectionResponse>();
-
+	const [isDeleteSuccess, setIsDeleteSuccess] = useState<boolean>(false);
 	const [isShowToast, setIsShowToast] = useState<boolean>(false);
-
 	const [toastStatus, setToastStatus] = useState<boolean>();
-
 	const [toastMessage, setToastMessage] = useState<string>();
-
 	const [selectedUser, setSelectedUser] = useState<User>();
-
 	const [isShowEditModal, setIsShowEditModal] = useState<boolean>(false);
 
 	const {control, handleSubmit, watch} = useForm({
@@ -63,16 +60,23 @@ const Admin = () => {
 		resolver: yupResolver(schema),
 	});
 
-	const fetchData = useCallback(async (params: UserCollectionParams) => {
-		try {
-			const res: AxiosResponse<UserCollectionResponse> =
-				await axiosInstance.get("/api/user", {
-					params,
-				});
+	const fetchData = useCallback(
+		async (params: UserCollectionParams) => {
+			try {
+				if (isDeleteSuccess) {
+					setIsDeleteSuccess(false);
+				}
 
-			setData(res.data);
-		} catch (error) {}
-	}, []);
+				const res: AxiosResponse<UserCollectionResponse> =
+					await axiosInstance.get("/api/user", {
+						params,
+					});
+
+				setData(res.data);
+			} catch (error) {}
+		},
+		[isDeleteSuccess],
+	);
 
 	const onSubmit = useCallback((data: yup.InferType<typeof schema>) => {
 		console.log(data);
@@ -93,10 +97,16 @@ const Admin = () => {
 		return Math.ceil(total / 10);
 	}, [data?.data.recordsFiltered]);
 
+	const handleSuccessDeleted = useCallback(() => {
+		setIsDeleteSuccess(true);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isDeleteSuccess]);
+
 	useEffect(() => {
 		fetchData(params);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [params, isDeleteSuccess]);
 
 	return (
 		<Card className="flex flex-col gap-6">
@@ -227,9 +237,10 @@ const Admin = () => {
 									>
 										<i className="fa-regular fa-pen-to-square"></i>
 									</Button>
-									<button className="text-red-80">
-										<i className="fas fa-trash"></i>
-									</button>
+									<ModalDeleteUser
+										idData={item?.id}
+										onDeletedSuccess={handleSuccessDeleted}
+									/>
 								</td>
 							</tr>
 						))}
