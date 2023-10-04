@@ -6,23 +6,27 @@ import Toast from "./index";
 
 describe("Toast", () => {
 	test("renders toast when isShow is true", async () => {
-		render(<Toast isShow={true} handleClose={() => {}} />);
+		render(<Toast status="success" isShow={true} handleClose={() => {}} />);
 		const toastElement = document.querySelector(".toast-container");
 		await waitFor(async () => {
-			expect(toastElement).toHaveClass("flex", "opacity-100", "top-24");
+			expect(toastElement).toHaveClass(
+				"toast-container",
+				"opacity-100",
+				"top-24",
+			);
 		});
 		expect(toastElement).toBeInTheDocument();
 	});
 
 	test("does not render toast when isShow is false", () => {
-		render(<Toast isShow={false} handleClose={() => {}} />);
+		render(<Toast status="success" isShow={false} handleClose={() => {}} />);
 		const toastElement = screen.queryByTestId("toast-container");
 		expect(toastElement).not.toBeInTheDocument();
 	});
 
 	test("calls handleClose when close button is clicked", () => {
 		const handleClose = jest.fn();
-		render(<Toast isShow={true} handleClose={handleClose} />);
+		render(<Toast status="success" isShow={true} handleClose={handleClose} />);
 		const closeButton = screen.getByRole("button", {name: "Close Toast"});
 		fireEvent.click(closeButton);
 		expect(handleClose).toHaveBeenCalled();
@@ -32,6 +36,7 @@ describe("Toast", () => {
 		const handleClose = jest.fn();
 		const {getByTestId} = render(
 			<Toast
+				status="success"
 				isShow={true}
 				handleClose={handleClose}
 				data-testid="toast"

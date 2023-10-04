@@ -25,22 +25,43 @@ import {CreateUserPayload} from "@/types/CreateUserPayload";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 const schema = yup.object({
-	username: yup.string().required("Username harus diisi."),
-	name: yup.string().required("Nama harus diisi."),
+	username: yup
+		.string()
+		.required("Username harus diisi.")
+		.matches(/^\d+$/, "Username hanya boleh memiliki angka.")
+		.min(8, "Username minimal 8 karakter.")
+		.max(16, "Username maksimal 16 karakter."),
+	name: yup
+		.string()
+		.required("Nama harus diisi.")
+		.max(60, "Nama maksimal 60 karakter")
+		.matches(/^[A-Za-z\s]+$/, "Nama hanya boleh mengandung huruf alfabet.")
+		.test(
+			"no-leading-trailing-spaces",
+			"Nama tidak boleh hanya berisi spasi.",
+			function (value) {
+				return value.trim() !== "";
+			},
+		),
 	email: yup
 		.string()
 		.required("Email harus diisi.")
-		.email("Email harus berdomain @work.bri.co.id")
+		.matches(
+			/^[A-Za-z._]+@/,
+			"Email hanya bisa memiliki kombinasi huruf, angka, simbol underscore ( _ ) dan titik ( . )",
+		)
 		.test(
-			"is-bri-email",
-			"Email harus berdomain @work.bri.co.id",
+			"is-work-bri-email",
+			"Email harus berdomain work.bri.co.id",
 			function (value) {
-				return value.endsWith("@work.bri.co.id");
+				return value.endsWith("work.bri.co.id");
 			},
 		),
 	phoneNumber: yup
 		.string()
 		.required("Nomor Telepon harus diisi.")
+		.min(7, "Nomor Telepon minimal 7 karakter.")
+		.max(13, "Nomor Telepon maksimal 13 karakter.")
 		.matches(/^\d+$/, "Nomor Telepon hanya boleh mengandung angka."),
 	userTypeId: yup
 		.mixed()
@@ -51,8 +72,8 @@ const schema = yup.object({
 		.required("Password harus diisi.")
 		.min(8, "Password minimal 8 karakter.")
 		.matches(
-			/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-			"Password harus mempunyai setidaknya satu huruf, satu angka, dan satu simbol.",
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]+$/,
+			"Password harus memiliki kombinasi huruf besar, huruf kecil dan angka.",
 		),
 	passwordConfirm: yup
 		.string()
@@ -407,8 +428,8 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess}) => {
 										false
 									)}
 									<FormMessage>
-										Min. 8 karakter serta merupakan kombinasi huruf, angka dan
-										simbol
+										Min. 8 karakter serta merupakan kombinasi huruf besar dan
+										angka.
 									</FormMessage>
 								</FormGroup>
 							)}

@@ -8,13 +8,15 @@ import React, {
 import {createPortal} from "react-dom";
 
 type ToastProps = HTMLAttributes<HTMLElement> & {
-	isShow: boolean;
 	handleClose: () => void;
+	status: "success" | "error";
+	isShow: boolean;
 };
 
 const Toast: FunctionComponent<ToastProps> = ({
-	isShow,
 	handleClose,
+	status,
+	isShow,
 	children,
 	className,
 	...attrs
@@ -52,7 +54,9 @@ const Toast: FunctionComponent<ToastProps> = ({
 			{createPortal(
 				<div className="toast-container" ref={toastContainerRef}>
 					<div
-						className={"toast".concat(className ? ` ${className}` : "")}
+						className={"toast"
+							.concat(status ? ` ${status}` : "")
+							.concat(className ? ` ${className}` : "")}
 						{...attrs}
 					>
 						{children}

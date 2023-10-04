@@ -6,6 +6,7 @@ import {Controller, useForm} from "react-hook-form";
 import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 
+import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
 import FormGroup from "@/components/atoms/FormGroup";
 import FormIcon from "@/components/atoms/FormIcon";
@@ -15,12 +16,15 @@ import Label from "@/components/atoms/Label";
 import PageTitle from "@/components/atoms/PageTitle";
 import Table from "@/components/atoms/Table";
 import TableContainer from "@/components/atoms/TableContainer";
+import Toast from "@/components/molecules/Toast";
 import axiosInstance from "@/config/client/axios";
+import {User} from "@/types/User";
 import {UserCollectionParams} from "@/types/UserCollectionParams";
 import {UserCollectionResponse} from "@/types/UserCollectionResponse";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 import ModalAddUser from "./add-user";
+import ModalEditUser from "./edit-user";
 
 const schema = yup.object({
 	search: yup.string().optional(),
@@ -38,7 +42,15 @@ const Admin = () => {
 
 	const [data, setData] = useState<UserCollectionResponse>();
 
-	const [isShowModalDelete, setIsShowModalDelete] = useState<boolean>(false);
+	const [isShowToast, setIsShowToast] = useState<boolean>(false);
+
+	const [toastStatus, setToastStatus] = useState<boolean>();
+
+	const [toastMessage, setToastMessage] = useState<string>();
+
+	const [selectedUser, setSelectedUser] = useState<User>();
+
+	const [isShowEditModal, setIsShowEditModal] = useState<boolean>(false);
 
 	const {control, handleSubmit, watch} = useForm({
 		values: {
@@ -204,9 +216,17 @@ const Admin = () => {
 								<td>{item.email}</td>
 								<td>{item.userTypeId}</td>
 								<td className="flex gap-4">
-									<button className="text-primary-80">
-										<i className="fas fa-edit"></i>
-									</button>
+									<Button
+										id="show-modal-btn"
+										data-testid="show-modal-btn"
+										onClick={() => {
+											setSelectedUser(item);
+											setIsShowEditModal(true);
+										}}
+										transparent
+									>
+										<i className="fa-regular fa-pen-to-square"></i>
+									</Button>
 									<button className="text-red-80">
 										<i className="fas fa-trash"></i>
 									</button>
@@ -227,6 +247,41 @@ const Admin = () => {
 				pageCount={pageCount}
 				previousLabel={null}
 				renderOnZeroPageCount={null}
+			/>
+
+			<Toast
+				id="toast"
+				data-testid="toast"
+				status={toastStatus ? "success" : "error"}
+				isShow={isShowToast}
+				handleClose={() => {
+					setIsShowToast(false);
+				}}
+			>
+				{toastMessage}
+			</Toast>
+
+			<ModalEditUser
+				isShow={isShowEditModal}
+				handleClose={() => setIsShowEditModal(false)}
+				userData={selectedUser}
+				onSuccess={async () => {
+					setToastStatus(true);
+					setIsShowToast(true);
+					setToastMessage("User berhasil diubah.");
+					await fetchData({
+						...params,
+						page: 1,
+						search: undefined,
+						userId: undefined,
+						sortBy: undefined,
+					});
+				}}
+				onError={() => {
+					setToastStatus(false);
+					setIsShowToast(true);
+					setToastMessage("User gagal diubah. Silakan coba lagi.");
+				}}
 			/>
 		</Card>
 	);
