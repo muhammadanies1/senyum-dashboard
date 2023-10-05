@@ -1,5 +1,6 @@
 "use client";
 
+import axios, {AxiosError} from "axios";
 import {nanoid} from "nanoid";
 import React, {
 	Fragment,
@@ -21,6 +22,7 @@ import Label from "@/components/atoms/Label";
 import Radio from "@/components/atoms/Radio";
 import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
+import {ApiResponse} from "@/types/ApiResponse";
 import {CreateUserPayload} from "@/types/CreateUserPayload";
 import {yupResolver} from "@hookform/resolvers/yup";
 
@@ -61,8 +63,11 @@ const schema = yup.object({
 		.string()
 		.required("Nomor Telepon harus diisi.")
 		.min(7, "Nomor Telepon minimal 7 karakter.")
-		.max(13, "Nomor Telepon maksimal 13 karakter.")
-		.matches(/^\d+$/, "Nomor Telepon hanya boleh mengandung angka."),
+		.max(15, "Nomor Telepon maksimal 15 karakter.")
+		.matches(
+			/^\+?\d+$/,
+			"Nomor Telepon hanya boleh mengandung angka dan satu plus (+) opsional.",
+		),
 	userTypeId: yup
 		.mixed()
 		.oneOf(["ADMIN", "VIEWER"], "Tipe user tidak valid.")
@@ -86,6 +91,7 @@ const schema = yup.object({
 
 type AddUserProps = {
 	onSuccess: () => Promise<void>;
+	onError: (error: unknown) => void;
 };
 
 const initialValue: yup.InferType<typeof schema> = {
@@ -98,7 +104,7 @@ const initialValue: yup.InferType<typeof schema> = {
 	passwordConfirm: "",
 };
 
-const AddUser: FunctionComponent<AddUserProps> = ({onSuccess}) => {
+const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
 
 	const [isUnmaskPasswordConfirmation, setIsUnmaskPasswordConfirmation] =
@@ -132,10 +138,29 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess}) => {
 				await axiosInstance.post("/api/user", payload);
 				setIsShow(false);
 				await onSuccess();
-			} catch (error) {}
-			setIsLoading(false);
+			} catch (error) {
+				setIsLoading(false);
+				if (axios.isAxiosError(error)) {
+					const errorData: AxiosError<ApiResponse> = error;
+					const responseDescription =
+						errorData.response?.data.responseDescription;
+
+					switch (responseDescription) {
+						case "USERNAME_ALREADY_REGISTERED":
+							onError(
+								new Error("Username sudah terdaftar. Silahkan coba lagi."),
+							);
+							break;
+						case "EMAIL_ALREADY_REGISTERED":
+							onError(new Error("Email sudah terdaftar. Silahkan coba lagi."));
+							break;
+						default:
+							onError(error);
+					}
+				}
+			}
 		},
-		[onSuccess],
+		[onError, onSuccess],
 	);
 
 	const submitForm = async (data: yup.InferType<typeof schema>) => {

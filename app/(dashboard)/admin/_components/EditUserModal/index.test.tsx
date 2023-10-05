@@ -5,7 +5,7 @@ import {User} from "@/types/User";
 import {act, fireEvent, render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import EditUser from "./edit-user";
+import EditUser from "./";
 
 const handleClose = jest.fn();
 

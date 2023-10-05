@@ -32,18 +32,14 @@ export async function PATCH(
 	}
 }
 
-export async function DELETE(req: NextRequest) {
-	const getID = req.url.split("/");
-
-	let url = process.env.API_BFF_URL + "/api/v1/users-dashboard";
-
-	if (getID.length > 0) {
-		url = url + "/" + getID[getID.length - 1];
-	}
-
+export async function DELETE(
+	req: NextRequest,
+	{params}: {params: {id: string}},
+) {
 	try {
-		const apiResponse: AxiosResponse<ApiResponse> =
-			await axiosInstance.delete(url);
+		const apiResponse: AxiosResponse<ApiResponse> = await axiosInstance.delete(
+			`/api/v1/users-dashboard/${params.id}`,
+		);
 
 		const res = NextResponse.json(apiResponse.data, {
 			status: apiResponse.status,

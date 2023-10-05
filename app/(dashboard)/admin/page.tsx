@@ -6,7 +6,9 @@ import {Controller, useForm} from "react-hook-form";
 import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 
-import ModalDeleteUser from "@/app/(dashboard)/admin/modal-delete-user";
+import ModalAddUser from "@/app/(dashboard)/admin/_components/AddUserModal";
+import ModalDeleteUser from "@/app/(dashboard)/admin/_components/DeleteUserModal";
+import ModalEditUser from "@/app/(dashboard)/admin/_components/EditUserModal";
 import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
 import FormGroup from "@/components/atoms/FormGroup";
@@ -23,9 +25,6 @@ import {User} from "@/types/User";
 import {UserCollectionParams} from "@/types/UserCollectionParams";
 import {UserCollectionResponse} from "@/types/UserCollectionResponse";
 import {yupResolver} from "@hookform/resolvers/yup";
-
-import ModalAddUser from "./add-user";
-import ModalEditUser from "./edit-user";
 
 const schema = yup.object({
 	search: yup.string().optional(),
@@ -48,6 +47,7 @@ const Admin = () => {
 	const [toastMessage, setToastMessage] = useState<string>();
 	const [selectedUser, setSelectedUser] = useState<User>();
 	const [isShowEditModal, setIsShowEditModal] = useState<boolean>(false);
+	const [isShowDeleteModal, setIsShowDeleteModal] = useState<boolean>(false);
 
 	const {control, handleSubmit, watch} = useForm({
 		values: {
@@ -97,12 +97,6 @@ const Admin = () => {
 		return Math.ceil(total / 10);
 	}, [data?.data.recordsFiltered]);
 
-	const handleSuccessDeleted = useCallback(() => {
-		setIsDeleteSuccess(true);
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isDeleteSuccess]);
-
 	useEffect(() => {
 		fetchData(params);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,15 +112,24 @@ const Admin = () => {
 				<div className="flex justify-between items-center">
 					<PageTitle>Tabel User</PageTitle>
 					<ModalAddUser
-						onSuccess={() =>
-							fetchData({
+						onSuccess={async () => {
+							setToastStatus(true);
+							setIsShowToast(true);
+							setToastMessage("User berhasil diubah.");
+							await fetchData({
 								...params,
 								page: 1,
 								search: undefined,
 								userId: undefined,
 								sortBy: undefined,
-							})
-						}
+							});
+						}}
+						onError={(error) => {
+							const errorMessage = new Error(error as any).message;
+							setToastStatus(false);
+							setIsShowToast(true);
+							setToastMessage(errorMessage);
+						}}
 					/>
 				</div>
 
@@ -154,7 +157,7 @@ const Admin = () => {
 					<Controller
 						control={control}
 						name="isSuperAdmin"
-						render={({field: {value, ...attrs}, fieldState}) => (
+						render={({field: {value, ...attrs}}) => (
 							<label
 								className={"checkbox-filter".concat(value ? " active" : "")}
 							>
@@ -171,7 +174,7 @@ const Admin = () => {
 					<Controller
 						control={control}
 						name="isAdmin"
-						render={({field: {value, ...attrs}, fieldState}) => (
+						render={({field: {value, ...attrs}}) => (
 							<label
 								className={"checkbox-filter".concat(value ? " active" : "")}
 							>
@@ -188,7 +191,7 @@ const Admin = () => {
 					<Controller
 						control={control}
 						name="isViewer"
-						render={({field: {value, ...attrs}, fieldState}) => (
+						render={({field: {value, ...attrs}}) => (
 							<label
 								className={"checkbox-filter".concat(value ? " active" : "")}
 							>
@@ -227,8 +230,8 @@ const Admin = () => {
 								<td>{item.userTypeId}</td>
 								<td className="flex gap-4">
 									<Button
-										id="show-modal-btn"
-										data-testid="show-modal-btn"
+										id="show-edit-modal-btn"
+										data-testid="show-edit-modal-btn"
 										onClick={() => {
 											setSelectedUser(item);
 											setIsShowEditModal(true);
@@ -237,10 +240,17 @@ const Admin = () => {
 									>
 										<i className="fa-regular fa-pen-to-square"></i>
 									</Button>
-									<ModalDeleteUser
-										idData={item?.id}
-										onDeletedSuccess={handleSuccessDeleted}
-									/>
+									<Button
+										id="show-delete-modal-btn"
+										data-testid="show-delete-modal-btn"
+										onClick={() => {
+											setSelectedUser(item);
+											setIsShowDeleteModal(true);
+										}}
+										transparent
+									>
+										<i className="fas fa-trash-alt text-red-80"></i>
+									</Button>
 								</td>
 							</tr>
 						))}
@@ -292,6 +302,29 @@ const Admin = () => {
 					setToastStatus(false);
 					setIsShowToast(true);
 					setToastMessage("User gagal diubah. Silakan coba lagi.");
+				}}
+			/>
+
+			<ModalDeleteUser
+				isShow={isShowDeleteModal}
+				handleClose={() => setIsShowDeleteModal(false)}
+				userData={selectedUser}
+				onSuccess={async () => {
+					setToastStatus(true);
+					setIsShowToast(true);
+					setToastMessage("User berhasil dihapus.");
+					await fetchData({
+						...params,
+						page: 1,
+						search: undefined,
+						userId: undefined,
+						sortBy: undefined,
+					});
+				}}
+				onError={() => {
+					setToastStatus(false);
+					setIsShowToast(true);
+					setToastMessage("User gagal dihapus. Silakan coba lagi.");
 				}}
 			/>
 		</Card>

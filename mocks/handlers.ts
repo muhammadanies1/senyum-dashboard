@@ -43,4 +43,14 @@ export const handlers = [
 			}),
 		);
 	}),
+	rest.delete("/api/user/:id", (req, res, ctx) => {
+		return res(
+			ctx.status(200),
+			ctx.json({
+				responseCode: "0200",
+				responseDescription: "SUCCESS",
+				data: null,
+			}),
+		);
+	}),
 ];
