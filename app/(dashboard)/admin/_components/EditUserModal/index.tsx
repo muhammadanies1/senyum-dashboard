@@ -30,6 +30,7 @@ const schema = yup.object({
 	email: yup
 		.string()
 		.required("Email harus diisi.")
+		.max(255, "Email maksimal 255 karakter.")
 		.matches(
 			/^[\w.]+@/,
 			"Email hanya bisa memiliki kombinasi huruf kecil, angka, simbol underscore ( _ ) dan titik ( . ) sebelum @work.bri.co.id",
