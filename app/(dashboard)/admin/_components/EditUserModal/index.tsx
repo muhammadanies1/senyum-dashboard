@@ -30,6 +30,7 @@ const schema = yup.object({
 	email: yup
 		.string()
 		.required("Email harus diisi.")
+		.max(255, "Email maksimal 255 karakter.")
 		.matches(
 			/^[\w.]+@/,
 			"Email hanya bisa memiliki kombinasi huruf kecil, angka, simbol underscore ( _ ) dan titik ( . ) sebelum @work.bri.co.id",
@@ -132,6 +133,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 		handleSubmit,
 		reset,
 		formState: {isValid},
+		setValue,
 	} = useForm({
 		values: {...initialValue},
 		resolver: yupResolver(schema),
@@ -323,6 +325,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 										value="ADMIN"
 										checked={value === "ADMIN"}
 										onChange={onChange}
+										onClick={() => setValue("userTypeId", "ADMIN")}
 									/>
 									<Radio
 										label="Viewer"
@@ -333,6 +336,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 										value="VIEWER"
 										checked={value === "VIEWER"}
 										onChange={onChange}
+										onClick={() => setValue("userTypeId", "VIEWER")}
 									/>
 								</div>
 								{error?.message ? (
