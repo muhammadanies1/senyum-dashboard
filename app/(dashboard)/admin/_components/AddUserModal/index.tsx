@@ -99,7 +99,7 @@ const initialValue: yup.InferType<typeof schema> = {
 	name: "",
 	email: "",
 	phoneNumber: "",
-	userTypeId: {},
+	userTypeId: "",
 	password: "",
 	passwordConfirm: "",
 };
@@ -121,6 +121,7 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 		handleSubmit,
 		reset,
 		formState: {isValid},
+		setValue,
 	} = useForm({
 		values: {...initialValue},
 		resolver: yupResolver(schema),
@@ -379,6 +380,9 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 											value="ADMIN"
 											checked={value === "ADMIN"}
 											onChange={onChange}
+											onClick={() => {
+												setValue("userTypeId", "ADMIN");
+											}}
 										/>
 										<Radio
 											label="Viewer"
@@ -389,6 +393,9 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 											value="VIEWER"
 											checked={value === "VIEWER"}
 											onChange={onChange}
+											onClick={() => {
+												setValue("userTypeId", "VIEWER");
+											}}
 										/>
 									</div>
 									{error?.message ? (

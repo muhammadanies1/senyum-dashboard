@@ -132,6 +132,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 		handleSubmit,
 		reset,
 		formState: {isValid},
+		setValue,
 	} = useForm({
 		values: {...initialValue},
 		resolver: yupResolver(schema),
@@ -323,6 +324,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 										value="ADMIN"
 										checked={value === "ADMIN"}
 										onChange={onChange}
+										onClick={() => setValue("userTypeId", "ADMIN")}
 									/>
 									<Radio
 										label="Viewer"
@@ -333,6 +335,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 										value="VIEWER"
 										checked={value === "VIEWER"}
 										onChange={onChange}
+										onClick={() => setValue("userTypeId", "VIEWER")}
 									/>
 								</div>
 								{error?.message ? (

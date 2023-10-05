@@ -115,7 +115,7 @@ const Admin = () => {
 						onSuccess={async () => {
 							setToastStatus(true);
 							setIsShowToast(true);
-							setToastMessage("User berhasil diubah.");
+							setToastMessage("User berhasil dibuat.");
 							await fetchData({
 								...params,
 								page: 1,
