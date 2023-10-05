@@ -49,8 +49,8 @@ const schema = yup.object({
 		.string()
 		.required("Email harus diisi.")
 		.matches(
-			/^[A-Za-z._]+@/,
-			"Email hanya bisa memiliki kombinasi huruf, angka, simbol underscore ( _ ) dan titik ( . )",
+			/^[\w.]+@/,
+			"Email hanya bisa memiliki kombinasi huruf kecil, angka, simbol underscore ( _ ) dan titik ( . ) sebelum @work.bri.co.id",
 		)
 		.test(
 			"is-work-bri-email",
@@ -70,14 +70,14 @@ const schema = yup.object({
 		),
 	userTypeId: yup
 		.mixed()
-		.oneOf(["ADMIN", "VIEWER"], "Tipe user tidak valid.")
+		.oneOf(["ADMIN", "VIEWER"], "Tipe User tidak valid.")
 		.required("Tipe User harus dipilih."),
 	password: yup
 		.string()
 		.required("Password harus diisi.")
 		.min(8, "Password minimal 8 karakter.")
 		.matches(
-			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]+$/,
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[\w\W]+$/,
 			"Password harus memiliki kombinasi huruf besar, huruf kecil dan angka.",
 		),
 	passwordConfirm: yup
@@ -304,7 +304,7 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 									<Input
 										id="email"
 										data-testid="email"
-										placeholder="Email berdomain @bri.co.id"
+										placeholder="Email berdomain @work.bri.co.id"
 										type="email"
 										{...field}
 										variant={error ? "error" : undefined}
@@ -433,9 +433,9 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 											data-testid="toggle-password-btn"
 										>
 											{isUnmaskPassword ? (
-												<i className="fas fa-eye-slash"></i>
-											) : (
 												<i className="fas fa-eye"></i>
+											) : (
+												<i className="fas fa-eye-slash"></i>
 											)}
 										</button>
 									</FormIcon>
@@ -490,10 +490,10 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 											}
 											data-testid="toggle-password-confirm-btn"
 										>
-											{isUnmaskPassword ? (
-												<i className="fas fa-eye-slash"></i>
-											) : (
+											{isUnmaskPasswordConfirmation ? (
 												<i className="fas fa-eye"></i>
+											) : (
+												<i className="fas fa-eye-slash"></i>
 											)}
 										</button>
 									</FormIcon>
