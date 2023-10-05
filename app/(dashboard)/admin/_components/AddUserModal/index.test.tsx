@@ -5,7 +5,7 @@ import {server} from "@/mocks/server";
 import {fireEvent, render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import AddUser from "./add-user";
+import AddUser from "./";
 
 const onSuccessCallback = jest.fn();
 
@@ -238,7 +238,7 @@ describe("AddUser", () => {
 		});
 	});
 
-	it("should call createUser function when submitForm is called", async () => {
+	it("should call onSuccessCallback when success to submit new user", async () => {
 		const {getByTestId, debug} = render(
 			<AddUser onSuccess={onSuccessCallback} />,
 		);
@@ -247,36 +247,32 @@ describe("AddUser", () => {
 		const showModalBtn = getByTestId("show-modal-btn");
 		fireEvent.click(showModalBtn);
 
+		await waitFor(() => {
+			expect(getByTestId("modal-form").parentElement).toHaveClass(
+				"flex justify-center items-center",
+			);
+		});
+
 		// Fill in the form fields
-		await userEvent.type(getByTestId("username"), "john_doe");
+		await userEvent.type(getByTestId("username"), "901506012");
 		await userEvent.type(getByTestId("name"), "John Doe");
-		await userEvent.type(getByTestId("email"), "john.doe@bri.co.id");
+		await userEvent.type(getByTestId("email"), "john.doe@work.bri.co.id");
 		await userEvent.type(getByTestId("phone-number"), "1234567890");
 		await userEvent.click(getByTestId("radio-admin"));
 		await userEvent.type(getByTestId("password"), "Password123!");
 		await userEvent.type(getByTestId("password-confirm"), "Password123!");
 
 		await waitFor(() => {
-			expect(getByTestId("add-user-modal-submit-btn")).toHaveAttribute(
-				"disabled",
-				"",
-			);
+			expect(getByTestId("add-user-modal-submit-btn")).not.toBeDisabled();
 		});
 
 		// Submit the form
 		const submitBtn = getByTestId("add-user-modal-submit-btn");
 		fireEvent.click(submitBtn);
 
-		debug();
-
 		// Wait for the API call to finish
-		// await waitFor(() => {
-		// 	expect(onSuccessCallback).toHaveBeenCalled();
-		// });
-	});
-
-	it("test api", async () => {
-		const res = await axiosInstance.post("/api/user", {data: "tes"});
-		console.log(res);
+		await waitFor(() => {
+			expect(onSuccessCallback).toHaveBeenCalled();
+		});
 	});
 });
