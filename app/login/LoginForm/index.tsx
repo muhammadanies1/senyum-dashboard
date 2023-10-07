@@ -1,6 +1,6 @@
 "use client";
 
-import axios, {AxiosError} from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import React, {
@@ -12,6 +12,7 @@ import React, {
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
+import {LoginResponse} from "@/app/api/login/route";
 import Button from "@/components/atoms/Button";
 import FormGroup from "@/components/atoms/FormGroup";
 import FormIcon from "@/components/atoms/FormIcon";
@@ -67,8 +68,14 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 
 			try {
 				setIsLoading(true);
-				await axiosInstance.post("/api/login", data);
-				router.push("/");
+				const res: AxiosResponse<LoginResponse> = await axiosInstance.post(
+					"/api/login",
+					data,
+				);
+				if (res?.status === 200) {
+					await axiosInstance.get("/api/profile");
+					router.push("/");
+				}
 			} catch (error) {
 				if (axios.isAxiosError(error)) {
 					const errorData: AxiosError<ApiResponse> = error;

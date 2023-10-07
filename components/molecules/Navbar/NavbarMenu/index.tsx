@@ -34,6 +34,7 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 	const handleLogout = useCallback(() => {
 		document.cookie = `TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		document.cookie = `REFRESH_TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+		document.cookie = `USER_TYPE=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		router.push("/login");
 	}, [router]);
 

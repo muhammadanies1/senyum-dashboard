@@ -10,4 +10,5 @@ export type User = {
 	updatedAt: string;
 	userTypeId: string;
 	username: string;
+	editable: boolean;
 };
