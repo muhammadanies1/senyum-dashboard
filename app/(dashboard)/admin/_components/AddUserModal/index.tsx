@@ -155,12 +155,10 @@ const AddUser: FunctionComponent<AddUserProps> = ({
 
 					switch (responseDescription) {
 						case "USERNAME_ALREADY_REGISTERED":
-							onError(
-								new Error("Username sudah terdaftar. Silahkan coba lagi."),
-							);
+							onError("Username sudah terdaftar. Silahkan coba lagi.");
 							break;
 						case "EMAIL_ALREADY_REGISTERED":
-							onError(new Error("Email sudah terdaftar. Silahkan coba lagi."));
+							onError("Email sudah terdaftar. Silahkan coba lagi.");
 							break;
 						default:
 							onError(error);

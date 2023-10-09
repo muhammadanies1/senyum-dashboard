@@ -174,7 +174,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 
 					switch (responseDescription) {
 						case "FORBIDDEN":
-							onError(new Error("Maaf Anda tidak dapat mengubah user ini."));
+							onError("Maaf Anda tidak dapat mengubah user ini.");
 							break;
 						default:
 							onError(error);
