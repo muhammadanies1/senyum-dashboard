@@ -13,6 +13,8 @@ const onSuccessHandler = jest.fn();
 
 const onErrorHandler = jest.fn();
 
+jest.mock("@/utils/getCookie", () => jest.fn().mockReturnValue("SUPER_ADMIN"));
+
 const userData: User = {
 	counter: 0,
 	createdAt: "2023-10-02T21:18:23Z",
@@ -25,6 +27,7 @@ const userData: User = {
 	updatedAt: "2023-10-02T21:18:23Z",
 	userTypeId: "VIEWER",
 	username: "90147851",
+	editable: true,
 };
 
 beforeAll(() => server.listen());

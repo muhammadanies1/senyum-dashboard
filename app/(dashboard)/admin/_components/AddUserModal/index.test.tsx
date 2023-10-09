@@ -1,6 +1,5 @@
 import React from "react";
 
-import axiosInstance from "@/config/client/axios";
 import {server} from "@/mocks/server";
 import {fireEvent, render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -8,6 +7,10 @@ import userEvent from "@testing-library/user-event";
 import AddUser from "./";
 
 const onSuccessCallback = jest.fn();
+
+const onErrorHandler = jest.fn();
+
+jest.mock("@/utils/getCookie", () => jest.fn().mockReturnValue("SUPER_ADMIN"));
 
 jest.mock("nanoid", () => {
 	return {
@@ -23,14 +26,18 @@ afterAll(() => server.close());
 
 describe("AddUser", () => {
 	it("renders the 'Tambah User' button", () => {
-		const {getByTestId} = render(<AddUser onSuccess={onSuccessCallback} />);
+		const {getByTestId} = render(
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
+		);
 		const showModalButton = getByTestId("show-modal-btn");
 
 		expect(showModalButton).toBeInTheDocument();
 	});
 
 	it("opens the modal when the 'Tambah User' button is clicked", async () => {
-		const {getByTestId} = render(<AddUser onSuccess={onSuccessCallback} />);
+		const {getByTestId} = render(
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
+		);
 		const modal = getByTestId("modal-form");
 		const showModalButton = getByTestId("show-modal-btn");
 		const submitButton = getByTestId("add-user-modal-submit-btn");
@@ -54,7 +61,9 @@ describe("AddUser", () => {
 	});
 
 	it("closes the modal when the close button is clicked", async () => {
-		const {getByTestId} = render(<AddUser onSuccess={onSuccessCallback} />);
+		const {getByTestId} = render(
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
+		);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
 
@@ -78,7 +87,9 @@ describe("AddUser", () => {
 	});
 
 	it("closes the modal when the background is clicked", async () => {
-		const {getByTestId} = render(<AddUser onSuccess={onSuccessCallback} />);
+		const {getByTestId} = render(
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
+		);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
 
@@ -104,7 +115,7 @@ describe("AddUser", () => {
 
 	it("displays validation errors when submitting empty inputs", async () => {
 		const {findByTestId, getByTestId} = render(
-			<AddUser onSuccess={onSuccessCallback} />,
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
 		);
 		const showModalButton = getByTestId("show-modal-btn");
 		const submitButton = getByTestId("add-user-modal-submit-btn");
@@ -142,7 +153,7 @@ describe("AddUser", () => {
 
 	it("displays validation errors when submitting an invalid email or password", async () => {
 		const {findByTestId, getByTestId} = render(
-			<AddUser onSuccess={onSuccessCallback} />,
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
 		);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
@@ -171,7 +182,9 @@ describe("AddUser", () => {
 	});
 
 	it("submits the form with valid data", async () => {
-		const {getByTestId} = render(<AddUser onSuccess={onSuccessCallback} />);
+		const {getByTestId} = render(
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
+		);
 		const showModalButton = getByTestId("show-modal-btn");
 		const modal = getByTestId("modal-form");
 
@@ -239,8 +252,8 @@ describe("AddUser", () => {
 	});
 
 	it("should call onSuccessCallback when success to submit new user", async () => {
-		const {getByTestId, debug} = render(
-			<AddUser onSuccess={onSuccessCallback} />,
+		const {getByTestId} = render(
+			<AddUser onSuccess={onSuccessCallback} onError={onErrorHandler} />,
 		);
 
 		// Open the modal

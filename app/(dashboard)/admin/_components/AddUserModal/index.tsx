@@ -24,6 +24,7 @@ import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
 import {ApiResponse} from "@/types/ApiResponse";
 import {CreateUserPayload} from "@/types/CreateUserPayload";
+import getCookie from "@/utils/getCookie";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 const schema = yup.object({
@@ -71,7 +72,7 @@ const schema = yup.object({
 		),
 	userTypeId: yup
 		.mixed()
-		.oneOf(["ADMIN", "VIEWER"], "Tipe User tidak valid.")
+		.oneOf(["SUPER_ADMIN", "ADMIN", "VIEWER"], "Tipe User tidak valid.")
 		.required("Tipe User harus dipilih."),
 	password: yup
 		.string()
@@ -372,19 +373,39 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 										Tipe User
 									</Label>
 									<div id="user-type" className="flex mt-2">
-										<Radio
-											label="Admin"
-											id="radio-admin"
-											data-testid="radio-admin"
-											name="usertype-option"
-											className="w-full"
-											value="ADMIN"
-											checked={value === "ADMIN"}
-											onChange={onChange}
-											onClick={() => {
-												setValue("userTypeId", "ADMIN");
-											}}
-										/>
+										{getCookie("USER_TYPE") === "SUPER_ADMIN" ? (
+											<>
+												<Radio
+													label="Super Admin"
+													id="radio-super-admin"
+													data-testid="radio-super-admin"
+													name="usertype-option"
+													className="w-full"
+													value="SUPER_ADMIN"
+													checked={value === "SUPER_ADMIN"}
+													onChange={onChange}
+													onClick={() => {
+														setValue("userTypeId", "SUPER_ADMIN");
+													}}
+												/>
+												<Radio
+													label="Admin"
+													id="radio-admin"
+													data-testid="radio-admin"
+													name="usertype-option"
+													className="w-full"
+													value="ADMIN"
+													checked={value === "ADMIN"}
+													onChange={onChange}
+													onClick={() => {
+														setValue("userTypeId", "ADMIN");
+													}}
+												/>
+											</>
+										) : (
+											false
+										)}
+
 										<Radio
 											label="Viewer"
 											id="radio-viewer"

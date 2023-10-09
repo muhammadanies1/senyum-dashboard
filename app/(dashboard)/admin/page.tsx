@@ -4,6 +4,7 @@ import {AxiosResponse} from "axios";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import ReactPaginate from "react-paginate";
+import getCookie from "utils/getCookie";
 import * as yup from "yup";
 
 import ModalAddUser from "@/app/(dashboard)/admin/_components/AddUserModal";
@@ -41,7 +42,6 @@ const Admin = () => {
 	});
 
 	const [data, setData] = useState<UserCollectionResponse>();
-	const [isDeleteSuccess, setIsDeleteSuccess] = useState<boolean>(false);
 	const [isShowToast, setIsShowToast] = useState<boolean>(false);
 	const [toastStatus, setToastStatus] = useState<boolean>();
 	const [toastMessage, setToastMessage] = useState<string>();
@@ -60,23 +60,20 @@ const Admin = () => {
 		resolver: yupResolver(schema),
 	});
 
-	const fetchData = useCallback(
-		async (params: UserCollectionParams) => {
-			try {
-				if (isDeleteSuccess) {
-					setIsDeleteSuccess(false);
-				}
+	const fetchData = useCallback(async (params: UserCollectionParams) => {
+		try {
+			const res: AxiosResponse<UserCollectionResponse> =
+				await axiosInstance.get("/api/user", {
+					params,
+				});
 
-				const res: AxiosResponse<UserCollectionResponse> =
-					await axiosInstance.get("/api/user", {
-						params,
-					});
-
-				setData(res.data);
-			} catch (error) {}
-		},
-		[isDeleteSuccess],
-	);
+			setData(res.data);
+		} catch (error) {
+			if (error) {
+				setData(undefined);
+			}
+		}
+	}, []);
 
 	const onSubmit = useCallback((data: yup.InferType<typeof schema>) => {
 		console.log(data);
@@ -100,7 +97,17 @@ const Admin = () => {
 	useEffect(() => {
 		fetchData(params);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [params, isDeleteSuccess]);
+	}, [params]);
+
+	const tableNumber = useMemo(() => {
+		const numberOfTable: number = params?.page * 10 - 10;
+
+		return numberOfTable;
+	}, [params?.page]);
+
+	const isEditable = useCallback((data: User) => {
+		return data.editable;
+	}, []);
 
 	return (
 		<Card className="flex flex-col gap-6">
@@ -111,26 +118,30 @@ const Admin = () => {
 			>
 				<div className="flex justify-between items-center">
 					<PageTitle>Tabel User</PageTitle>
-					<ModalAddUser
-						onSuccess={async () => {
-							setToastStatus(true);
-							setIsShowToast(true);
-							setToastMessage("User berhasil dibuat.");
-							await fetchData({
-								...params,
-								page: 1,
-								search: undefined,
-								userId: undefined,
-								sortBy: undefined,
-							});
-						}}
-						onError={(error) => {
-							const errorMessage = new Error(error as any).message;
-							setToastStatus(false);
-							setIsShowToast(true);
-							setToastMessage(errorMessage);
-						}}
-					/>
+					{getCookie("USER_TYPE") !== "VIEWER" ? (
+						<ModalAddUser
+							onSuccess={async () => {
+								setToastStatus(true);
+								setIsShowToast(true);
+								setToastMessage("User berhasil dibuat.");
+								await fetchData({
+									...params,
+									page: 1,
+									search: undefined,
+									userId: undefined,
+									sortBy: undefined,
+								});
+							}}
+							onError={(error) => {
+								const errorMessage = new Error(error as any).message;
+								setToastStatus(false);
+								setIsShowToast(true);
+								setToastMessage(errorMessage);
+							}}
+						/>
+					) : (
+						false
+					)}
 				</div>
 
 				<Controller
@@ -221,39 +232,63 @@ const Admin = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{data?.data.data.map((item, index) => (
-							<tr key={index}>
-								<td>{index + 1}</td>
-								<td>{item.username}</td>
-								<td>{item.name}</td>
-								<td>{item.email}</td>
-								<td>{item.userTypeId}</td>
-								<td className="flex gap-4">
-									<Button
-										id="show-edit-modal-btn"
-										data-testid="show-edit-modal-btn"
-										onClick={() => {
-											setSelectedUser(item);
-											setIsShowEditModal(true);
-										}}
-										transparent
-									>
-										<i className="fa-regular fa-pen-to-square"></i>
-									</Button>
-									<Button
-										id="show-delete-modal-btn"
-										data-testid="show-delete-modal-btn"
-										onClick={() => {
-											setSelectedUser(item);
-											setIsShowDeleteModal(true);
-										}}
-										transparent
-									>
-										<i className="fas fa-trash-alt text-red-80"></i>
-									</Button>
+						{data !== undefined ? (
+							data?.data.data.map((item, index) => (
+								<tr key={index}>
+									<td>{tableNumber + (index + 1)}</td>
+									<td>{item.username}</td>
+									<td>{item.name}</td>
+									<td>{item.email}</td>
+									<td>{item.userTypeId}</td>
+									<td className="flex">
+										<Button
+											id="show-edit-modal-btn"
+											data-testid="show-edit-modal-btn"
+											onClick={
+												isEditable(item)
+													? () => {
+															setSelectedUser(item);
+															setIsShowEditModal(true);
+													  }
+													: undefined
+											}
+											transparent
+										>
+											<i
+												className={"fa-regular fa-pen-to-square".concat(
+													isEditable(item) ? "" : " text-light-80",
+												)}
+											></i>
+										</Button>
+										<Button
+											id="show-delete-modal-btn"
+											data-testid="show-delete-modal-btn"
+											onClick={
+												isEditable(item)
+													? () => {
+															setSelectedUser(item);
+															setIsShowDeleteModal(true);
+													  }
+													: undefined
+											}
+											transparent
+										>
+											<i
+												className={"fas fa-trash-alt".concat(
+													isEditable(item) ? " text-red-80" : " text-light-80",
+												)}
+											></i>
+										</Button>
+									</td>
+								</tr>
+							))
+						) : (
+							<tr>
+								<td className="!text-center" colSpan={6}>
+									Tidak Ada Data
 								</td>
 							</tr>
-						))}
+						)}
 					</tbody>
 				</Table>
 			</TableContainer>
@@ -298,10 +333,12 @@ const Admin = () => {
 						sortBy: undefined,
 					});
 				}}
-				onError={() => {
+				onError={(error) => {
+					const errorMessage = new Error(error as any).message;
 					setToastStatus(false);
 					setIsShowToast(true);
-					setToastMessage("User gagal diubah. Silakan coba lagi.");
+					setToastMessage(errorMessage);
+					setIsShowEditModal(false);
 				}}
 			/>
 
@@ -321,10 +358,12 @@ const Admin = () => {
 						sortBy: undefined,
 					});
 				}}
-				onError={() => {
+				onError={(error) => {
+					const errorMessage = new Error(error as any).message;
 					setToastStatus(false);
 					setIsShowToast(true);
-					setToastMessage("User gagal dihapus. Silakan coba lagi.");
+					setToastMessage(errorMessage);
+					setIsShowDeleteModal(false);
 				}}
 			/>
 		</Card>

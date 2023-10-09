@@ -6,6 +6,7 @@ import React, {
 	Fragment,
 	HTMLAttributes,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
 
@@ -17,7 +18,7 @@ import NavbarMenu from "./NavbarMenu";
 
 type NavbarContextType = {
 	isExpand: boolean;
-	userName?: string;
+	name?: string;
 };
 
 const navbarContextInitialState: NavbarContextType = {
@@ -28,10 +29,11 @@ export const NavbarContext = createContext(navbarContextInitialState);
 
 type Props = HTMLAttributes<HTMLDivElement> & {
 	isLoggedIn?: boolean;
+	name?: string;
 };
 
 const Navbar = (props: Props) => {
-	const {isLoggedIn, ...attrs} = props;
+	const {isLoggedIn, name, ...attrs} = props;
 
 	const [isExpand, setIsExpand] = useState<boolean>(false);
 
@@ -51,7 +53,7 @@ const Navbar = (props: Props) => {
 		<NavbarContext.Provider
 			value={{
 				isExpand: isExpand,
-				userName: "John Doe",
+				name,
 			}}
 		>
 			<div className="navbar" {...attrs}>

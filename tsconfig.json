@@ -26,7 +26,8 @@
 			"@/types/*": ["types/*"],
 			"@/config/*": ["config/*"],
 			"@/app/*": ["app/*"],
-			"@/mocks/*": ["mocks/*"]
+			"@/mocks/*": ["mocks/*"],
+			"@/utils/*": ["utils/*"]
 		},
 		"types": ["jest", "node", "@testing-library/jest-dom"]
 	},

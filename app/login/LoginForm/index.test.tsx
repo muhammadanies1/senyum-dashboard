@@ -104,20 +104,6 @@ describe("LoginForm", () => {
 	});
 
 	test("submits login form with invalid username and password", async () => {
-		global.fetch = jest.fn(() => {
-			return Promise.resolve({
-				ok: false,
-				text: () =>
-					Promise.resolve(
-						JSON.stringify({
-							responseCode: "0404",
-							responseDescription: "RESOURCE_NOT_FOUND",
-							data: null,
-						}),
-					),
-			});
-		}) as jest.Mock;
-
 		const {getByTestId} = render(<LoginForm />);
 
 		const usernameInput = getByTestId("username");
@@ -179,28 +165,26 @@ describe("LoginForm", () => {
 	test("should toggle password field type", async () => {
 		const {getByTestId} = render(<LoginForm />);
 
-		const passwordFormIcon = getByTestId("password-form-icon");
-		const passwordInputToggleBtns =
-			passwordFormIcon.getElementsByClassName("icon-wrapper");
+		const passwordTogglerBtn = getByTestId("password-toggler-btn");
 
 		const passwordInput = getByTestId("password");
 
 		expect(passwordInput).toHaveAttribute("type", "password");
 
-		if (passwordInputToggleBtns.length > 2) {
-			throw new Error(
-				`Expected 1 element, got ${passwordInputToggleBtns.length}.`,
-			);
-		} else if (passwordInputToggleBtns.length === 0) {
-			throw new Error(`The element does not exist.`);
-		}
-
 		act(() => {
-			userEvent.click(passwordInputToggleBtns[0]);
+			userEvent.click(passwordTogglerBtn);
 		});
 
 		await waitFor(async () => {
 			expect(passwordInput).toHaveAttribute("type", "text");
+		});
+
+		act(() => {
+			userEvent.click(passwordTogglerBtn);
+		});
+
+		await waitFor(async () => {
+			expect(passwordInput).toHaveAttribute("type", "password");
 		});
 	});
 

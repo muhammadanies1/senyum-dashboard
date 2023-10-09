@@ -1,9 +1,11 @@
 "use client";
 
+import axios, {AxiosError} from "axios";
 import React, {
 	FunctionComponent,
 	useCallback,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -18,8 +20,10 @@ import Label from "@/components/atoms/Label";
 import Radio from "@/components/atoms/Radio";
 import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
+import {ApiResponse} from "@/types/ApiResponse";
 import {EditUserPayload} from "@/types/EditUserPayload";
 import {User} from "@/types/User";
+import getCookie from "@/utils/getCookie";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 const schema = yup.object({
@@ -54,7 +58,7 @@ const schema = yup.object({
 	userTypeId: yup
 		.string()
 		.required("Tipe User harus dipilih.")
-		.oneOf(["ADMIN", "VIEWER"], "Tipe User tidak valid."),
+		.oneOf(["SUPER_ADMIN", "ADMIN", "VIEWER"], "Tipe User tidak valid."),
 	password: yup
 		.string()
 		.optional()
@@ -98,7 +102,7 @@ type EditUserProps = {
 	isShow: boolean;
 	handleClose: () => void;
 	onSuccess: () => Promise<void>;
-	onError: () => void;
+	onError: (error: unknown) => void;
 	userData?: User;
 };
 
@@ -116,17 +120,28 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const initialValue: yup.InferType<typeof schema> = {
-		id: userData?.id.toString() || "",
-		deviceId: userData?.deviceId || "",
-		username: userData?.username || "",
-		name: userData?.name || "",
-		email: userData?.email || "",
-		phoneNumber: userData?.phoneNumber || "",
-		userTypeId: userData?.userTypeId || "",
-		password: "",
-		passwordConfirm: "",
-	};
+	const initialValue: yup.InferType<typeof schema> = useMemo(
+		() => ({
+			id: userData?.id.toString() || "",
+			deviceId: userData?.deviceId || "",
+			username: userData?.username || "",
+			name: userData?.name || "",
+			email: userData?.email || "",
+			phoneNumber: userData?.phoneNumber || "",
+			userTypeId: userData?.userTypeId || "",
+			password: "",
+			passwordConfirm: "",
+		}),
+		[
+			userData?.deviceId,
+			userData?.email,
+			userData?.id,
+			userData?.name,
+			userData?.phoneNumber,
+			userData?.userTypeId,
+			userData?.username,
+		],
+	);
 
 	const {
 		control,
@@ -149,11 +164,23 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 				handleClose();
 				await onSuccess();
 			} catch (error) {
-				onError();
+				setIsLoading(false);
+				if (axios.isAxiosError(error)) {
+					const errorData: AxiosError<ApiResponse> = error;
+					const responseDescription =
+						errorData.response?.data.responseDescription;
+
+					switch (responseDescription) {
+						case "FORBIDDEN":
+							onError(new Error("Maaf Anda tidak dapat mengubah user ini."));
+							break;
+						default:
+							onError(error);
+					}
+				}
 			}
-			setIsLoading(false);
 		},
-		[onSuccess],
+		[handleClose, onError, onSuccess],
 	);
 
 	const submitForm = async (data: yup.InferType<typeof schema>) => {
@@ -171,7 +198,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 			setIsUnmaskPassword(false);
 			setIsUnmaskPasswordConfirmation(false);
 		}
-	}, [isShow]);
+	}, [initialValue, isShow, reset]);
 
 	return (
 		<Modal
@@ -316,17 +343,38 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 									Tipe User
 								</Label>
 								<div id="user-type-edit" className="flex mt-2">
-									<Radio
-										label="Admin"
-										id="radio-admin-edit"
-										data-testid="radio-admin-edit"
-										name="usertype-option"
-										className="w-full"
-										value="ADMIN"
-										checked={value === "ADMIN"}
-										onChange={onChange}
-										onClick={() => setValue("userTypeId", "ADMIN")}
-									/>
+									{getCookie("USER_TYPE") === "SUPER_ADMIN" ? (
+										<>
+											<Radio
+												label="Super Admin"
+												id="radio-super-admin"
+												data-testid="radio-super-admin-edit"
+												name="usertype-option"
+												className="w-full"
+												value="SUPER_ADMIN"
+												checked={value === "SUPER_ADMIN"}
+												onChange={onChange}
+												onClick={() => {
+													setValue("userTypeId", "SUPER_ADMIN");
+												}}
+											/>
+											<Radio
+												label="Admin"
+												id="radio-admin"
+												data-testid="radio-admin-edit"
+												name="usertype-option"
+												className="w-full"
+												value="ADMIN"
+												checked={value === "ADMIN"}
+												onChange={onChange}
+												onClick={() => {
+													setValue("userTypeId", "ADMIN");
+												}}
+											/>
+										</>
+									) : (
+										false
+									)}
 									<Radio
 										label="Viewer"
 										id="radio-viewer-edit"
