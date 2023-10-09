@@ -10,8 +10,8 @@ const Admin: FunctionComponent = () => {
 
 	let userType: userTypeID | undefined;
 
-	if (cookieStore.get("USER_TYPE")?.value) {
-		userType = cookieStore.get("USER_TYPE")?.value as userTypeID;
+	if (cookieStore.get("USER_TYPE_ID")?.value) {
+		userType = cookieStore.get("USER_TYPE_ID")?.value as userTypeID;
 	} else {
 		userType = "VIEWER";
 	}
