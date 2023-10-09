@@ -25,6 +25,7 @@ const userData: User = {
 	updatedAt: "2023-10-02T21:18:23Z",
 	userTypeId: "VIEWER",
 	username: "90147851",
+	editable: false,
 };
 
 beforeAll(() => server.listen());

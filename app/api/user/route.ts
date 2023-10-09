@@ -9,7 +9,7 @@ import {UserCollectionResponse} from "@/types/UserCollectionResponse";
 export async function GET(req: NextRequest) {
 	const searchParams = req.url.split("?");
 
-	let url = process.env.API_BFF_URL + "/api/v1/users-dashboard/get";
+	let url = "/api/v1/users-dashboard/get";
 
 	if (searchParams.length === 2) {
 		url = url + "?" + searchParams[1];

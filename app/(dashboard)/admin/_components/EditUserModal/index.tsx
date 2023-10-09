@@ -23,7 +23,7 @@ import axiosInstance from "@/config/client/axios";
 import {ApiResponse} from "@/types/ApiResponse";
 import {EditUserPayload} from "@/types/EditUserPayload";
 import {User} from "@/types/User";
-import getCookie from "@/utils/getCookie";
+import {userTypeID} from "@/types/UserTypeID";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 const schema = yup.object({
@@ -104,6 +104,7 @@ type EditUserProps = {
 	onSuccess: () => Promise<void>;
 	onError: (error: unknown) => void;
 	userData?: User;
+	userTypeId: userTypeID;
 };
 
 const EditUser: FunctionComponent<EditUserProps> = ({
@@ -112,6 +113,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 	onSuccess,
 	onError,
 	userData,
+	userTypeId,
 }) => {
 	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
 
@@ -343,7 +345,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 									Tipe User
 								</Label>
 								<div id="user-type-edit" className="flex mt-2">
-									{getCookie("USER_TYPE") === "SUPER_ADMIN" ? (
+									{userTypeId === "SUPER_ADMIN" ? (
 										<>
 											<Radio
 												label="Super Admin"

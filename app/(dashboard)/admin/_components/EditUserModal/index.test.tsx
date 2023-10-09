@@ -2,7 +2,7 @@ import React from "react";
 
 import {server} from "@/mocks/server";
 import {User} from "@/types/User";
-import {act, fireEvent, render, waitFor} from "@testing-library/react";
+import {render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import EditUser from "./";
@@ -12,8 +12,6 @@ const handleClose = jest.fn();
 const onSuccessHandler = jest.fn();
 
 const onErrorHandler = jest.fn();
-
-jest.mock("@/utils/getCookie", () => jest.fn().mockReturnValue("SUPER_ADMIN"));
 
 const userData: User = {
 	counter: 0,
@@ -45,6 +43,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
+				userType="SUPER_ADMIN"
 			/>,
 		);
 		const submitButton = getByTestId("submit-modal-edit-btn");
@@ -64,6 +63,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
+				userType="SUPER_ADMIN"
 			/>,
 		);
 		const modal = getByTestId("modal-edit-form");
@@ -88,6 +88,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
+				userType="SUPER_ADMIN"
 			/>,
 		);
 		const modal = getByTestId("modal-edit-form");
@@ -108,6 +109,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
+				userType="SUPER_ADMIN"
 			/>,
 		);
 
@@ -149,6 +151,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
+				userType="SUPER_ADMIN"
 			/>,
 		);
 
@@ -190,6 +193,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
+				userType="SUPER_ADMIN"
 			/>,
 		);
 

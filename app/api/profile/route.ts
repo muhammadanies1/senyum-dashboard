@@ -2,13 +2,15 @@ import {AxiosResponse, isAxiosError} from "axios";
 import {NextRequest, NextResponse} from "next/server";
 
 import axiosInstance from "@/config/server/axios";
-import {GetProfileResponse} from "@/types/GetProfileResponse";
+import {ProfileResponse} from "@/types/ProfileResponse";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-	let url = process.env.API_BFF_URL + "/api/v1/users-dashboard/get/profile";
+	let url = "/api/v1/users-dashboard/get/profile";
 
 	try {
-		const apiResponse: AxiosResponse<GetProfileResponse> =
+		const apiResponse: AxiosResponse<ProfileResponse> =
 			await axiosInstance.get(url);
 
 		const res = NextResponse.json(apiResponse.data, {
@@ -16,20 +18,22 @@ export async function GET(req: NextRequest) {
 		});
 
 		res.cookies.set({
-			name: "USER_TYPE",
+			name: "USER_TYPE_ID",
 			value: apiResponse.data.data.userTypeId,
+			path: "/",
 		});
 
 		res.cookies.set({
 			name: "NAME",
 			value: apiResponse.data.data.name,
+			path: "/",
 		});
 
 		return res;
 	} catch (error) {
 		if (isAxiosError(error)) {
 			return NextResponse.json(error.response?.data, {
-				status: error?.response?.status,
+				status: error.response?.status,
 			});
 		}
 	}

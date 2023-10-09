@@ -68,10 +68,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 
 			try {
 				setIsLoading(true);
-				const res: AxiosResponse<LoginResponse> = await axiosInstance.post(
-					"/api/login",
-					data,
-				);
+				await axiosInstance.post("/api/login", data);
 				await axiosInstance.get("/api/profile");
 				router.push("/");
 			} catch (error) {
