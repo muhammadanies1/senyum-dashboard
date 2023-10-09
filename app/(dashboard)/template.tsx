@@ -1,3 +1,5 @@
+export const dynamic = "auto";
+
 import {cookies} from "next/headers";
 import {Fragment, FunctionComponent} from "react";
 
@@ -11,12 +13,12 @@ interface AdminTemplateProps {
 
 const AdminTemplate: FunctionComponent<AdminTemplateProps> = ({children}) => {
 	const cookieStore = cookies();
-	const TOKEN = cookieStore.get("TOKEN");
-	const name = cookieStore.get("NAME");
+	const TOKEN = cookieStore.get("TOKEN")?.value;
+	const name = cookieStore.get("NAME")?.value;
 
 	return (
 		<Fragment>
-			<Navbar isLoggedIn={!!TOKEN?.value} name={name?.value} />
+			<Navbar isLoggedIn={!!TOKEN} name={name} />
 			<div className="wrapper">
 				<div className="inner-wrapper">
 					<div className="py-4">

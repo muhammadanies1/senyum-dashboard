@@ -1,8 +1,9 @@
 import {AxiosResponse, isAxiosError} from "axios";
-import {NextResponse} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 
 import axiosInstance from "@/config/server/axios";
 import {ApiResponse} from "@/types/ApiResponse";
+import {ProfileResponse} from "@/types/ProfileResponse";
 
 export type LoginPayload = {
 	username: string;
@@ -16,7 +17,7 @@ export type ResponseData = {
 
 export type LoginResponse = ApiResponse<ResponseData>;
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
 	try {
 		const requestData: LoginPayload = await request.json();
 		const apiResponse: AxiosResponse<LoginResponse> = await axiosInstance.post(

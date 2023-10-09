@@ -24,7 +24,7 @@ import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
 import {ApiResponse} from "@/types/ApiResponse";
 import {CreateUserPayload} from "@/types/CreateUserPayload";
-import getCookie from "@/utils/getCookie";
+import {userTypeID} from "@/types/UserTypeID";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 const schema = yup.object({
@@ -94,6 +94,7 @@ const schema = yup.object({
 type AddUserProps = {
 	onSuccess: () => Promise<void>;
 	onError: (error: unknown) => void;
+	userTypeId: userTypeID;
 };
 
 const initialValue: yup.InferType<typeof schema> = {
@@ -106,7 +107,11 @@ const initialValue: yup.InferType<typeof schema> = {
 	passwordConfirm: "",
 };
 
-const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
+const AddUser: FunctionComponent<AddUserProps> = ({
+	onSuccess,
+	onError,
+	userTypeId,
+}) => {
 	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
 
 	const [isUnmaskPasswordConfirmation, setIsUnmaskPasswordConfirmation] =
@@ -373,7 +378,7 @@ const AddUser: FunctionComponent<AddUserProps> = ({onSuccess, onError}) => {
 										Tipe User
 									</Label>
 									<div id="user-type" className="flex mt-2">
-										{getCookie("USER_TYPE") === "SUPER_ADMIN" ? (
+										{userTypeId && userTypeId === "SUPER_ADMIN" ? (
 											<>
 												<Radio
 													label="Super Admin"
