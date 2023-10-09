@@ -244,9 +244,9 @@ const Admin = () => {
 									<td>{item.name}</td>
 									<td>{item.email}</td>
 									<td>{item.userTypeId}</td>
-									<td className="flex gap-4">
+									<td>
 										{item?.editable ? (
-											<>
+											<div className="flex">
 												<Button
 													id="show-edit-modal-btn"
 													data-testid="show-edit-modal-btn"
@@ -269,7 +269,7 @@ const Admin = () => {
 												>
 													<i className="fas fa-trash-alt text-red-80"></i>
 												</Button>
-											</>
+											</div>
 										) : (
 											false
 										)}
@@ -278,7 +278,7 @@ const Admin = () => {
 							))
 						) : (
 							<tr>
-								<td className="text-center"> Tidak Ada Data </td>
+								<td className="text-center">Tidak Ada Data</td>
 							</tr>
 						)}
 					</tbody>
@@ -325,10 +325,12 @@ const Admin = () => {
 						sortBy: undefined,
 					});
 				}}
-				onError={() => {
+				onError={(error) => {
+					const errorMessage = new Error(error as any).message;
 					setToastStatus(false);
 					setIsShowToast(true);
-					setToastMessage("User gagal diubah. Silakan coba lagi.");
+					setToastMessage(errorMessage);
+					setIsShowEditModal(false);
 				}}
 			/>
 
@@ -348,10 +350,12 @@ const Admin = () => {
 						sortBy: undefined,
 					});
 				}}
-				onError={() => {
+				onError={(error) => {
+					const errorMessage = new Error(error as any).message;
 					setToastStatus(false);
 					setIsShowToast(true);
-					setToastMessage("User gagal dihapus. Silakan coba lagi.");
+					setToastMessage(errorMessage);
+					setIsShowDeleteModal(false);
 				}}
 			/>
 		</Card>

@@ -1,10 +1,12 @@
 "use client";
 
+import axios, {AxiosError} from "axios";
 import React, {FunctionComponent, HTMLAttributes, useState} from "react";
 
 import Button from "@/components/atoms/Button";
 import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
+import {ApiResponse} from "@/types/ApiResponse";
 import {User} from "@/types/User";
 
 type Props = HTMLAttributes<HTMLDivElement> & {
@@ -36,7 +38,19 @@ const ModalDeleteUser: FunctionComponent<Props> = ({
 			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
-			onError(error);
+			if (axios.isAxiosError(error)) {
+				const errorData: AxiosError<ApiResponse> = error;
+				const responseDescription =
+					errorData.response?.data.responseDescription;
+
+				switch (responseDescription) {
+					case "FORBIDDEN":
+						onError("Maaf Anda tidak dapat menghapus user ini");
+						break;
+					default:
+						onError(error);
+				}
+			}
 		}
 	};
 
