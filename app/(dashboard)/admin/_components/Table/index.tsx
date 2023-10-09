@@ -251,7 +251,7 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 									<td>{item.name}</td>
 									<td>{item.email}</td>
 									<td>{item.userTypeId}</td>
-									<td className="flex">
+									<td className="flex gap-1">
 										<Button
 											id="show-edit-modal-btn"
 											data-testid="show-edit-modal-btn"
@@ -264,10 +264,11 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 													: undefined
 											}
 											transparent
+											disabled={!isEditable(item)}
 										>
 											<i
 												className={"fa-regular fa-pen-to-square".concat(
-													isEditable(item) ? "" : " text-light-80",
+													isEditable(item) ? "" : " text-light-50",
 												)}
 											></i>
 										</Button>
@@ -283,10 +284,11 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 													: undefined
 											}
 											transparent
+											disabled={!isEditable(item)}
 										>
 											<i
 												className={"fas fa-trash-alt".concat(
-													isEditable(item) ? " text-red-80" : " text-light-80",
+													isEditable(item) ? " text-red-80" : " text-light-50",
 												)}
 											></i>
 										</Button>

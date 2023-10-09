@@ -1,6 +1,6 @@
 "use client";
 
-import axios, {AxiosError, AxiosResponse} from "axios";
+import axios, {AxiosError} from "axios";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import React, {
@@ -12,7 +12,6 @@ import React, {
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
-import {LoginResponse} from "@/app/api/login/route";
 import Button from "@/components/atoms/Button";
 import FormGroup from "@/components/atoms/FormGroup";
 import FormIcon from "@/components/atoms/FormIcon";
@@ -61,34 +60,31 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 		mode: "all",
 	});
 
-	const fetchLogin = useCallback(
-		async (data: yup.InferType<typeof schema>) => {
-			setIsShowToast(false);
-			setToastMessage(undefined);
+	const fetchLogin = useCallback(async (data: yup.InferType<typeof schema>) => {
+		setIsShowToast(false);
+		setToastMessage(undefined);
 
-			try {
-				setIsLoading(true);
-				await axiosInstance.post("/api/login", data);
-				await axiosInstance.get("/api/profile");
-				router.push("/");
-			} catch (error) {
-				if (axios.isAxiosError(error)) {
-					const errorData: AxiosError<ApiResponse> = error;
-					const responseDescription =
-						errorData.response?.data.responseDescription;
-					switch (responseDescription) {
-						case "INVALID_USERNAME_OR_PASSWORD":
-						case "RESOURCE_NOT_FOUND":
-							setIsShowToast(true);
-							setToastMessage("Username atau password tidak valid.");
-							break;
-					}
+		try {
+			setIsLoading(true);
+			await axiosInstance.post("/api/login", data);
+			await axiosInstance.get("/api/profile");
+			window.location.href = "/";
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				const errorData: AxiosError<ApiResponse> = error;
+				const responseDescription =
+					errorData.response?.data.responseDescription;
+				switch (responseDescription) {
+					case "INVALID_USERNAME_OR_PASSWORD":
+					case "RESOURCE_NOT_FOUND":
+						setIsShowToast(true);
+						setToastMessage("Username atau password tidak valid.");
+						break;
 				}
 			}
-			setIsLoading(false);
-		},
-		[router],
-	);
+		}
+		setIsLoading(false);
+	}, []);
 
 	const onSubmit = async (data: yup.InferType<typeof schema>) => {
 		let timeout: NodeJS.Timeout | undefined = undefined;

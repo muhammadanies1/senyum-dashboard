@@ -3,7 +3,6 @@
 import "./style.css";
 
 import Link from "next/link";
-import {useRouter} from "next/navigation";
 import React, {
 	Fragment,
 	FunctionComponent,
@@ -25,8 +24,6 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 	className,
 	...attrs
 }) => {
-	const router = useRouter();
-
 	const {isExpand, name} = useContext(NavbarContext);
 
 	const [isShowConfirmation, setIsShowConfirmation] = useState<boolean>(false);
@@ -36,8 +33,8 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 		document.cookie = `REFRESH_TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		document.cookie = `USER_TYPE_ID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		document.cookie = `NAME=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-		router.push("/login");
-	}, [router]);
+		window.location.href = "/login";
+	}, []);
 
 	return (
 		<Fragment>
