@@ -20,6 +20,11 @@ export async function GET(req: NextRequest) {
 			value: apiResponse.data.data.userTypeId,
 		});
 
+		res.cookies.set({
+			name: "NAME",
+			value: apiResponse.data.data.name,
+		});
+
 		return res;
 	} catch (error) {
 		if (isAxiosError(error)) {

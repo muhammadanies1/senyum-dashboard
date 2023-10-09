@@ -105,6 +105,10 @@ const Admin = () => {
 		return numberOfTable;
 	}, [params?.page]);
 
+	const isEditable = useCallback((data: User) => {
+		return data.editable;
+	}, []);
+
 	return (
 		<Card className="flex flex-col gap-6">
 			<form
@@ -236,35 +240,45 @@ const Admin = () => {
 									<td>{item.name}</td>
 									<td>{item.email}</td>
 									<td>{item.userTypeId}</td>
-									<td>
-										{item?.editable ? (
-											<div className="flex">
-												<Button
-													id="show-edit-modal-btn"
-													data-testid="show-edit-modal-btn"
-													onClick={() => {
-														setSelectedUser(item);
-														setIsShowEditModal(true);
-													}}
-													transparent
-												>
-													<i className="fa-regular fa-pen-to-square"></i>
-												</Button>
-												<Button
-													id="show-delete-modal-btn"
-													data-testid="show-delete-modal-btn"
-													onClick={() => {
-														setSelectedUser(item);
-														setIsShowDeleteModal(true);
-													}}
-													transparent
-												>
-													<i className="fas fa-trash-alt text-red-80"></i>
-												</Button>
-											</div>
-										) : (
-											false
-										)}
+									<td className="flex">
+										<Button
+											id="show-edit-modal-btn"
+											data-testid="show-edit-modal-btn"
+											onClick={
+												isEditable(item)
+													? () => {
+															setSelectedUser(item);
+															setIsShowEditModal(true);
+													  }
+													: undefined
+											}
+											transparent
+										>
+											<i
+												className={"fa-regular fa-pen-to-square".concat(
+													isEditable(item) ? "" : " text-light-80",
+												)}
+											></i>
+										</Button>
+										<Button
+											id="show-delete-modal-btn"
+											data-testid="show-delete-modal-btn"
+											onClick={
+												isEditable(item)
+													? () => {
+															setSelectedUser(item);
+															setIsShowDeleteModal(true);
+													  }
+													: undefined
+											}
+											transparent
+										>
+											<i
+												className={"fas fa-trash-alt".concat(
+													isEditable(item) ? " text-red-80" : " text-light-80",
+												)}
+											></i>
+										</Button>
 									</td>
 								</tr>
 							))

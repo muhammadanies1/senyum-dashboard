@@ -12,10 +12,11 @@ interface AdminTemplateProps {
 const AdminTemplate: FunctionComponent<AdminTemplateProps> = ({children}) => {
 	const cookieStore = cookies();
 	const TOKEN = cookieStore.get("TOKEN");
+	const name = cookieStore.get("NAME");
 
 	return (
 		<Fragment>
-			<Navbar isLoggedIn={!!TOKEN} />
+			<Navbar isLoggedIn={!!TOKEN?.value} name={name?.value} />
 			<div className="wrapper">
 				<div className="inner-wrapper">
 					<div className="py-4">

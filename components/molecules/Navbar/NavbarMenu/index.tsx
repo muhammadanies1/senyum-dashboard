@@ -27,7 +27,7 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 }) => {
 	const router = useRouter();
 
-	const {isExpand, userName} = useContext(NavbarContext);
+	const {isExpand, name} = useContext(NavbarContext);
 
 	const [isShowConfirmation, setIsShowConfirmation] = useState<boolean>(false);
 
@@ -35,6 +35,7 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 		document.cookie = `TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		document.cookie = `REFRESH_TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		document.cookie = `USER_TYPE=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+		document.cookie = `NAME=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		router.push("/login");
 	}, [router]);
 
@@ -63,11 +64,11 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 					label={
 						<div className="flex gap-2 items-center w-full lg:w-auto text-light-80">
 							<span className="font-medium text-dark-40 text-base order-2 lg:order-1">
-								{userName}
+								{name}
 							</span>
 							<Avatar
-								name="John Doe Tes"
-								title="John Doe Avatar"
+								name={name || ""}
+								title={name}
 								className="order-1 lg:order-2"
 							/>
 							<i className="fas fa-chevron-down order-3"></i>

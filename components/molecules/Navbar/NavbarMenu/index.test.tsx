@@ -17,7 +17,7 @@ describe("NavbarMenu component", () => {
 			<NavbarContext.Provider
 				value={{
 					isExpand: false,
-					userName: "John Doe",
+					name: "John Doe",
 				}}
 			>
 				<NavbarMenu />
@@ -37,19 +37,19 @@ describe("NavbarMenu component", () => {
 		expect(profileLink).toBeInTheDocument();
 	});
 
-	it("renders the username", () => {
+	it("renders the name", () => {
 		const {getByText} = render(
 			<NavbarContext.Provider
 				value={{
 					isExpand: false,
-					userName: "John Doe",
+					name: "John Doe",
 				}}
 			>
 				<NavbarMenu />
 			</NavbarContext.Provider>,
 		);
-		const usernameElement = getByText("John Doe");
-		expect(usernameElement).toBeInTheDocument();
+		const nameElement = getByText("John Doe");
+		expect(nameElement).toBeInTheDocument();
 	});
 
 	it("renders the avatar", () => {
@@ -57,13 +57,13 @@ describe("NavbarMenu component", () => {
 			<NavbarContext.Provider
 				value={{
 					isExpand: false,
-					userName: "John Doe",
+					name: "John Doe",
 				}}
 			>
 				<NavbarMenu />
 			</NavbarContext.Provider>,
 		);
-		const avatarElement = getByTitle("John Doe Avatar");
+		const avatarElement = getByTitle("John Doe");
 		expect(avatarElement).toBeInTheDocument();
 	});
 
@@ -72,7 +72,7 @@ describe("NavbarMenu component", () => {
 			<NavbarContext.Provider
 				value={{
 					isExpand: false,
-					userName: "John Doe",
+					name: "John Doe",
 				}}
 			>
 				<NavbarMenu />
@@ -87,7 +87,7 @@ describe("NavbarMenu component", () => {
 			<NavbarContext.Provider
 				value={{
 					isExpand: true,
-					userName: "John Doe",
+					name: "John Doe",
 				}}
 			>
 				<NavbarMenu />
@@ -102,7 +102,7 @@ describe("NavbarMenu component", () => {
 			<NavbarContext.Provider
 				value={{
 					isExpand: true,
-					userName: "John Doe",
+					name: "John Doe",
 				}}
 			>
 				<NavbarMenu className="custom-class" />

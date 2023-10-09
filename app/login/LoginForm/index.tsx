@@ -72,10 +72,8 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 					"/api/login",
 					data,
 				);
-				if (res?.status === 200) {
-					await axiosInstance.get("/api/profile");
-					router.push("/");
-				}
+				await axiosInstance.get("/api/profile");
+				router.push("/");
 			} catch (error) {
 				if (axios.isAxiosError(error)) {
 					const errorData: AxiosError<ApiResponse> = error;
@@ -155,6 +153,8 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 								/>
 								<button
 									className="icon"
+									id="password-toggler-btn"
+									data-testid="password-toggler-btn"
 									type="button"
 									onClick={() => setIsUnmaskPassword(!isUnmaskPassword)}
 								>
