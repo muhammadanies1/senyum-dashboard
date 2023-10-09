@@ -5,6 +5,7 @@ import React, {
 	FunctionComponent,
 	useCallback,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -119,17 +120,28 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const initialValue: yup.InferType<typeof schema> = {
-		id: userData?.id.toString() || "",
-		deviceId: userData?.deviceId || "",
-		username: userData?.username || "",
-		name: userData?.name || "",
-		email: userData?.email || "",
-		phoneNumber: userData?.phoneNumber || "",
-		userTypeId: userData?.userTypeId || "",
-		password: "",
-		passwordConfirm: "",
-	};
+	const initialValue: yup.InferType<typeof schema> = useMemo(
+		() => ({
+			id: userData?.id.toString() || "",
+			deviceId: userData?.deviceId || "",
+			username: userData?.username || "",
+			name: userData?.name || "",
+			email: userData?.email || "",
+			phoneNumber: userData?.phoneNumber || "",
+			userTypeId: userData?.userTypeId || "",
+			password: "",
+			passwordConfirm: "",
+		}),
+		[
+			userData?.deviceId,
+			userData?.email,
+			userData?.id,
+			userData?.name,
+			userData?.phoneNumber,
+			userData?.userTypeId,
+			userData?.username,
+		],
+	);
 
 	const {
 		control,
@@ -160,7 +172,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 
 					switch (responseDescription) {
 						case "FORBIDDEN":
-							onError("Maaf Anda tidak dapat mengubah user ini");
+							onError(new Error("Maaf Anda tidak dapat mengubah user ini."));
 							break;
 						default:
 							onError(error);
@@ -168,7 +180,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 				}
 			}
 		},
-		[onSuccess],
+		[handleClose, onError, onSuccess],
 	);
 
 	const submitForm = async (data: yup.InferType<typeof schema>) => {
@@ -186,7 +198,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 			setIsUnmaskPassword(false);
 			setIsUnmaskPasswordConfirmation(false);
 		}
-	}, [isShow]);
+	}, [initialValue, isShow, reset]);
 
 	return (
 		<Modal

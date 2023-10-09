@@ -42,7 +42,6 @@ const Admin = () => {
 	});
 
 	const [data, setData] = useState<UserCollectionResponse>();
-	const [isDeleteSuccess, setIsDeleteSuccess] = useState<boolean>(false);
 	const [isShowToast, setIsShowToast] = useState<boolean>(false);
 	const [toastStatus, setToastStatus] = useState<boolean>();
 	const [toastMessage, setToastMessage] = useState<string>();
@@ -61,27 +60,20 @@ const Admin = () => {
 		resolver: yupResolver(schema),
 	});
 
-	const fetchData = useCallback(
-		async (params: UserCollectionParams) => {
-			try {
-				if (isDeleteSuccess) {
-					setIsDeleteSuccess(false);
-				}
+	const fetchData = useCallback(async (params: UserCollectionParams) => {
+		try {
+			const res: AxiosResponse<UserCollectionResponse> =
+				await axiosInstance.get("/api/user", {
+					params,
+				});
 
-				const res: AxiosResponse<UserCollectionResponse> =
-					await axiosInstance.get("/api/user", {
-						params,
-					});
-
-				setData(res.data);
-			} catch (error) {
-				if (error) {
-					setData(undefined);
-				}
+			setData(res.data);
+		} catch (error) {
+			if (error) {
+				setData(undefined);
 			}
-		},
-		[isDeleteSuccess],
-	);
+		}
+	}, []);
 
 	const onSubmit = useCallback((data: yup.InferType<typeof schema>) => {
 		console.log(data);
@@ -105,7 +97,7 @@ const Admin = () => {
 	useEffect(() => {
 		fetchData(params);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [params, isDeleteSuccess]);
+	}, [params]);
 
 	const tableNumber = useMemo(() => {
 		const numberOfTable: number = params?.page * 10 - 10;
@@ -278,7 +270,9 @@ const Admin = () => {
 							))
 						) : (
 							<tr>
-								<td className="text-center">Tidak Ada Data</td>
+								<td className="!text-center" colSpan={6}>
+									Tidak Ada Data
+								</td>
 							</tr>
 						)}
 					</tbody>
