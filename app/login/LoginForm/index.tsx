@@ -80,6 +80,12 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 						setIsShowToast(true);
 						setToastMessage("Username atau password tidak valid.");
 						break;
+					case "FREEZE":
+						setIsShowToast(true);
+						setToastMessage(
+							"Anda salah menginputkan password sebanyak 5x. Silakan coba lagi setelah 3 menit",
+						);
+						break;
 				}
 			}
 		}
