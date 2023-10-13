@@ -51,15 +51,8 @@ const schema = yup.object({
 		.required("Email harus diisi.")
 		.max(255, "Email maksimal 255 karakter")
 		.matches(
-			/^[\w.]+@/,
-			"Email hanya bisa memiliki kombinasi huruf kecil, angka, simbol underscore ( _ ) dan titik ( . ) sebelum @work.bri.co.id",
-		)
-		.test(
-			"is-work-bri-email",
-			"Email harus berdomain work.bri.co.id",
-			function (value) {
-				return value.endsWith("work.bri.co.id");
-			},
+			/^[\w.]+@(bri\.co\.id|work\.bri\.co\.id|corp\.bri\.co\.id)$/,
+			"Email hanya bisa memiliki kombinasi huruf, angka, simbol underscore dan titik dengan domain yang valid.",
 		),
 	phoneNumber: yup
 		.string()
@@ -68,7 +61,7 @@ const schema = yup.object({
 		.max(15, "Nomor Telepon maksimal 15 karakter.")
 		.matches(
 			/^\+?\d+$/,
-			"Nomor Telepon hanya boleh mengandung angka dan satu plus (+) opsional.",
+			"Nomor Telepon hanya boleh mengandung angka dan satu simbol plus opsional.",
 		),
 	userTypeId: yup
 		.mixed()
@@ -145,6 +138,7 @@ const AddUser: FunctionComponent<AddUserProps> = ({
 				setIsLoading(true);
 				await axiosInstance.post("/api/user", payload);
 				setIsShow(false);
+				setIsLoading(false);
 				await onSuccess();
 			} catch (error) {
 				setIsLoading(false);
@@ -184,9 +178,7 @@ const AddUser: FunctionComponent<AddUserProps> = ({
 	}, [isLoading]);
 
 	useEffect(() => {
-		if (!isShow) {
-			reset(initialValue);
-		}
+		reset(initialValue);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isShow]);
 
@@ -298,7 +290,7 @@ const AddUser: FunctionComponent<AddUserProps> = ({
 						<Controller
 							control={control}
 							name="email"
-							render={({field, fieldState: {error}}) => (
+							render={({field: {onChange, ...attrs}, fieldState: {error}}) => (
 								<FormGroup>
 									<Label
 										htmlFor="email"
@@ -310,9 +302,13 @@ const AddUser: FunctionComponent<AddUserProps> = ({
 									<Input
 										id="email"
 										data-testid="email"
-										placeholder="Email berdomain @work.bri.co.id"
+										placeholder="Email berdomain @bri.co.id / @corp.bri.co.id / @work.bri.co.id"
 										type="email"
-										{...field}
+										{...attrs}
+										onChange={(e) => {
+											const value = e.currentTarget.value.trim().toLowerCase();
+											onChange(value);
+										}}
 										variant={error ? "error" : undefined}
 									/>
 									{error?.message ? (
