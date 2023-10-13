@@ -3,16 +3,9 @@ import userEvent from "@testing-library/user-event";
 
 import LoginForm from "./index";
 
-const mockedRouterPush = jest.fn();
+const mockedWindowNavigate = jest.fn();
 
-jest.mock("next/navigation", () => ({
-	useRouter: () => {
-		return {
-			...jest.requireActual("next/navigation").useRouter,
-			push: mockedRouterPush,
-		};
-	},
-}));
+jest.mock("@/utils/windowNavigate.ts", () => mockedWindowNavigate);
 
 describe("LoginForm", () => {
 	test("renders login form correctly", () => {
@@ -25,7 +18,7 @@ describe("LoginForm", () => {
 	});
 
 	test("renders error message when the username and password leaves blank after blur", async () => {
-		const {getByTestId, findByTestId, debug} = render(<LoginForm />);
+		const {getByTestId, findByTestId} = render(<LoginForm />);
 
 		const usernameInput = getByTestId("username");
 		const passwordInput = getByTestId("password");
@@ -47,21 +40,6 @@ describe("LoginForm", () => {
 	});
 
 	test("submits login form with correct username and password", async () => {
-		global.fetch = jest.fn(() => {
-			return Promise.resolve({
-				ok: true,
-				json: () =>
-					Promise.resolve({
-						responseCode: "0200",
-						responseDescription: "SUCCESS",
-						data: {
-							accessToken: "accessToken",
-							refreshToken: "refreshToken",
-						},
-					}),
-			});
-		}) as jest.Mock;
-
 		const {getByTestId} = render(<LoginForm />);
 
 		const usernameInput = getByTestId("username");
@@ -99,7 +77,7 @@ describe("LoginForm", () => {
 		});
 
 		await waitFor(() => {
-			expect(mockedRouterPush).toHaveBeenCalledWith("/");
+			expect(mockedWindowNavigate).toHaveBeenCalledWith("/");
 		});
 	});
 
@@ -141,10 +119,11 @@ describe("LoginForm", () => {
 		});
 
 		await waitFor(() => {
-			expect(toast).toHaveTextContent("Username atau password tidak valid.");
-			expect(toast.parentElement).toHaveClass("flex", "opacity-100", "top-24");
+			expect(toast.parentElement).toHaveClass("toast-container");
 			expect(toast.parentElement).toHaveClass("opacity-100");
+			expect(toast.parentElement).toHaveClass("flex", "opacity-100", "top-24");
 			expect(toast.parentElement).toHaveClass("top-24");
+			expect(toast).toHaveTextContent("Username atau password tidak valid.");
 		});
 
 		const toastCloseBtn = toast.getElementsByClassName("toast-close-btn");

@@ -13,6 +13,7 @@ import React, {
 } from "react";
 
 import Avatar from "@/components/atoms/Avatar";
+import windowNavigate from "@/utils/windowNavigate";
 
 import {NavbarContext} from "../";
 import Dropdown from "../../Dropdown";
@@ -33,7 +34,7 @@ const NavbarMenu: FunctionComponent<NavbarMenuProps> = ({
 		document.cookie = `REFRESH_TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		document.cookie = `USER_TYPE_ID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		document.cookie = `NAME=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-		window.location.href = "/login";
+		windowNavigate("/login");
 	}, []);
 
 	return (

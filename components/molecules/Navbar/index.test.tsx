@@ -5,14 +5,9 @@ import userEvent from "@testing-library/user-event";
 
 import Navbar from "./";
 
-const mockedPush = jest.fn();
+const mockedWindowNavigate = jest.fn();
 
-jest.mock("next/navigation", () => ({
-	useRouter: () => ({
-		...jest.requireActual("next/navigation").useRouter,
-		push: mockedPush,
-	}),
-}));
+jest.mock("@/utils/windowNavigate", () => mockedWindowNavigate);
 
 describe("Navbar component", () => {
 	it("renders without errors", () => {
@@ -118,7 +113,7 @@ describe("Navbar component", () => {
 		fireEvent.click(logoutConfirmationModalLogoutBtn);
 
 		await waitFor(() => {
-			expect(mockedPush).toHaveBeenCalled();
+			expect(mockedWindowNavigate).toHaveBeenCalledWith("/login");
 		});
 	});
 });

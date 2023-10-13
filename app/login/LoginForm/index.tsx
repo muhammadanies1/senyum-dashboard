@@ -21,6 +21,7 @@ import Label from "@/components/atoms/Label";
 import Toast from "@/components/molecules/Toast";
 import axiosInstance from "@/config/client/axios";
 import {ApiResponse} from "@/types/ApiResponse";
+import windowNavigate from "@/utils/windowNavigate";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 type LoginFormProps = HTMLAttributes<HTMLDivElement>;
@@ -68,7 +69,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 			setIsLoading(true);
 			await axiosInstance.post("/api/login", data);
 			await axiosInstance.get("/api/profile");
-			window.location.href = "/";
+			windowNavigate("/");
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const errorData: AxiosError<ApiResponse> = error;
