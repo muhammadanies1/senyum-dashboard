@@ -23,6 +23,7 @@ import FormMessage from "@/components/atoms/FormMessage";
 import Input from "@/components/atoms/Input";
 import Label from "@/components/atoms/Label";
 import PageTitle from "@/components/atoms/PageTitle";
+import Pagination from "@/components/atoms/Pagination";
 import Table from "@/components/atoms/Table";
 import TableContainer from "@/components/atoms/TableContainer";
 import Toast from "@/components/molecules/Toast";
@@ -305,17 +306,10 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 					</tbody>
 				</Table>
 			</TableContainer>
-			<ReactPaginate
-				className="container-pagination"
-				pageLinkClassName="page-link"
-				activeClassName="page-active"
-				breakLabel="..."
-				nextLabel={null}
-				onPageChange={handlePageClick}
-				pageRangeDisplayed={5}
+			<Pagination
+				page={params?.page}
 				pageCount={pageCount}
-				previousLabel={null}
-				renderOnZeroPageCount={null}
+				onPageChange={handlePageClick}
 			/>
 
 			<Toast
