@@ -42,15 +42,15 @@
 	}
 
 	.btn.primary.transparent {
-		@apply text-primary-80 bg-white border-white focus:outline-primary-40;
+		@apply text-primary-80 bg-transparent border-transparent focus:outline-primary-40;
 	}
 
 	.btn.secondary.transparent {
-		@apply text-secondary-80 bg-white border-white focus:outline-secondary-10;
+		@apply text-secondary-80 bg-transparent border-transparent focus:outline-secondary-10;
 	}
 
 	.btn.danger.transparent {
-		@apply text-red-80 bg-white border-white focus:outline-red-10;
+		@apply text-red-80 bg-transparent border-transparent focus:outline-red-10;
 	}
 
 	/* ===== MODAL ===== */

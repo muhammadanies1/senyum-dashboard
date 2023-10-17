@@ -1,0 +1,24 @@
+export type SimpedesUmiApplicationDetail = {
+	id: string;
+	idNo: string;
+	custName: string;
+	cellPhoneNumber: string;
+	dateOfBirth: string;
+	placeOfBirth: string;
+	sex: string;
+	religion: string;
+	maritalStatus: string;
+	motherName: string;
+	education: string;
+	workTypeId: string;
+	workPositionId: string;
+	fieldWork: string;
+	typeOfWork: string;
+	addressDom: string;
+	address: string;
+	partnerId: number;
+	partnerName: string;
+	status: string;
+	createdAt: string;
+	updatedAt: string;
+};
