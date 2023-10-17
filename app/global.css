@@ -446,6 +446,10 @@
 		@apply flex justify-between font-semibold text-sm underline text-blue-80;
 	}
 
+	.table .td-partner-name {
+		@apply max-w-[108px] truncate;
+	}
+
 	/* ===== CARD ===== */
 	.card {
 		@apply bg-white rounded-xl p-4;
