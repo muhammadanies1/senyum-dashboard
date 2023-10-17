@@ -3,20 +3,20 @@ import React from "react";
 import {render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import ModalDownloadSubmission from "./modal-download-submission";
+import DownloadApplication from "./";
 
 window.alert = jest.fn();
 
-describe("ModalDownloadSubmission", () => {
+describe("DownloadApplication", () => {
 	it("renders the 'Download Data Pengajuan' button", () => {
-		const {getByTestId} = render(<ModalDownloadSubmission />);
+		const {getByTestId} = render(<DownloadApplication />);
 		const showModalButton = getByTestId("show-modal-download-btn");
 
 		expect(showModalButton).toBeInTheDocument();
 	});
 
 	it("opens the modal when the 'Download Data Pengajuan' button is clicked and submit button is disabled initially", async () => {
-		const {getByTestId} = render(<ModalDownloadSubmission />);
+		const {getByTestId} = render(<DownloadApplication />);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
 		const showModalButton = getByTestId("show-modal-download-btn");
 		const modal = getByTestId("modal-download-form");
@@ -36,7 +36,7 @@ describe("ModalDownloadSubmission", () => {
 	});
 
 	it("closes the modal when the close button is clicked", async () => {
-		const {getByTestId, queryByTestId} = render(<ModalDownloadSubmission />);
+		const {getByTestId, queryByTestId} = render(<DownloadApplication />);
 		const showModalButton = getByTestId("show-modal-download-btn");
 		const modal = queryByTestId("modal-download-form");
 
@@ -61,7 +61,7 @@ describe("ModalDownloadSubmission", () => {
 	});
 
 	it("closes the modal when the background is clicked", async () => {
-		const {getByTestId} = render(<ModalDownloadSubmission />);
+		const {getByTestId} = render(<DownloadApplication />);
 		const showModalButton = getByTestId("show-modal-download-btn");
 		const modal = getByTestId("modal-download-form");
 
@@ -86,7 +86,7 @@ describe("ModalDownloadSubmission", () => {
 	});
 
 	it("submits the form with valid data", async () => {
-		const {getByTestId, queryByTestId} = render(<ModalDownloadSubmission />);
+		const {getByTestId, queryByTestId} = render(<DownloadApplication />);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
 		const showModalButton = getByTestId("show-modal-download-btn");
 		const modal = queryByTestId("modal-download-form");

@@ -8,7 +8,6 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import ReactPaginate from "react-paginate";
 
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
@@ -24,8 +23,15 @@ import {SimpedesUmiApplicationCollectionParams} from "@/types/SimpedesUmiApplica
 import {SimpedesUmiApplicationCollectionResponse} from "@/types/SimpedesUmiApplicationCollectionResponse";
 import formatISODateToCustomFormat from "@/utils/formatISODateToCustomFormat";
 
+import ModalDetailApplication from "./_components/DetailApplicationModal";
+import ModalDownloadApplication from "./_components/DownloadApplicationModal";
+
 const Application: FunctionComponent = () => {
 	const [isShowDropdown, setIsShowDropdown] = useState<boolean>(false);
+	const [isShowDetailModal, setIsShowDetailModal] = useState<boolean>(false);
+	const [isShowDownloadModal, setIsShowDownloadModal] =
+		useState<boolean>(false);
+	const [selectedApplication, setSelectedApplication] = useState<string>();
 
 	const [params, setParams] = useState<SimpedesUmiApplicationCollectionParams>({
 		page: 1,
@@ -150,8 +156,29 @@ const Application: FunctionComponent = () => {
 									</td>
 									<td>
 										<div className="td-action">
-											<span>Detail</span>
-											<i className="fa fa-download"></i>
+											<Button
+												id="show-detail-modal-btn"
+												data-testid="show-detail-modal-btn"
+												onClick={() => {
+													setSelectedApplication(item.id);
+													setIsShowDetailModal(true);
+												}}
+												transparent
+												// disabled={!isEditable(item)}
+											>
+												Detail
+											</Button>
+											<Button
+												id="show-download-modal-btn"
+												data-testid="show-download-modal-btn"
+												onClick={() => {
+													setIsShowDownloadModal(true);
+												}}
+												transparent
+												// disabled={!isEditable(item)}
+											>
+												<i className="fa fa-download"></i>
+											</Button>
 										</div>
 									</td>
 								</tr>
@@ -170,6 +197,16 @@ const Application: FunctionComponent = () => {
 				page={params?.page}
 				pageCount={pageCount}
 				onPageChange={handlePagination}
+			/>
+
+			<ModalDetailApplication
+				isShow={isShowDetailModal}
+				handleClose={() => setIsShowDetailModal(false)}
+				selectedApplication={selectedApplication}
+			/>
+			<ModalDownloadApplication
+				isShow={isShowDownloadModal}
+				handleClose={() => setIsShowDownloadModal(false)}
 			/>
 		</Card>
 	);
