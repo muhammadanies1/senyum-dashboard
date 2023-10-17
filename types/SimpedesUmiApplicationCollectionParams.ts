@@ -8,4 +8,7 @@ export type SimpedesUmiApplicationCollectionParams = {
 	disableCalculateTotal?: boolean;
 	startDate?: string;
 	endDate?: string;
+	nama?: string;
+	nik?: string;
+	noTelp?: string;
 };
