@@ -2,7 +2,7 @@ import {AxiosResponse, isAxiosError} from "axios";
 import {NextRequest, NextResponse} from "next/server";
 
 import axiosInstance from "@/config/server/axios";
-import {ApplicationSimpedesUmiCollectionResponse} from "@/types/SimpedesUmiApplicationCollectionResponse";
+import {SimpedesUmiApplicationCollectionResponse} from "@/types/SimpedesUmiApplicationCollectionResponse";
 
 export async function GET(req: NextRequest) {
 	const searchParams = req.url.split("?");
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
-		const apiResponse: AxiosResponse<ApplicationSimpedesUmiCollectionResponse> =
+		const apiResponse: AxiosResponse<SimpedesUmiApplicationCollectionResponse> =
 			await axiosInstance.get(url);
 
 		const res = NextResponse.json(apiResponse.data, {
