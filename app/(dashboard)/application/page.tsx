@@ -3,6 +3,7 @@
 import "@/app/(dashboard)/application/style.css";
 
 import {AxiosResponse} from "axios";
+import dayjs from "dayjs";
 import Image from "next/image";
 import {
 	FunctionComponent,
@@ -27,7 +28,6 @@ import DropdownFilter from "@/components/molecules/FilterDropdown";
 import axiosInstance from "@/config/client/axios";
 import {SimpedesUmiApplicationCollectionParams} from "@/types/SimpedesUmiApplicationCollectionParams";
 import {SimpedesUmiApplicationCollectionResponse} from "@/types/SimpedesUmiApplicationCollectionResponse";
-import formatISODateToCustomFormat from "@/utils/formatISODateToCustomFormat";
 
 import ModalDetailApplication from "./_components/DetailApplicationModal";
 import ModalDownloadApplication from "./_components/DownloadApplicationModal";
@@ -281,13 +281,13 @@ const Application: FunctionComponent = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{data !== undefined ? (
+							{data !== undefined && data?.data?.data.length !== 0 ? (
 								data?.data.data.map((item, index) => (
 									<tr key={index}>
 										<td>{tableNumber + (index + 1)}</td>
 										<td>
 											{item?.createdAt
-												? formatISODateToCustomFormat(item?.createdAt)
+												? dayjs(item?.createdAt).format("DD MMM YY, HH:mm")
 												: "-"}
 										</td>
 										<td className="td-customer-name">
