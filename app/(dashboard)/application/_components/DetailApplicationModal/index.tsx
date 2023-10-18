@@ -7,6 +7,7 @@ import React, {
 	FunctionComponent,
 	useCallback,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
 
@@ -48,8 +49,36 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 		}
 	}, [selectedApplication]);
 
+	const useDataProperty = (propertyName: string | number | undefined) =>
+		useMemo(() => {
+			if (!propertyName) {
+				return "-";
+			}
+			return propertyName;
+		}, [propertyName]);
+
+	const gender = useMemo(() => {
+		switch (data?.data.sex) {
+			case "M":
+				return "Laki-laki";
+			case "F":
+				return "Perempuan";
+			default:
+				return "-";
+		}
+	}, [data?.data.sex]);
+
+	const placeDateOfBirth = useMemo(() => {
+		if (!data?.data.placeOfBirth || !data?.data.dateOfBirth) {
+			return "-";
+		}
+		return `${data?.data.placeOfBirth}, ${dayjs(data?.data.dateOfBirth).format(
+			"DD MMM YYYY",
+		)}`;
+	}, [data?.data.placeOfBirth, data?.data.dateOfBirth]);
+
 	useEffect(() => {
-		if (isShow === true) {
+		if (isShow) {
 			fetchDetail();
 		}
 	}, [fetchDetail, isShow]);
@@ -81,6 +110,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								setIsShowDownloadModal(true);
 							}}
 							transparent
+							className="gap-2"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -103,6 +133,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									fill="#1078CA"
 								/>
 							</svg>
+							<span>Download Data Pengajuan</span>
 						</Button>
 					</div>
 					<div className="flex items-center justify-between gap-4">
@@ -120,7 +151,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 										? "error"
 										: "pending"
 								}
-								size="md"
+								size="sm"
 							/>
 						</div>
 						<div className="w-full flex gap-2">
@@ -128,7 +159,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								Partner
 							</span>
 							<span className="font-semibold text-base">
-								: {data?.data.partnerName}
+								: {useDataProperty(data?.data.partnerName)}
 							</span>
 						</div>
 					</div>
@@ -171,7 +202,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-nik"
 									className="w-2/3 font-semibold text-base"
 								>
-									: {data?.data.idNo}
+									: {useDataProperty(data?.data.idNo)}
 								</span>
 							</div>
 							<div className="flex">
@@ -183,7 +214,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-fullname"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.custName}
+									: {useDataProperty(data?.data.custName)}
 								</span>
 							</div>
 							<div className="flex">
@@ -195,7 +226,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-phone-number"
 									className="w-2/3 font-semibold text-base"
 								>
-									: {data?.data.cellPhoneNumber}
+									: {useDataProperty(data?.data.cellPhoneNumber)}
 								</span>
 							</div>
 							<div className="flex">
@@ -205,9 +236,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-gender"
 									data-testid="value-gender"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.sex === "M" ? "Laki-laki" : "Perempuan"}
+									: {gender}
 								</span>
 							</div>
 							<div className="flex">
@@ -217,10 +248,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-birthdate"
 									data-testid="value-birthdate"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.placeOfBirth},{" "}
-									{dayjs(data?.data.dateOfBirth).format("DD MMM YYYY")}
+									: {placeDateOfBirth}
 								</span>
 							</div>
 							<div className="flex">
@@ -232,7 +262,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-religion"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.religion}
+									: {useDataProperty(data?.data.religion)}
 								</span>
 							</div>
 							<div className="flex">
@@ -242,9 +272,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-marital-status"
 									data-testid="value-marital-status"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.maritalStatus}
+									: {useDataProperty(data?.data.maritalStatus)}
 								</span>
 							</div>
 							<div className="flex">
@@ -256,7 +286,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-mother-name"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.motherName}
+									: {useDataProperty(data?.data.motherName)}
 								</span>
 							</div>
 						</div>
@@ -268,9 +298,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-education"
 									data-testid="value-education"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.education}
+									: {useDataProperty(data?.data.education)}
 								</span>
 							</div>
 							<div className="flex">
@@ -280,9 +310,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-occupation"
 									data-testid="value-occupation"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.typeOfWork}
+									: {useDataProperty(data?.data.typeOfWork)}
 								</span>
 							</div>
 							<div className="flex">
@@ -292,9 +322,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-business-field"
 									data-testid="value-business-field"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.fieldWork}
+									: {useDataProperty(data?.data.fieldWork)}
 								</span>
 							</div>
 							<div className="flex">
@@ -304,9 +334,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-id-address"
 									data-testid="value-id-address"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.address}
+									: {useDataProperty(data?.data.address)}
 								</span>
 							</div>
 							<div className="flex">
@@ -316,9 +346,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								<span
 									id="value-home-address"
 									data-testid="value-home-address"
-									className="w-2/3 font-semibold text-base"
+									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {data?.data.addressDom}
+									: {useDataProperty(data?.data.addressDom)}
 								</span>
 							</div>
 						</div>

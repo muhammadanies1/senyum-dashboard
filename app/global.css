@@ -100,11 +100,11 @@
 
 	/* ===== BADGE ===== */
 	.badge {
-		@apply h-[26px] p-1 rounded-xl text-center font-semibold text-sm leading-[18px];
+		@apply h-[26px] p-1 rounded-xl text-center font-semibold text-xs leading-[18px];
 	}
 
 	.badge.sm {
-		@apply w-[120px];
+		@apply w-fit min-w-[120px];
 	}
 
 	.badge.md {
