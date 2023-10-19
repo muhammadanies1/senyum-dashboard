@@ -49,11 +49,12 @@ const Application: FunctionComponent = () => {
 	});
 
 	const [searchBy, setSearchBy] = useState<string>();
-	const [searchKeyword, setSearchKeyword] = useState<string>();
 	const [data, setData] = useState<SimpedesUmiApplicationCollectionResponse>();
 	const [isDataNotFound, setIsDataNotFound] = useState<boolean>(false);
 
-	const {control, handleSubmit, resetField, setValue} = useForm<InputSearch>();
+	const {control, handleSubmit, resetField, setValue} = useForm<InputSearch>({
+		values: {search: ""},
+	});
 
 	const onClickDropdown = () => {
 		setIsShowDropdown(!isShowDropdown);
@@ -88,7 +89,10 @@ const Application: FunctionComponent = () => {
 
 	const handlePagination = useCallback(
 		(event: {selected: number}) => {
-			const newParams = {...params, page: event.selected + 1};
+			const newParams: SimpedesUmiApplicationCollectionParams = {
+				...params,
+				page: event.selected + 1,
+			};
 			setParams(newParams);
 
 			fetchData(newParams);
@@ -127,11 +131,17 @@ const Application: FunctionComponent = () => {
 	}, [searchBy]);
 
 	const onSubmit = useCallback(
-		(dataSearch: InputSearch) => {
-			if (searchBy && dataSearch?.search) {
-				const newParams = {...params, [searchBy as string]: dataSearch?.search};
+		({search}: InputSearch) => {
+			if (searchBy && search) {
+				const newParams: SimpedesUmiApplicationCollectionParams = {
+					page: 1,
+					limit: 10,
+				};
 
-				setSearchKeyword(dataSearch?.search);
+				Object.assign(newParams, {
+					[searchBy]: search,
+				});
+
 				setParams(newParams);
 				fetchData(newParams);
 			} else {
@@ -139,25 +149,26 @@ const Application: FunctionComponent = () => {
 
 				setParams(resetParams);
 				fetchData(resetParams);
-				setSearchKeyword(undefined);
 			}
 		},
-		[fetchData, params, searchBy],
+		[fetchData, searchBy],
 	);
 
 	const clearFilter = useCallback(() => {
-		const resetParams = {page: 1, limit: 10};
+		const resetParams: SimpedesUmiApplicationCollectionParams = {
+			page: 1,
+			limit: 10,
+		};
 		resetField("search");
 		setValue("search", "");
 		setSearchBy(undefined);
-		setSearchKeyword(undefined);
 		setParams(resetParams);
 	}, [resetField, setValue]);
 
 	return (
 		<Card
 			className={"flex flex-col gap-6".concat(
-				data?.data?.data.length === 0 && (searchBy || searchKeyword)
+				data?.data?.data.length === 0 && (searchBy || params.search)
 					? " h-full"
 					: "",
 			)}
@@ -222,11 +233,12 @@ const Application: FunctionComponent = () => {
 							render={({field}) => (
 								<FormIcon iconPosition="right">
 									<Input
-										className="w-[25.875rem]"
+										className="w-[25.875rem] pl-10"
 										placeholder="Cari Data"
 										{...field}
 									/>
-									{searchKeyword ? (
+									<i className="fa-solid fa-search icon pointer-events-none left-3"></i>
+									{field.value ? (
 										<button
 											className="icon"
 											id="btn-clear-search"
