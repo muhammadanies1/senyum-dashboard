@@ -34,17 +34,10 @@ const schema = yup.object({
 	email: yup
 		.string()
 		.required("Email harus diisi.")
-		.max(255, "Email maksimal 255 karakter.")
+		.max(255, "Email maksimal 255 karakter")
 		.matches(
-			/^[\w.]+@/,
-			"Email hanya bisa memiliki kombinasi huruf kecil, angka, simbol underscore ( _ ) dan titik ( . ) sebelum @work.bri.co.id",
-		)
-		.test(
-			"is-work-bri-email",
-			"Email harus berdomain work.bri.co.id",
-			function (value) {
-				return value.endsWith("@work.bri.co.id");
-			},
+			/^[\w.]+@(bri\.co\.id|work\.bri\.co\.id|corp\.bri\.co\.id)$/,
+			"Email hanya bisa memiliki kombinasi huruf, angka, simbol underscore dan titik dengan domain yang valid.",
 		),
 	phoneNumber: yup
 		.string()
@@ -53,7 +46,7 @@ const schema = yup.object({
 		.max(15, "Nomor Telepon maksimal 15 karakter.")
 		.matches(
 			/^\+?\d+$/,
-			"Nomor Telepon hanya boleh mengandung angka dan satu plus (+) opsional.",
+			"Nomor Telepon hanya boleh mengandung angka dan satu simbol plus opsional.",
 		),
 	userTypeId: yup
 		.string()
