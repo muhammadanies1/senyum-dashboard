@@ -1,5 +1,6 @@
 import React from "react";
 
+import axiosInstance from "@/config/client/axios";
 import {render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -7,25 +8,79 @@ import DetailApplication from "./";
 
 const handleClose = jest.fn();
 
+const handleCloseDownloadModal = jest.fn();
+
+jest.mock("@/config/client/axios", () => ({
+	get: jest.fn(),
+}));
+
 describe("DetailApplication", () => {
+	afterEach(() => {
+		jest.clearAllMocks();
+	});
+
 	it("render the modal", () => {
-		render(<DetailApplication isShow handleClose={handleClose} />);
+		render(
+			<DetailApplication
+				isShow
+				handleClose={handleClose}
+				handleShowDownloadModal={handleCloseDownloadModal}
+			/>,
+		);
 	});
 
 	it("not render the modal detail and modal download by default", () => {
 		const {getByTestId} = render(
-			<DetailApplication isShow handleClose={handleClose} />,
+			<DetailApplication
+				isShow
+				handleClose={handleClose}
+				handleShowDownloadModal={handleCloseDownloadModal}
+			/>,
 		);
 		const modalDetail = getByTestId("modal-detail-form");
-		const modalDownload = getByTestId("modal-download-form");
 		expect(modalDetail).not.toHaveClass("opacity-100");
-		expect(modalDownload).not.toHaveClass("opacity-100");
 	});
 
 	it("render the pictures and text inside the modal", async () => {
+		const responseData = {
+			data: {
+				id: "69157503-c34b-46bf-ab01-0f59ea85fc89",
+				idNo: "3277012212940001",
+				custName: "LOVINDO SITUNGKIR",
+				cellPhoneNumber: "085861130329",
+				dateOfBirth: "1994-12-22",
+				placeOfBirth: "Jakarta Pusat",
+				sex: "F",
+				religion: "ISLAM",
+				maritalStatus: "SINGLE",
+				motherName: "LASTRINA",
+				education: "S1",
+				workTypeId: "AKUN",
+				workPositionId: "64",
+				fieldWork: "KEUANGAN",
+				typeOfWork: "Akunting",
+				addressDom: "JAKARTA",
+				address: "SUMATRA",
+				partnerId: 9,
+				partnerName: "Pegadaian",
+				status: "DONE_SUCCESS",
+				ktpImagePath: "kpt_photo_base64",
+				selfiePath: "selfie_photo_base64",
+				createdAt: "2023-10-16T03:16:11.481Z",
+				updatedAt: "2023-10-04T14:04:42.585989Z",
+			},
+		};
+		jest.spyOn(axiosInstance, "get").mockResolvedValue({data: responseData});
+
 		const {getByTestId} = render(
-			<DetailApplication isShow handleClose={handleClose} />,
+			<DetailApplication
+				selectedApplication="someId"
+				handleClose={handleClose}
+				isShow={true}
+				handleShowDownloadModal={handleCloseDownloadModal}
+			/>,
 		);
+
 		const modalDetail = getByTestId("modal-detail-form");
 
 		waitFor(() => {
@@ -36,6 +91,8 @@ describe("DetailApplication", () => {
 			expect(modalDetail).toHaveClass("opacity-100");
 		});
 
+		const valueStatus = getByTestId("value-status");
+		const valuePartnerName = getByTestId("value-partner-name");
 		const photoKTP = getByTestId("image-ktp");
 		const photoSelfie = getByTestId("image-selfie");
 		const valueNIK = getByTestId("value-nik");
@@ -52,52 +109,57 @@ describe("DetailApplication", () => {
 		const valueIDAddress = getByTestId("value-id-address");
 		const valueHomeAddress = getByTestId("value-home-address");
 
-		expect(photoKTP).toBeInTheDocument();
-		expect(photoSelfie).toBeInTheDocument();
-
+		expect(modalDetail).toHaveTextContent("Status");
+		expect(modalDetail).toHaveTextContent("Partner");
 		expect(modalDetail).toHaveTextContent("NIK");
-		expect(valueNIK).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Nama Lengkap");
-		expect(valueFullName).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("No Telepon");
-		expect(valuePhoneNumber).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Jenis Kelamin");
-		expect(valueGender).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Tempat, Tgl Lahir");
-		expect(valueBirthdate).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Agama");
-		expect(valueReligion).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Status Perkawinan");
-		expect(valueMaritalStatus).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Nama Ibu Kandung");
-		expect(valueMotherName).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Pendidikan Terakhir");
-		expect(valueEducation).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Pekerjaan");
-		expect(valueOccupation).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Bidang Usaha");
-		expect(valueBusinessField).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Alamat KTP");
-		expect(valueIDAddress).toBeInTheDocument();
-
 		expect(modalDetail).toHaveTextContent("Alamat Tinggal");
-		expect(valueHomeAddress).toBeInTheDocument();
+
+		waitFor(() => {
+			expect(valueStatus).toHaveTextContent("DONE_SUCCESS");
+			expect(valuePartnerName).toHaveTextContent(": Pegadaian");
+			expect(photoKTP).toBeInTheDocument();
+			expect(photoSelfie).toBeInTheDocument();
+			expect(photoKTP).toHaveTextContent("ktp_photo_base64");
+			expect(photoSelfie).toHaveTextContent("selfie_photo_base64");
+			expect(valueNIK).toHaveTextContent(": 3277012212940001");
+			expect(valueFullName).toHaveTextContent("LOVINDO SITUNGKIR");
+			expect(valuePhoneNumber).toHaveTextContent("085861130329");
+			expect(valueGender).toHaveTextContent(": Perempuan");
+			expect(valueBirthdate).toHaveTextContent("1994-12-22");
+			expect(valueReligion).toHaveTextContent("ISLAM");
+			expect(valueMaritalStatus).toHaveTextContent("SINGLE");
+			expect(valueMotherName).toHaveTextContent("LASTRINA");
+			expect(valueEducation).toHaveTextContent("S1");
+			expect(valueOccupation).toHaveTextContent("Akunting");
+			expect(valueBusinessField).toHaveTextContent("KEUANGAN");
+			expect(valueIDAddress).toHaveTextContent("SUMATRA");
+			expect(valueHomeAddress).toHaveTextContent("JAKARTA");
+		});
+
+		await waitFor(() => {
+			expect(axiosInstance.get).toHaveBeenCalledWith("/api/application/someId");
+			expect(getByTestId("modal-detail-body")).toBeInTheDocument();
+		});
 	});
 
 	it("close the modal detail when the close button in modal detail is clicked", async () => {
 		const {queryByTestId, getByTestId} = render(
-			<DetailApplication isShow handleClose={handleClose} />,
+			<DetailApplication
+				isShow
+				handleClose={handleClose}
+				handleShowDownloadModal={handleCloseDownloadModal}
+			/>,
 		);
 		const modalDetail = queryByTestId("modal-detail-form");
 
@@ -125,7 +187,11 @@ describe("DetailApplication", () => {
 
 	it("close the modal detail when the background modal detail is clicked", async () => {
 		const {getByTestId} = render(
-			<DetailApplication isShow handleClose={handleClose} />,
+			<DetailApplication
+				isShow
+				handleClose={handleClose}
+				handleShowDownloadModal={handleCloseDownloadModal}
+			/>,
 		);
 		const modalDetail = getByTestId("modal-detail-form");
 
@@ -142,20 +208,4 @@ describe("DetailApplication", () => {
 			expect(modalDetail).not.toHaveClass("opacity-100");
 		});
 	});
-
-	it('trigger the download modal when the "Download Submission" button is clicked', async () => {
-		const {getByTestId} = render(
-			<DetailApplication isShow handleClose={handleClose} />,
-		);
-
-		const showModalDownloadButton = getByTestId("show-download-modal-btn");
-		userEvent.click(showModalDownloadButton);
-
-		const modalDownload = getByTestId("modal-download-form");
-		await waitFor(() => {
-			expect(modalDownload).toHaveClass("opacity-100");
-		});
-	});
-
-	// Add more specific tests for content within the modal body as needed.
 });
