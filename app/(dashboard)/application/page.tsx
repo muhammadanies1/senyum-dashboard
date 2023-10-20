@@ -29,8 +29,8 @@ import axiosInstance from "@/config/client/axios";
 import {SimpedesUmiApplicationCollectionParams} from "@/types/SimpedesUmiApplicationCollectionParams";
 import {SimpedesUmiApplicationCollectionResponse} from "@/types/SimpedesUmiApplicationCollectionResponse";
 
-import ModalDetailApplication from "./_components/DetailApplicationModal";
-import ModalDownloadApplication from "./_components/DownloadApplicationModal";
+import DetailApplicationModal from "./_components/DetailApplicationModal";
+import DownloadApplicationModal from "./_components/DownloadApplicationModal";
 
 type InputSearch = {
 	search: string;
@@ -338,7 +338,6 @@ const Application: FunctionComponent = () => {
 														setIsShowDetailModal(true);
 													}}
 													transparent
-													// disabled={!isEditable(item)}
 												>
 													Detail
 												</Button>
@@ -349,7 +348,6 @@ const Application: FunctionComponent = () => {
 														setIsShowDownloadModal(true);
 													}}
 													transparent
-													// disabled={!isEditable(item)}
 												>
 													<i className="fa fa-download"></i>
 												</Button>
@@ -374,12 +372,13 @@ const Application: FunctionComponent = () => {
 				onPageChange={handlePagination}
 			/>
 
-			<ModalDetailApplication
+			<DetailApplicationModal
 				isShow={isShowDetailModal}
 				handleClose={() => setIsShowDetailModal(false)}
 				selectedApplication={selectedApplication}
+				handleShowDownloadModal={() => setIsShowDownloadModal(true)}
 			/>
-			<ModalDownloadApplication
+			<DownloadApplicationModal
 				isShow={isShowDownloadModal}
 				handleClose={() => setIsShowDownloadModal(false)}
 			/>

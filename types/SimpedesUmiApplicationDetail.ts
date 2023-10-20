@@ -12,13 +12,17 @@ export type SimpedesUmiApplicationDetail = {
 	education: string;
 	workTypeId: string;
 	workPositionId: string;
+	workingPosition: string;
 	fieldWork: string;
 	typeOfWork: string;
+	businessType: string;
 	addressDom: string;
 	address: string;
 	partnerId: number;
 	partnerName: string;
 	status: string;
+	ktpImagePath: string;
+	selfiePath: string;
 	createdAt: string;
 	updatedAt: string;
 };

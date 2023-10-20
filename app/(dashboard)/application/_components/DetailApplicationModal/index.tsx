@@ -13,34 +13,30 @@ import React, {
 
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
+import ImageContainer from "@/components/molecules/ImageContainer";
 import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
 import {SimpedesUmiApplicationDetailResponse} from "@/types/SimpedesUmiApplicationDetailResponse";
 
-import ModalDownloadApplication from "../DownloadApplicationModal";
-import PhotoKTP from "./photo-ktp.svg";
-import PhotoSelfie from "./photo-selfie.svg";
-
 type DetailApplicationProps = {
+	handleShowDownloadModal: () => void;
 	selectedApplication?: string;
 	handleClose: () => void;
 	isShow: boolean;
 };
 
 const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
+	handleShowDownloadModal,
 	selectedApplication,
 	handleClose,
 	isShow,
 }) => {
-	const [isShowDownloadModal, setIsShowDownloadModal] =
-		useState<boolean>(false);
 	const [data, setData] = useState<SimpedesUmiApplicationDetailResponse>();
 
 	const fetchDetail = useCallback(async () => {
 		try {
 			const res: AxiosResponse<SimpedesUmiApplicationDetailResponse> =
 				await axiosInstance.get(`/api/application/${selectedApplication}`);
-
 			setData(res.data);
 		} catch (error) {
 			if (error) {
@@ -58,7 +54,8 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 		}, [propertyName]);
 
 	const gender = useMemo(() => {
-		switch (data?.data.sex) {
+		const sex = (data?.data.sex || "").toUpperCase();
+		switch (sex) {
 			case "M":
 				return "Laki-laki";
 			case "F":
@@ -80,6 +77,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 	useEffect(() => {
 		if (isShow) {
 			fetchDetail();
+		}
+		if (!isShow) {
+			setData(undefined);
 		}
 	}, [fetchDetail, isShow]);
 
@@ -106,9 +106,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 						<Button
 							id="show-download-modal-btn"
 							data-testid="show-download-modal-btn"
-							onClick={() => {
-								setIsShowDownloadModal(true);
-							}}
+							onClick={handleShowDownloadModal}
 							transparent
 							className="gap-2"
 						>
@@ -142,7 +140,9 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								Status
 							</span>
 							<Badge
-								text={data?.data.status}
+								id="value-status"
+								data-testid="value-status"
+								text={data?.data.status ?? "-"}
 								status={
 									data?.data.status === "DONE_SUCCESS"
 										? "success"
@@ -158,7 +158,11 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 							<span className="w-1/3 text-dark-10 font-semibold text-base">
 								Partner
 							</span>
-							<span className="font-semibold text-base">
+							<span
+								id="value-partner-name"
+								data-testid="value-partner-name"
+								className="font-semibold text-base"
+							>
 								: {useDataProperty(data?.data.partnerName)}
 							</span>
 						</div>
@@ -171,23 +175,11 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 					<div className="flex gap-4">
 						<div className="w-full flex flex-col gap-3">
 							<span className="font-semibold text-base">Foto KTP</span>
-							<Image
-								id="image-ktp"
-								data-testid="image-ktp"
-								src={PhotoKTP}
-								alt="Photo KTP"
-								className="w-full rounded-xl"
-							/>
+							<ImageContainer imagePath={data?.data.ktpImagePath} />
 						</div>
 						<div className="w-full flex flex-col gap-3">
 							<span className="font-semibold text-base">Foto Selfie</span>
-							<Image
-								id="image-selfie"
-								data-testid="image-selfie"
-								src={PhotoSelfie}
-								alt="Photo Selfie"
-								className="w-full rounded-xl"
-							/>
+							<ImageContainer imagePath={data?.data.selfiePath} />
 						</div>
 					</div>
 					<span className="font-semibold text-base">Data Nasabah</span>
@@ -312,7 +304,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-occupation"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {useDataProperty(data?.data.typeOfWork)}
+									: {useDataProperty(data?.data.workingPosition)}
 								</span>
 							</div>
 							<div className="flex">
@@ -324,7 +316,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-business-field"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {useDataProperty(data?.data.fieldWork)}
+									: {useDataProperty(data?.data.businessType)}
 								</span>
 							</div>
 							<div className="flex">
@@ -355,11 +347,6 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 					</div>
 				</div>
 			</Modal.Body>
-
-			<ModalDownloadApplication
-				isShow={isShowDownloadModal}
-				handleClose={() => setIsShowDownloadModal(false)}
-			/>
 		</Modal>
 	);
 };
