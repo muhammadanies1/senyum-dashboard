@@ -2,43 +2,56 @@ import Image from "next/image";
 import React, {FunctionComponent, useEffect, useState} from "react";
 
 type ImageContainerProps = {
-	imagePath: string | undefined;
+	id?: string;
+	alt: string;
+	src: string | undefined;
 };
 
 const ImageContainer: FunctionComponent<ImageContainerProps> = ({
-	imagePath,
+	id,
+	alt,
+	src,
+	...attrs
 }) => {
 	const [imageLoaded, setImageLoaded] = useState(false);
 
 	useEffect(() => {
 		setImageLoaded(false);
-	}, [imagePath]);
+	}, [src]);
 
 	return (
 		<>
-			{imagePath ? (
+			{src !== "" ? (
 				<Image
-					id="image-selfie"
-					data-testid="image-selfie"
-					src={`data:image/jpg;base64,${imagePath}`}
-					alt="Selfie Photo"
+					id={id}
+					src={`data:image/jpg;base64,${src}`}
+					alt={alt}
 					width={100}
 					height={100}
 					className="w-full rounded-xl"
 					onLoad={() => setImageLoaded(true)}
+					{...attrs}
 				/>
 			) : (
 				false
 			)}
-			{imagePath === "" ? (
-				<div className="flex justify-center items-center rounded-xl bg-light-20 w-full h-[527px]">
+			{src === "" ? (
+				<div
+					id={id}
+					data-testid="empty-image"
+					className="flex justify-center items-center rounded-xl bg-light-20 w-full h-[527px]"
+				>
 					No Image
 				</div>
 			) : (
 				false
 			)}
-			{!imageLoaded && imagePath !== "" ? (
-				<div className="animate-pulse rounded-xl bg-light-20 w-full h-[527px]"></div>
+			{!imageLoaded && !src ? (
+				<div
+					id={id}
+					data-testid="loading-placeholder"
+					className="animate-pulse rounded-xl bg-light-20 w-full h-[527px]"
+				></div>
 			) : (
 				false
 			)}

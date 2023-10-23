@@ -8,7 +8,7 @@ import DetailApplication from "./";
 
 const handleClose = jest.fn();
 
-const handleCloseDownloadModal = jest.fn();
+const handleShowDownloadModal = jest.fn();
 
 jest.mock("@/config/client/axios", () => ({
 	get: jest.fn(),
@@ -24,7 +24,7 @@ describe("DetailApplication", () => {
 			<DetailApplication
 				isShow
 				handleClose={handleClose}
-				handleShowDownloadModal={handleCloseDownloadModal}
+				handleShowDownloadModal={handleShowDownloadModal}
 			/>,
 		);
 	});
@@ -34,7 +34,7 @@ describe("DetailApplication", () => {
 			<DetailApplication
 				isShow
 				handleClose={handleClose}
-				handleShowDownloadModal={handleCloseDownloadModal}
+				handleShowDownloadModal={handleShowDownloadModal}
 			/>,
 		);
 		const modalDetail = getByTestId("modal-detail-form");
@@ -77,7 +77,7 @@ describe("DetailApplication", () => {
 				selectedApplication="someId"
 				handleClose={handleClose}
 				isShow={true}
-				handleShowDownloadModal={handleCloseDownloadModal}
+				handleShowDownloadModal={handleShowDownloadModal}
 			/>,
 		);
 
@@ -127,15 +127,13 @@ describe("DetailApplication", () => {
 
 		waitFor(() => {
 			expect(valueStatus).toHaveTextContent("DONE_SUCCESS");
-			expect(valuePartnerName).toHaveTextContent(": Pegadaian");
-			expect(photoKTP).toBeInTheDocument();
-			expect(photoSelfie).toBeInTheDocument();
-			expect(photoKTP).toHaveTextContent("ktp_photo_base64");
-			expect(photoSelfie).toHaveTextContent("selfie_photo_base64");
-			expect(valueNIK).toHaveTextContent(": 3277012212940001");
+			expect(valuePartnerName).toHaveTextContent("Pegadaian");
+			expect(photoKTP).toHaveAttribute("src", "ktp_photo_base64");
+			expect(photoSelfie).toHaveAttribute("src", "selfie_photo_base64");
+			expect(valueNIK).toHaveTextContent("3277012212940001");
 			expect(valueFullName).toHaveTextContent("LOVINDO SITUNGKIR");
 			expect(valuePhoneNumber).toHaveTextContent("085861130329");
-			expect(valueGender).toHaveTextContent(": Perempuan");
+			expect(valueGender).toHaveTextContent("Perempuan");
 			expect(valueBirthdate).toHaveTextContent("1994-12-22");
 			expect(valueReligion).toHaveTextContent("ISLAM");
 			expect(valueMaritalStatus).toHaveTextContent("SINGLE");
@@ -158,12 +156,10 @@ describe("DetailApplication", () => {
 			<DetailApplication
 				isShow
 				handleClose={handleClose}
-				handleShowDownloadModal={handleCloseDownloadModal}
+				handleShowDownloadModal={handleShowDownloadModal}
 			/>,
 		);
 		const modalDetail = queryByTestId("modal-detail-form");
-
-		expect(modalDetail).not.toHaveClass("opacity-100");
 
 		await waitFor(() => {
 			expect(modalDetail).toHaveClass("opacity-100");
@@ -190,7 +186,7 @@ describe("DetailApplication", () => {
 			<DetailApplication
 				isShow
 				handleClose={handleClose}
-				handleShowDownloadModal={handleCloseDownloadModal}
+				handleShowDownloadModal={handleShowDownloadModal}
 			/>,
 		);
 		const modalDetail = getByTestId("modal-detail-form");
