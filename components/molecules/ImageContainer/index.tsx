@@ -21,7 +21,7 @@ const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 
 	return (
 		<>
-			{src !== "" ? (
+			{src ? (
 				<Image
 					id={id}
 					src={`data:image/jpg;base64,${src}`}
@@ -46,7 +46,7 @@ const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 			) : (
 				false
 			)}
-			{!imageLoaded && !src ? (
+			{!imageLoaded && src !== "" ? (
 				<div
 					id={id}
 					data-testid="loading-placeholder"
