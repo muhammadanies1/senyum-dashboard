@@ -2,7 +2,6 @@
 
 import {AxiosResponse} from "axios";
 import dayjs from "dayjs";
-import Image from "next/image";
 import React, {
 	FunctionComponent,
 	useCallback,
@@ -53,8 +52,21 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 			return propertyName;
 		}, [propertyName]);
 
+	const status = useMemo(() => {
+		switch (data?.data.status) {
+			case "DONE_SUCCESS":
+				return "success";
+			case "CANCELED":
+			case "PENDING_ESB":
+			case "PRIVY_REGISTER_FAILED":
+				return "error";
+			default:
+				return "pending";
+		}
+	}, [data?.data.status]);
+
 	const gender = useMemo(() => {
-		const sex = (data?.data.sex || "").toUpperCase();
+		const sex = (data?.data.sex ?? "").toUpperCase();
 		switch (sex) {
 			case "M":
 				return "Laki-laki";
@@ -143,14 +155,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 								id="value-status"
 								data-testid="value-status"
 								text={data?.data.status ?? "-"}
-								status={
-									data?.data.status === "DONE_SUCCESS"
-										? "success"
-										: data?.data.status ===
-										  ("CANCELED" || "PENDING_ESB" || "PRIVY_REGISTER_FAILED")
-										? "error"
-										: "pending"
-								}
+								status={status}
 								size="sm"
 							/>
 						</div>
@@ -175,11 +180,21 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 					<div className="flex gap-4">
 						<div className="w-full flex flex-col gap-3">
 							<span className="font-semibold text-base">Foto KTP</span>
-							<ImageContainer imagePath={data?.data.ktpImagePath} />
+							<ImageContainer
+								id="image-ktp"
+								data-testid="image-ktp"
+								src={data?.data.ktpImagePath}
+								alt="KTP Image"
+							/>
 						</div>
 						<div className="w-full flex flex-col gap-3">
 							<span className="font-semibold text-base">Foto Selfie</span>
-							<ImageContainer imagePath={data?.data.selfiePath} />
+							<ImageContainer
+								id="image-selfie"
+								data-testid="image-selfie"
+								src={data?.data.selfiePath}
+								alt="Selfie Image"
+							/>
 						</div>
 					</div>
 					<span className="font-semibold text-base">Data Nasabah</span>
@@ -304,7 +319,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-occupation"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {useDataProperty(data?.data.workingPosition)}
+									: {useDataProperty(data?.data.typeOfWork)}
 								</span>
 							</div>
 							<div className="flex">
