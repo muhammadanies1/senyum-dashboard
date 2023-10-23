@@ -165,6 +165,16 @@ const Application: FunctionComponent = () => {
 		setParams(resetParams);
 	}, [resetField, setValue]);
 
+	const handleForward = useCallback(() => {
+		const newParams = {...params, page: pageCount};
+		setParams(newParams);
+	}, [pageCount, params]);
+
+	const handleBackward = useCallback(() => {
+		const newParams = {...params, page: 1};
+		setParams(newParams);
+	}, [params]);
+
 	return (
 		<Card
 			className={"flex flex-col gap-6".concat(
@@ -357,7 +367,7 @@ const Application: FunctionComponent = () => {
 								))
 							) : (
 								<tr>
-									<td className="!text-center" colSpan={6}>
+									<td className="!text-center" colSpan={8}>
 										Tidak Ada Data
 									</td>
 								</tr>
@@ -370,6 +380,8 @@ const Application: FunctionComponent = () => {
 				page={params?.page}
 				pageCount={pageCount}
 				onPageChange={handlePagination}
+				forward={handleForward}
+				backward={handleBackward}
 			/>
 
 			<DetailApplicationModal

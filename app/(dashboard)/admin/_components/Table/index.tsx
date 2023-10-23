@@ -9,7 +9,6 @@ import {
 	useState,
 } from "react";
 import {Controller, useForm} from "react-hook-form";
-import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 
 import ModalAddUser from "@/app/(dashboard)/admin/_components/AddUserModal";
@@ -119,6 +118,16 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 	const isEditable = useCallback((data: User) => {
 		return data.editable;
 	}, []);
+
+	const handleForward = useCallback(() => {
+		const newParams = {...params, page: pageCount};
+		setParams(newParams);
+	}, [pageCount, params]);
+
+	const handleBackward = useCallback(() => {
+		const newParams = {...params, page: 1};
+		setParams(newParams);
+	}, [params]);
 
 	return (
 		<Card className="flex flex-col gap-6">
@@ -310,6 +319,8 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 				page={params?.page}
 				pageCount={pageCount}
 				onPageChange={handlePageClick}
+				forward={handleForward}
+				backward={handleBackward}
 			/>
 
 			<Toast
