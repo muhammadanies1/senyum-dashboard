@@ -182,7 +182,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 							<span className="font-semibold text-base">Foto KTP</span>
 							<ImageContainer
 								id="image-ktp"
-								data-testid="image-ktp"
+								data-testid="ktp"
 								src={data?.data.ktpImagePath}
 								alt="KTP Image"
 							/>
@@ -191,7 +191,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 							<span className="font-semibold text-base">Foto Selfie</span>
 							<ImageContainer
 								id="image-selfie"
-								data-testid="image-selfie"
+								data-testid="selfie"
 								src={data?.data.selfiePath}
 								alt="Selfie Image"
 							/>

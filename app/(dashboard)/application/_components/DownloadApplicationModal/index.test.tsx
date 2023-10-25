@@ -5,30 +5,18 @@ import userEvent from "@testing-library/user-event";
 
 import DownloadApplication from "./";
 
+const handleClose = jest.fn();
+
 window.alert = jest.fn();
 
 describe("DownloadApplication", () => {
-	it("renders the 'Download Data Pengajuan' button", () => {
-		const {getByTestId} = render(<DownloadApplication />);
-		const showModalButton = getByTestId("show-modal-download-btn");
-
-		expect(showModalButton).toBeInTheDocument();
-	});
-
 	it("opens the modal when the 'Download Data Pengajuan' button is clicked and submit button is disabled initially", async () => {
-		const {getByTestId} = render(<DownloadApplication />);
+		const {getByTestId} = render(
+			<DownloadApplication isShow handleClose={handleClose} />,
+		);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
-		const showModalButton = getByTestId("show-modal-download-btn");
-		const modal = getByTestId("modal-download-form");
 		const xlsRadio = getByTestId("radio-xls");
 		const csvRadio = getByTestId("radio-csv");
-
-		expect(modal).not.toHaveClass("opacity-100");
-
-		userEvent.click(showModalButton);
-		await waitFor(() => {
-			expect(modal).toHaveClass("opacity-100");
-		});
 
 		expect(xlsRadio).not.toBeChecked();
 		expect(csvRadio).not.toBeChecked();
@@ -36,16 +24,10 @@ describe("DownloadApplication", () => {
 	});
 
 	it("closes the modal when the close button is clicked", async () => {
-		const {getByTestId, queryByTestId} = render(<DownloadApplication />);
-		const showModalButton = getByTestId("show-modal-download-btn");
+		const {getByTestId, queryByTestId} = render(
+			<DownloadApplication isShow handleClose={handleClose} />,
+		);
 		const modal = queryByTestId("modal-download-form");
-
-		expect(modal).not.toHaveClass("opacity-100");
-
-		userEvent.click(showModalButton);
-		await waitFor(() => {
-			expect(modal).toHaveClass("opacity-100");
-		});
 
 		const closeModalButton = getByTestId("modal-download-header").querySelector(
 			".modal-close-btn",
@@ -61,16 +43,10 @@ describe("DownloadApplication", () => {
 	});
 
 	it("closes the modal when the background is clicked", async () => {
-		const {getByTestId} = render(<DownloadApplication />);
-		const showModalButton = getByTestId("show-modal-download-btn");
+		const {getByTestId} = render(
+			<DownloadApplication isShow handleClose={handleClose} />,
+		);
 		const modal = getByTestId("modal-download-form");
-
-		expect(modal).not.toHaveClass("opacity-100");
-
-		userEvent.click(showModalButton);
-		await waitFor(() => {
-			expect(modal).toHaveClass("opacity-100");
-		});
 
 		await waitFor(() => {
 			const modalBackground = modal.parentNode as Element;
@@ -86,19 +62,12 @@ describe("DownloadApplication", () => {
 	});
 
 	it("submits the form with valid data", async () => {
-		const {getByTestId, queryByTestId} = render(<DownloadApplication />);
+		const {getByTestId} = render(
+			<DownloadApplication isShow handleClose={handleClose} />,
+		);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
-		const showModalButton = getByTestId("show-modal-download-btn");
-		const modal = queryByTestId("modal-download-form");
 		const xlsRadio = getByTestId("radio-xls");
 		const csvRadio = getByTestId("radio-csv");
-
-		expect(modal).not.toHaveClass("opacity-100");
-
-		userEvent.click(showModalButton);
-		await waitFor(() => {
-			expect(modal).toHaveClass("opacity-100");
-		});
 
 		expect(xlsRadio).not.toBeChecked();
 		expect(csvRadio).not.toBeChecked();

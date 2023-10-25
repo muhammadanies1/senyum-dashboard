@@ -8,34 +8,29 @@ describe("ImageContainer Component", () => {
 	it("renders an image when `src` is not empty", () => {
 		render(
 			<ImageContainer
-				data-testid="image-container"
+				data-testid="random"
 				alt="Test Image"
 				src="your-base64-encoded-image-data-here"
 			/>,
 		);
 
-		// Ensure that the image is loaded
-		const image = screen.getByTestId("image-container");
+		const image = screen.getByTestId("image-container-random");
 		expect(image).toBeInTheDocument();
 
 		fireEvent.load(image);
 	});
 
 	it('renders "No Image" when `src` is empty', () => {
-		render(
-			<ImageContainer data-testid="image-container" alt="Test Image" src="" />,
-		);
+		render(<ImageContainer data-testid="random" alt="Test Image" src="" />);
 
-		// Ensure that "No Image" is displayed
-		const noImageText = screen.getByText("No Image");
+		const noImageText = screen.getByTestId("image-invalid-random");
 		expect(noImageText).toBeInTheDocument();
 	});
 
 	it("renders a loading placeholder when `src` is not loaded", () => {
-		render(<ImageContainer alt="Test Image" src="" />);
+		render(<ImageContainer data-testid="random" alt="Test Image" src="." />);
 
-		// Ensure that the loading placeholder with class "animate-pulse" is displayed
-		const loadingPlaceholder = screen.getByTestId("loading-placeholder");
+		const loadingPlaceholder = screen.getByTestId("image-loading-random");
 		expect(loadingPlaceholder).toBeInTheDocument();
 		expect(loadingPlaceholder).toHaveClass("animate-pulse");
 	});

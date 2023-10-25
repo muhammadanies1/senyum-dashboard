@@ -23,7 +23,7 @@ const userData: User = {
 	password: "$2a$12$DszQZyPLPfsb/sJKuy7qE.y2NOLxBFP97kvtsjR73RSBFUa26ovNa",
 	phoneNumber: "089618722872",
 	updatedAt: "2023-10-02T21:18:23Z",
-	userTypeId: "VIEWER",
+	userTypeId: "SUPER_ADMIN",
 	username: "90147851",
 	editable: true,
 };
@@ -35,6 +35,10 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 describe("EditUser", () => {
+	afterEach(() => {
+		jest.clearAllMocks();
+	});
+
 	it("opens the Edit modal with disabled components", async () => {
 		const {getByTestId} = render(
 			<EditUser
@@ -43,7 +47,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
-				userType="SUPER_ADMIN"
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 		const submitButton = getByTestId("submit-modal-edit-btn");
@@ -63,7 +67,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
-				userType="SUPER_ADMIN"
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 		const modal = getByTestId("modal-edit-form");
@@ -88,7 +92,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
-				userType="SUPER_ADMIN"
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 		const modal = getByTestId("modal-edit-form");
@@ -97,7 +101,7 @@ describe("EditUser", () => {
 		await userEvent.click(modalBackground);
 
 		await waitFor(() => {
-			expect(modal).not.toHaveClass("opacity-100");
+			expect(handleClose).toBeCalledTimes(1);
 		});
 	});
 
@@ -109,7 +113,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
-				userType="SUPER_ADMIN"
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 
@@ -151,15 +155,15 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
-				userType="SUPER_ADMIN"
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 
 		const emailInput = getByTestId("email-edit");
 		await userEvent.clear(emailInput);
-		await userEvent.type(emailInput, "email123@bri.co.id");
+		await userEvent.type(emailInput, "email123@bro.co.id");
 		await waitFor(() => {
-			expect(emailInput).toHaveValue("email123@bri.co.id");
+			expect(emailInput).toHaveValue("email123@bro.co.id");
 		});
 
 		const passwordInput = getByTestId("password-edit");
@@ -193,7 +197,7 @@ describe("EditUser", () => {
 				onSuccess={onSuccessHandler}
 				onError={onErrorHandler}
 				userData={userData}
-				userType="SUPER_ADMIN"
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 

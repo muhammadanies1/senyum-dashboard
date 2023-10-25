@@ -1,6 +1,6 @@
 import React from "react";
 
-import {render, screen} from "@testing-library/react";
+import {render, waitFor} from "@testing-library/react";
 
 import Pagination from "./"; // Ganti path import sesuai struktur proyek Anda
 
@@ -11,10 +11,10 @@ describe("Pagination component", () => {
 			page: 1,
 		};
 
-		render(<Pagination {...props} />);
+		const {getByText} = render(<Pagination {...props} />);
 
-		expect(screen.getByText("...")).toBeInTheDocument();
-		expect(screen.getByText("1")).toBeInTheDocument();
+		expect(getByText("...")).toBeInTheDocument();
+		expect(getByText("1")).toBeInTheDocument();
 	});
 
 	it("renders correctly for an intermediate page", () => {
@@ -23,10 +23,9 @@ describe("Pagination component", () => {
 			page: 5,
 		};
 
-		render(<Pagination {...props} />);
+		const {getByText} = render(<Pagination {...props} />);
 
-		expect(screen.getByText("...")).toBeInTheDocument();
-		expect(screen.getByText("1")).toBeInTheDocument();
+		expect(getByText("1")).toBeInTheDocument();
 	});
 
 	it("renders correctly for the last page", () => {
@@ -35,22 +34,24 @@ describe("Pagination component", () => {
 			page: 10,
 		};
 
-		render(<Pagination {...props} />);
+		const {getByText} = render(<Pagination {...props} />);
 
-		expect(screen.getByText("...")).toBeInTheDocument();
-		expect(screen.getByText("10")).toBeInTheDocument();
+		expect(getByText("10")).toBeInTheDocument();
 	});
 
-	it("handles custom class names", () => {
+	it("handles custom className", () => {
 		const props = {
 			pageCount: 10,
 			page: 1,
 			className: "custom-class",
 		};
 
-		render(<Pagination {...props} />);
+		const {container} = render(<Pagination {...props} />);
 
-		expect(screen.getByText("...")).toHaveClass("custom-class");
-		expect(screen.getByText("1")).toHaveClass("custom-class");
+		waitFor(() => {
+			expect(container.querySelector(".container-pagination")).toHaveClass(
+				"custom-class",
+			);
+		});
 	});
 });

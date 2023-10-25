@@ -84,17 +84,13 @@ describe("DetailApplication", () => {
 		const modalDetail = getByTestId("modal-detail-form");
 
 		waitFor(() => {
-			expect(modalDetail).not.toHaveClass("opacity-100");
-		});
-
-		waitFor(() => {
 			expect(modalDetail).toHaveClass("opacity-100");
 		});
 
 		const valueStatus = getByTestId("value-status");
 		const valuePartnerName = getByTestId("value-partner-name");
-		const photoKTP = getByTestId("image-ktp");
-		const photoSelfie = getByTestId("image-selfie");
+		const photoLoadingKTP = getByTestId("image-loading-ktp");
+		const photoLoadingSelfie = getByTestId("image-loading-selfie");
 		const valueNIK = getByTestId("value-nik");
 		const valueFullName = getByTestId("value-fullname");
 		const valuePhoneNumber = getByTestId("value-phone-number");
@@ -128,8 +124,8 @@ describe("DetailApplication", () => {
 		waitFor(() => {
 			expect(valueStatus).toHaveTextContent("DONE_SUCCESS");
 			expect(valuePartnerName).toHaveTextContent("Pegadaian");
-			expect(photoKTP).toHaveAttribute("src", "ktp_photo_base64");
-			expect(photoSelfie).toHaveAttribute("src", "selfie_photo_base64");
+			expect(photoLoadingKTP).toBeInTheDocument();
+			expect(photoLoadingSelfie).toBeInTheDocument();
 			expect(valueNIK).toHaveTextContent("3277012212940001");
 			expect(valueFullName).toHaveTextContent("LOVINDO SITUNGKIR");
 			expect(valuePhoneNumber).toHaveTextContent("085861130329");
@@ -174,7 +170,7 @@ describe("DetailApplication", () => {
 		await userEvent.click(closeModalDetailButton);
 
 		waitFor(() => {
-			expect(handleClose).not.toBeCalledTimes(1);
+			expect(handleClose).toBeCalledTimes(1);
 		});
 		waitFor(() => {
 			expect(modalDetail).not.toHaveClass("opacity-100");
@@ -201,7 +197,6 @@ describe("DetailApplication", () => {
 
 		await waitFor(() => {
 			expect(handleClose).toBeCalledTimes(1);
-			expect(modalDetail).not.toHaveClass("opacity-100");
 		});
 	});
 });

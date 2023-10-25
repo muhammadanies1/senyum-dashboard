@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import React, {FunctionComponent, HTMLAttributes, useState} from "react";
+import React, {FunctionComponent} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 

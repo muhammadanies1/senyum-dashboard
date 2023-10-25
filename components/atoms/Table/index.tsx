@@ -1,8 +1,4 @@
-import React, {
-	FunctionComponent,
-	HTMLAttributes,
-	TableHTMLAttributes,
-} from "react";
+import React, {FunctionComponent, TableHTMLAttributes} from "react";
 
 interface TableProps extends TableHTMLAttributes<HTMLTableElement> {}
 

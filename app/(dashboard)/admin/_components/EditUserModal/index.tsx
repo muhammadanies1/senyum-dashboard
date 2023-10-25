@@ -117,13 +117,13 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 
 	const initialValue: yup.InferType<typeof schema> = useMemo(
 		() => ({
-			id: userData?.id.toString() || "",
-			deviceId: userData?.deviceId || "",
-			username: userData?.username || "",
-			name: userData?.name || "",
-			email: userData?.email || "",
-			phoneNumber: userData?.phoneNumber || "",
-			userTypeId: userData?.userTypeId || "",
+			id: userData?.id.toString() ?? "",
+			deviceId: userData?.deviceId ?? "",
+			username: userData?.username ?? "",
+			name: userData?.name ?? "",
+			email: userData?.email ?? "",
+			phoneNumber: userData?.phoneNumber ?? "",
+			userTypeId: userData?.userTypeId ?? "",
 			password: "",
 			passwordConfirm: "",
 		}),
@@ -165,12 +165,10 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 					const responseDescription =
 						errorData.response?.data.responseDescription;
 
-					switch (responseDescription) {
-						case "FORBIDDEN":
-							onError("Maaf Anda tidak dapat mengubah user ini.");
-							break;
-						default:
-							onError(error);
+					if (responseDescription === "FORBIDDEN") {
+						onError("Maaf Anda tidak dapat mengubah user ini.");
+					} else {
+						onError(error);
 					}
 				}
 			}
@@ -181,7 +179,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 	const submitForm = async (data: yup.InferType<typeof schema>) => {
 		let timeout: NodeJS.Timeout | undefined = undefined;
 		timeout && clearTimeout(timeout);
-		timeout = setTimeout(() => {
+		setTimeout(() => {
 			editUser(data);
 		}, 200);
 		editUser(data);
