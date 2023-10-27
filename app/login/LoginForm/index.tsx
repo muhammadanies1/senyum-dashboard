@@ -2,7 +2,6 @@
 
 import axios, {AxiosError} from "axios";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
 import React, {
 	FunctionComponent,
 	HTMLAttributes,
@@ -45,8 +44,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
-
-	const router = useRouter();
 
 	const {
 		control,

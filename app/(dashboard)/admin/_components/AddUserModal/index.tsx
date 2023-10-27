@@ -156,6 +156,7 @@ const AddUser: FunctionComponent<AddUserProps> = ({
 							break;
 						default:
 							onError(error);
+							break;
 					}
 				}
 			}
@@ -419,17 +420,6 @@ const AddUser: FunctionComponent<AddUserProps> = ({
 											}}
 										/>
 									</div>
-									{error?.message ? (
-										<FormMessage
-											id="usertype-error-message"
-											data-testid="usertype-error-message"
-											variant="danger"
-										>
-											{error?.message}
-										</FormMessage>
-									) : (
-										false
-									)}
 								</FormGroup>
 							)}
 						/>
