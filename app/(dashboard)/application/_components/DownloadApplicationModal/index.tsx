@@ -1,6 +1,6 @@
 "use client";
 
-import React, {FunctionComponent} from "react";
+import React, {FunctionComponent, useCallback} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
@@ -14,20 +14,22 @@ import {yupResolver} from "@hookform/resolvers/yup";
 const schema = yup.object({
 	format: yup
 		.mixed()
-		.oneOf(["xls", "csv"], "Format file tidak valid.")
+		.oneOf(["pdf", "xls"], "Format file tidak valid.")
 		.required("Format file harus diisi."),
 });
 
 type DownloadApplicationProps = {
-	isShow: boolean;
+	onSuccess: () => void;
+	selectedApplication?: string;
 	handleClose: () => void;
-	onSuccess?: () => Promise<void>;
+	isShow: boolean;
 };
 
 const DownloadApplication: FunctionComponent<DownloadApplicationProps> = ({
-	isShow,
+	selectedApplication,
 	handleClose,
 	onSuccess,
+	isShow,
 }) => {
 	const {
 		control,
@@ -41,8 +43,21 @@ const DownloadApplication: FunctionComponent<DownloadApplicationProps> = ({
 		mode: "all",
 	});
 
+	const downloadDetail = useCallback(
+		(data: yup.InferType<typeof schema>) => {
+			const url = `${process.env.NEXT_PUBLIC_API_BFF_URL}/api/v1/simpedes-umi/detail/${data.format}/${selectedApplication}`;
+			window.open(url, "_blank");
+			onSuccess();
+		},
+		[onSuccess, selectedApplication],
+	);
+
 	const submitForm = (data: yup.InferType<typeof schema>) => {
-		alert(`data: ${JSON.stringify(data)}`);
+		let timeout: NodeJS.Timeout | undefined = undefined;
+		timeout && clearTimeout(timeout);
+		setTimeout(() => {
+			downloadDetail(data);
+		}, 200);
 	};
 
 	return (
@@ -78,6 +93,16 @@ const DownloadApplication: FunctionComponent<DownloadApplicationProps> = ({
 								</Label>
 								<div id="format-file" className="flex mt-2">
 									<Radio
+										id="radio-pdf"
+										data-testid="radio-pdf"
+										label=".pdf"
+										name="format-option"
+										className="w-full"
+										value="pdf"
+										checked={value === "pdf"}
+										onChange={onChange}
+									/>
+									<Radio
 										id="radio-xls"
 										data-testid="radio-xls"
 										label=".xls"
@@ -85,16 +110,6 @@ const DownloadApplication: FunctionComponent<DownloadApplicationProps> = ({
 										className="w-full"
 										value="xls"
 										checked={value === "xls"}
-										onChange={onChange}
-									/>
-									<Radio
-										id="radio-csv"
-										data-testid="radio-csv"
-										label=".csv"
-										name="format-option"
-										className="w-full"
-										value="csv"
-										checked={value === "csv"}
 										onChange={onChange}
 									/>
 								</div>

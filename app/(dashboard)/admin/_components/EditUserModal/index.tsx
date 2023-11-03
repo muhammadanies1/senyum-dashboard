@@ -157,6 +157,7 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 				const payload: EditUserPayload = data;
 				await axiosInstance.patch(`/api/user/${data.id}`, payload);
 				handleClose();
+				setIsLoading(false);
 				await onSuccess();
 			} catch (error) {
 				setIsLoading(false);
@@ -182,7 +183,6 @@ const EditUser: FunctionComponent<EditUserProps> = ({
 		setTimeout(() => {
 			editUser(data);
 		}, 200);
-		editUser(data);
 	};
 
 	useEffect(() => {
