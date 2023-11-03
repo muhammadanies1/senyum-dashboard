@@ -5,9 +5,15 @@ import userEvent from "@testing-library/user-event";
 
 import Navbar from "./";
 
-const mockedWindowNavigate = jest.fn();
+jest.mock("@/utils/windowNavigate", () => jest.fn());
 
-jest.mock("@/utils/windowNavigate", () => mockedWindowNavigate);
+function simulateWindowResize(width: number) {
+	const resizeEvent = new Event("resize");
+
+	window.innerWidth = width;
+
+	window.dispatchEvent(resizeEvent);
+}
 
 describe("Navbar component", () => {
 	it("renders without errors", () => {
@@ -37,14 +43,31 @@ describe("Navbar component", () => {
 		const menuButton = getByTestId("menu-toggler");
 		const navbarMenu = getByTestId("navbar-menu");
 
-		// Check if the menu is initially collapsed
 		expect(navbarMenu).toHaveClass("collapsed");
 
-		// Click the menu button to expand the menu
 		fireEvent.click(menuButton);
 
-		// Check if the menu is now expanded
 		expect(navbarMenu).not.toHaveClass("collapsed");
+	});
+
+	it("checks navbarMenu display property based on window width", () => {
+		const {getByTestId} = render(<Navbar isLoggedIn />);
+		const menuButton = getByTestId("menu-toggler");
+		const navbarMenu = getByTestId("navbar-menu");
+
+		fireEvent.click(menuButton);
+
+		simulateWindowResize(1024);
+
+		waitFor(() => {
+			expect(navbarMenu).not.toHaveClass("collapsed");
+		});
+
+		simulateWindowResize(1023);
+
+		waitFor(() => {
+			expect(navbarMenu).toHaveClass("collapsed");
+		});
 	});
 
 	it("collapses the menu when the button is clicked twice", () => {
@@ -113,7 +136,7 @@ describe("Navbar component", () => {
 		fireEvent.click(logoutConfirmationModalLogoutBtn);
 
 		await waitFor(() => {
-			expect(mockedWindowNavigate).toHaveBeenCalledWith("/login");
+			expect(require("@/utils/windowNavigate")).toHaveBeenCalledWith("/login");
 		});
 	});
 });

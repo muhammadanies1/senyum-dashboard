@@ -22,6 +22,48 @@ export const createUserSuccess = rest.post("/api/user", (req, res, ctx) => {
 	);
 });
 
+export const createUserErrorUsernameAlreadyRegistered = rest.post(
+	"/api/user",
+	(req, res, ctx) => {
+		return res(
+			ctx.status(400),
+			ctx.json({
+				responseCode: "0400",
+				responseDescription: "USERNAME_ALREADY_REGISTERED",
+				data: null,
+			}),
+		);
+	},
+);
+
+export const createUserErrorEmailAlreadyRegistered = rest.post(
+	"/api/user",
+	(req, res, ctx) => {
+		return res(
+			ctx.status(400),
+			ctx.json({
+				responseCode: "0400",
+				responseDescription: "EMAIL_ALREADY_REGISTERED",
+				data: null,
+			}),
+		);
+	},
+);
+
+export const createUserGeneralError = rest.post(
+	"/api/user",
+	(req, res, ctx) => {
+		return res(
+			ctx.status(500),
+			ctx.json({
+				responseCode: "0500",
+				responseDescription: "INTERNAL_SERVER_ERROR",
+				data: null,
+			}),
+		);
+	},
+);
+
 export const updateUserSuccess = rest.patch(
 	"/api/user/:id",
 	(req, res, ctx) => {

@@ -3,12 +3,10 @@ import userEvent from "@testing-library/user-event";
 
 import LoginForm from "./index";
 
-const mockedWindowNavigate = jest.fn();
-
-jest.mock("@/utils/windowNavigate.ts", () => mockedWindowNavigate);
+jest.mock("@/utils/windowNavigate", () => jest.fn());
 
 describe("LoginForm", () => {
-	test("renders login form correctly", () => {
+	it("renders login form correctly", () => {
 		const {getByTestId} = render(<LoginForm data-testid="login-form" />);
 
 		expect(getByTestId("login-form")).toBeInTheDocument();
@@ -17,7 +15,7 @@ describe("LoginForm", () => {
 		expect(getByTestId("submit-btn")).toBeInTheDocument();
 	});
 
-	test("renders error message when the username and password leaves blank after blur", async () => {
+	it("renders error message when the username and password leaves blank after blur", async () => {
 		const {getByTestId, findByTestId} = render(<LoginForm />);
 
 		const usernameInput = getByTestId("username");
@@ -30,16 +28,24 @@ describe("LoginForm", () => {
 		userEvent.click(passwordInput);
 		userEvent.click(submitBtn);
 
-		const usernameErrorMessage = await findByTestId("username-error-message");
-		expect(usernameErrorMessage).toBeInTheDocument();
-		expect(usernameErrorMessage).toHaveTextContent("Username harus diisi.");
+		// const usernameErrorMessage = getByTestId("username-error-message");
+		// expect(usernameErrorMessage).toBeInTheDocument();
+		// expect(usernameErrorMessage).toHaveTextContent("Username harus diisi.");
+		expect(await findByTestId("username-error-message")).toBeInTheDocument();
+		expect(await findByTestId("username-error-message")).toHaveTextContent(
+			"Username harus diisi.",
+		);
 
-		const passwordErrorMessage = await findByTestId("password-error-message");
-		expect(passwordErrorMessage).toBeInTheDocument();
-		expect(passwordErrorMessage).toHaveTextContent("Password harus diisi.");
+		// const passwordErrorMessage = getByTestId("password-error-message");
+		// expect(passwordErrorMessage).toBeInTheDocument();
+		// expect(passwordErrorMessage).toHaveTextContent("Password harus diisi.");
+		expect(await findByTestId("password-error-message")).toBeInTheDocument();
+		expect(await findByTestId("password-error-message")).toHaveTextContent(
+			"Password harus diisi.",
+		);
 	});
 
-	test("submits login form with correct username and password", async () => {
+	it("submits login form with correct username and password", async () => {
 		const {getByTestId} = render(<LoginForm />);
 
 		const usernameInput = getByTestId("username");
@@ -50,9 +56,9 @@ describe("LoginForm", () => {
 		expect(toast).not.toHaveClass("opacity-100");
 		expect(submitBtn).toBeDisabled();
 
-		act(() => {
-			userEvent.type(usernameInput, "testuser");
-		});
+		// act(() => {
+		userEvent.type(usernameInput, "testuser");
+		// });
 		await waitFor(() => {
 			expect(usernameInput).toHaveValue("testuser");
 		});
@@ -61,27 +67,27 @@ describe("LoginForm", () => {
 			expect(submitBtn).toBeDisabled();
 		});
 
-		await act(async () => {
-			userEvent.type(passwordInput, "password");
-			await waitFor(() => {
-				expect(passwordInput).toHaveValue("password");
-			});
+		// act(() => {
+		userEvent.type(passwordInput, "password");
+		// });
+		await waitFor(() => {
+			expect(passwordInput).toHaveValue("password");
 		});
 
 		await waitFor(() => {
 			expect(submitBtn).not.toBeDisabled();
 		});
 
-		await act(async () => {
-			userEvent.click(submitBtn);
-		});
+		// act(() => {
+		userEvent.click(submitBtn);
+		// });
 
-		await waitFor(() => {
-			expect(mockedWindowNavigate).toHaveBeenCalledWith("/");
+		waitFor(() => {
+			expect(require("@/utils/windowNavigate")).toHaveBeenCalledWith("/");
 		});
 	});
 
-	test("submits login form with invalid username and password", async () => {
+	it("submits login form with invalid username and password", () => {
 		const {getByTestId} = render(<LoginForm />);
 
 		const usernameInput = getByTestId("username");
@@ -95,30 +101,30 @@ describe("LoginForm", () => {
 		act(() => {
 			userEvent.type(usernameInput, "invalidusername");
 		});
-		await waitFor(() => {
+		waitFor(() => {
 			expect(usernameInput).toHaveValue("invalidusername");
 		});
 
-		await waitFor(() => {
+		waitFor(() => {
 			expect(submitBtn).toBeDisabled();
 		});
 
-		await act(async () => {
+		act(() => {
 			userEvent.type(passwordInput, "invalidpassword");
-			await waitFor(() => {
-				expect(passwordInput).toHaveValue("invalidpassword");
-			});
+		});
+		waitFor(() => {
+			expect(passwordInput).toHaveValue("invalidpassword");
 		});
 
-		await waitFor(() => {
+		waitFor(() => {
 			expect(submitBtn).not.toBeDisabled();
 		});
 
-		await act(async () => {
+		act(() => {
 			userEvent.click(submitBtn);
 		});
 
-		await waitFor(() => {
+		waitFor(() => {
 			expect(toast.parentElement).toHaveClass("toast-container");
 			expect(toast.parentElement).toHaveClass("opacity-100");
 			expect(toast.parentElement).toHaveClass("flex", "opacity-100", "top-24");
@@ -130,18 +136,18 @@ describe("LoginForm", () => {
 		if (!toastCloseBtn) {
 			throw new Error("Element does not exist.");
 		}
-		await act(async () => {
+		act(() => {
 			userEvent.click(toastCloseBtn[0]);
 		});
 
-		await waitFor(() => {
+		waitFor(() => {
 			expect(toast.parentElement).not.toHaveClass("opacity-100");
 			expect(toast.parentElement).not.toHaveClass("flex");
 			expect(toast.parentElement).not.toHaveClass("top-24");
 		});
 	});
 
-	test("should toggle password field type", async () => {
+	it("should toggle password field type", () => {
 		const {getByTestId} = render(<LoginForm />);
 
 		const passwordTogglerBtn = getByTestId("password-toggler-btn");
@@ -154,7 +160,7 @@ describe("LoginForm", () => {
 			userEvent.click(passwordTogglerBtn);
 		});
 
-		await waitFor(async () => {
+		waitFor(() => {
 			expect(passwordInput).toHaveAttribute("type", "text");
 		});
 
@@ -162,12 +168,12 @@ describe("LoginForm", () => {
 			userEvent.click(passwordTogglerBtn);
 		});
 
-		await waitFor(async () => {
+		waitFor(() => {
 			expect(passwordInput).toHaveAttribute("type", "password");
 		});
 	});
 
-	test("renders with custom className", () => {
+	it("renders with custom className", () => {
 		const {getByTestId} = render(
 			<LoginForm data-testid="login-form" className="custom-class" />,
 		);

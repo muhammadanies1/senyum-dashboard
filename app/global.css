@@ -42,15 +42,15 @@
 	}
 
 	.btn.primary.transparent {
-		@apply text-primary-80 bg-transparent border-transparent focus:outline-primary-40;
+		@apply text-primary-80 bg-transparent border-transparent focus:outline-primary-40 disabled:text-light-30;
 	}
 
 	.btn.secondary.transparent {
-		@apply text-secondary-80 bg-transparent border-transparent focus:outline-secondary-10;
+		@apply text-secondary-80 bg-transparent border-transparent focus:outline-secondary-10 disabled:text-light-30;
 	}
 
 	.btn.danger.transparent {
-		@apply text-red-80 bg-transparent border-transparent focus:outline-red-10;
+		@apply text-red-80 bg-transparent border-transparent focus:outline-red-10 disabled:text-light-30;
 	}
 
 	/* ===== MODAL ===== */
@@ -125,7 +125,7 @@
 
 	/* ===== RADIO ===== */
 	.radio {
-		@apply absolute top-0 left-0 h-0 w-0 appearance-none;
+		@apply absolute top-2 left-2.5 h-0 w-0 appearance-none;
 	}
 
 	.radio-label {

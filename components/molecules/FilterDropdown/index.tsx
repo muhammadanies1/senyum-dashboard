@@ -17,11 +17,19 @@ const DropdownFilter = (props: Props) => {
 
 	return (
 		<div className="relative inline-block text-left">
-			<ButtonFilter onClick={onClickDropdown} />
+			<ButtonFilter
+				onClick={onClickDropdown}
+				data-testid="dropdown-filter-btn-trigger"
+			/>
 			<Dropdown isOpen={isShowDropdown}>
 				<div className="flex flex-col gap-4">
 					<div className="flex justify-between items-center">
-						<span className="font-bold text-xl text-dark-40"> Filter </span>
+						<span
+							className="font-bold text-xl text-dark-40"
+							data-testid="filter-title"
+						>
+							Filter
+						</span>
 						<span className="font-semibold text-base text-primary-80 cursor-pointer">
 							Terapkan
 						</span>
@@ -61,6 +69,7 @@ const DropdownFilter = (props: Props) => {
 												});
 											}
 										}}
+										data-testid="end-user-checkbox"
 									/>
 								</div>
 								<div className="flex flex-row w-[10.25rem] gap-2 items-center">

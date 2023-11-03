@@ -5,12 +5,14 @@ type ImageContainerProps = {
 	id?: string;
 	alt: string;
 	src: string | undefined;
+	"data-testid"?: string;
 };
 
 const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 	id,
 	alt,
 	src,
+	"data-testid": dataTestId,
 	...attrs
 }) => {
 	const [imageLoaded, setImageLoaded] = useState(false);
@@ -24,6 +26,7 @@ const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 			{src ? (
 				<Image
 					id={id}
+					data-testid={`image-container-${dataTestId}`}
 					src={`data:image/jpg;base64,${src}`}
 					alt={alt}
 					width={100}
@@ -38,7 +41,7 @@ const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 			{src === "" ? (
 				<div
 					id={id}
-					data-testid="empty-image"
+					data-testid={`image-invalid-${dataTestId}`}
 					className="flex justify-center items-center rounded-xl bg-light-20 w-full h-[527px]"
 				>
 					No Image
@@ -49,7 +52,7 @@ const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 			{!imageLoaded && src !== "" ? (
 				<div
 					id={id}
-					data-testid="loading-placeholder"
+					data-testid={`image-loading-${dataTestId}`}
 					className="animate-pulse rounded-xl bg-light-20 w-full h-[527px]"
 				></div>
 			) : (
