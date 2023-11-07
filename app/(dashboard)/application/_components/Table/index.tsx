@@ -216,6 +216,17 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		[params],
 	);
 
+	const resetFilter = useCallback(() => {
+		const newParams = {...params};
+
+		delete newParams?.startDate;
+		delete newParams?.endDate;
+		delete newParams?.partnerName;
+		delete newParams?.status;
+
+		setParams(newParams);
+	}, [params]);
+
 	return (
 		<Card
 			className={"flex flex-col gap-6".concat(
@@ -359,6 +370,12 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 							</button>
 						</div>
 					) : null}
+					<button
+						className="text-blue-80 font-normal text-base"
+						onClick={resetFilter}
+					>
+						Reset Filter
+					</button>
 				</div>
 			) : null}
 
