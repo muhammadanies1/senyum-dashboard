@@ -14,6 +14,7 @@ import {
 } from "react";
 import {Controller, useForm} from "react-hook-form";
 
+import FilterApplicationSimpedesUMi from "@/app/(dashboard)/application/_components/FilterApplicationSimpedesUMi";
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
@@ -24,7 +25,6 @@ import Pagination from "@/components/atoms/Pagination";
 import Table from "@/components/atoms/Table";
 import TableContainer from "@/components/atoms/TableContainer";
 import Dropdown from "@/components/molecules/Dropdown";
-import DropdownFilter from "@/components/molecules/FilterDropdown";
 import axiosInstance from "@/config/client/axios";
 import {SimpedesUmiApplicationCollectionParams} from "@/types/SimpedesUmiApplicationCollectionParams";
 import {SimpedesUmiApplicationCollectionResponse} from "@/types/SimpedesUmiApplicationCollectionResponse";
@@ -48,6 +48,8 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 	const [isShowDownloadModal, setIsShowDownloadModal] =
 		useState<boolean>(false);
 	const [selectedApplication, setSelectedApplication] = useState<string>();
+	const [filter, setFilter] =
+		useState<SimpedesUmiApplicationCollectionParams>();
 
 	const [params, setParams] = useState<SimpedesUmiApplicationCollectionParams>({
 		page: 1,
@@ -57,14 +59,11 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 	const [searchBy, setSearchBy] = useState<string>();
 	const [data, setData] = useState<SimpedesUmiApplicationCollectionResponse>();
 	const [isDataNotFound, setIsDataNotFound] = useState<boolean>(false);
+	const [isFilterApplication, setIsFilterApplication] = useState(false);
 
 	const {control, handleSubmit, resetField, setValue} = useForm<InputSearch>({
 		values: {search: ""},
 	});
-
-	const onClickDropdown = () => {
-		setIsShowDropdown(!isShowDropdown);
-	};
 
 	const fetchData = useCallback(
 		async (params: SimpedesUmiApplicationCollectionParams) => {
@@ -108,8 +107,7 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 
 	useEffect(() => {
 		fetchData(params);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [params]);
+	}, [fetchData, params]);
 
 	const pageCount = useMemo(() => {
 		const total = data?.data.recordsFiltered || 0;
@@ -181,10 +179,47 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		setParams(newParams);
 	}, [params]);
 
+	const handleClickFilterApplication = useCallback(() => {
+		setIsFilterApplication(!isFilterApplication);
+	}, [isFilterApplication]);
+
+	const handleApplyFilter = useCallback(
+		(args: SimpedesUmiApplicationCollectionParams) => {
+			setParams(args);
+		},
+		[],
+	);
+
+	const deleteFilter = useCallback(
+		(filterName: string) => {
+			const newParams = {...params};
+
+			switch (filterName) {
+				case "date":
+					delete newParams?.startDate;
+					delete newParams?.endDate;
+					setParams(newParams);
+					break;
+				case "partner":
+					delete newParams?.partnerName;
+					setParams(newParams);
+					break;
+				case "status":
+					delete newParams?.status;
+					setParams(newParams);
+					break;
+
+				default:
+					break;
+			}
+		},
+		[params],
+	);
+
 	return (
 		<Card
 			className={"flex flex-col gap-6".concat(
-				data?.data?.data.length === 0 && (searchBy || params.search)
+				data?.data?.data?.length === 0 && (searchBy || params.search)
 					? " h-full"
 					: "",
 			)}
@@ -207,7 +242,7 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 						id="dropdown-search"
 						data-testid="dropdown-search"
 						label={
-							<div className=" w-[11.25rem] h-[3rem] outline outline-light-20 rounded-xl flex gap-2 justify-between items-center px-3">
+							<div className="container-label-search">
 								<span
 									className={"text-sm font-medium ".concat(
 										searchBy ? " text-dark-40" : "text-light-40 ",
@@ -273,13 +308,59 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 							)}
 						/>
 					</form>
-					{/* <Input placeholder="Cari Data" className="w-[25.875rem]" /> */}
 				</div>
-				<DropdownFilter
-					isShowDropdown={isShowDropdown}
-					onClickDropdown={onClickDropdown}
+				<FilterApplicationSimpedesUMi
+					id="dropdown-filter-application"
+					data-testid="dropdown-filter-application"
+					label={
+						<div
+							className={"dropdown-filter-application "}
+							onClick={handleClickFilterApplication}
+						>
+							<i className="fa fa-filter text-blue-80"></i>
+							<span className="text-dark-40 font-medium text-base">Filter</span>
+						</div>
+					}
+					params={params}
+					onApplyFilter={handleApplyFilter}
 				/>
 			</div>
+
+			{(params?.startDate && params?.endDate) !== undefined ||
+			params?.partnerName !== undefined ||
+			params?.status !== undefined ? (
+				<div className="flex w-full gap-4">
+					{params?.startDate && params?.endDate !== "" ? (
+						<div className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center">
+							<span className="text-dark-10 text-sm font-semibold">{`${params?.startDate.replace(
+								/-/g,
+								"/",
+							)} - ${
+								params?.endDate ? params?.endDate.replace(/-/g, "/") : "-"
+							}`}</span>
+							<button onClick={() => deleteFilter("date")}>
+								<i className="fa fa-circle-xmark text-light-80"></i>
+							</button>
+						</div>
+					) : null}
+					{params?.partnerName !== undefined ? (
+						<div className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center">
+							<span className="text-dark-10 text-sm font-semibold">{`${params?.partnerName}`}</span>
+							<button onClick={() => deleteFilter("partner")}>
+								<i className="fa fa-circle-xmark text-light-80"></i>
+							</button>
+						</div>
+					) : null}
+					{params?.status !== undefined ? (
+						<div className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center">
+							<span className="text-dark-10 text-sm font-semibold">{`${params?.status}`}</span>
+							<button onClick={() => deleteFilter("status")}>
+								<i className="fa fa-circle-xmark text-light-80"></i>
+							</button>
+						</div>
+					) : null}
+				</div>
+			) : null}
 
 			{isDataNotFound ? (
 				<div className="flex justify-center h-full items-center">
@@ -313,8 +394,8 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 							</tr>
 						</thead>
 						<tbody>
-							{data !== undefined && data?.data?.data.length !== 0 ? (
-								data?.data.data.map((item, index) => (
+							{data !== undefined && data?.data?.data?.length !== 0 ? (
+								data?.data?.data?.map((item, index) => (
 									<tr key={index}>
 										<td>{tableNumber + (index + 1)}</td>
 										<td>

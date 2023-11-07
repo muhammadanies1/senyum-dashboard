@@ -319,7 +319,7 @@
 
 	.checkbox-outer {
 		border-width: 1.5 !important;
-		@apply w-6 h-6 border border-light-80 bg-white rounded-[3px] relative;
+		@apply min-w-[24px] h-6 border border-light-80 bg-white rounded-[3px] relative;
 	}
 
 	.checkbox-label input:checked ~ .checkbox-outer {
@@ -384,7 +384,7 @@
 	}
 
 	.container-date-range {
-		@apply flex justify-between;
+		@apply flex flex-col;
 	}
 
 	.container-date-range .from,
@@ -511,5 +511,63 @@
 
 	.dropdown-item.active {
 		@apply bg-gray-100;
+	}
+
+	.dropdown-filter-application {
+		@apply flex p-2 gap-2 items-center;
+	}
+
+	.dropdown-filter-application.active {
+		@apply bg-blue-10 rounded-xl h-[32px];
+	}
+
+	.container-label-search {
+		@apply w-[11.25rem] h-[3rem] outline outline-light-20 rounded-xl flex gap-2 justify-between items-center px-3;
+	}
+
+	/* ========= FILTER APPLICATION ========= */
+
+	.dropdown .dropdown-toggler-filter-application {
+		@apply flex items-center gap-2;
+	}
+
+	.dropdown .dropdown-toggler-filter-application.active {
+		@apply bg-blue-10 rounded-xl h-[32px];
+	}
+
+	.dropdown .dropdown-content-filter-application {
+		@apply z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow lg:w-44 absolute top-8 left-0 lg:left-auto bottom-auto right-auto lg:right-0 overflow-hidden;
+	}
+
+	.dropdown-content-filter-application.active {
+		@apply w-[360px] mt-2 flex flex-col gap-4 p-4 max-h-[500px] overflow-auto;
+	}
+
+	.label-filter {
+		@apply font-bold text-xl text-dark-40;
+	}
+
+	.button-apply-filter {
+		@apply font-semibold text-base text-primary-80 cursor-pointer;
+	}
+
+	.label-date-range {
+		@apply font-medium text-xs text-dark-40;
+	}
+
+	.label-filter-by {
+		@apply font-semibold text-base text-dark-40;
+	}
+
+	.container-date-range {
+		@apply flex gap-2 justify-between;
+	}
+
+	.container-date-range .date-range {
+		@apply flex flex-col gap-2;
+	}
+
+	.container-filter-simpedes-umi {
+		@apply flex flex-col gap-4;
 	}
 }
