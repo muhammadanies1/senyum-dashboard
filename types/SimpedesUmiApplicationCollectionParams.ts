@@ -11,4 +11,7 @@ export type SimpedesUmiApplicationCollectionParams = {
 	nama?: string;
 	nik?: string;
 	noTelp?: string;
+	partnerId?: string;
+	status?: string;
+	partnerName?: string;
 };
