@@ -42,8 +42,8 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 	const [dataPartner, setDataPartner] = useState<PartnerCollectionResponse>();
 	const [dataApplicationStatus, setDataApplicationStatus] =
 		useState<ApplicationStatusCollectionResponse>();
-	const [partner, setPartner] = useState<Record<string, string>>({});
-	const [status, setStatus] = useState<Record<string, string>>({});
+	const [partnerList, setPartnerList] = useState<string[]>([]);
+	const [statusList, setStatusList] = useState<string[]>([]);
 	const [startDate, setStartDate] = useState<string>("");
 	const [endDate, setEndDate] = useState<string>("");
 
@@ -72,8 +72,8 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 	}, []);
 
 	const handleApplyFilter = useCallback(() => {
-		const filterByPartner = Object.values(partner).join(",");
-		const filterByStatus = Object.values(status).join(",");
+		const filterByPartner = partnerList.join(",");
+		const filterByStatus = statusList.join(",");
 
 		const filter: SimpedesUmiApplicationCollectionParams = {
 			startDate: startDate,
@@ -97,34 +97,39 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		}
 		onApplyFilter(filter);
 		setIsShowDropdownMenu(false);
-	}, [endDate, onApplyFilter, params, partner, startDate, status]);
+	}, [endDate, onApplyFilter, params, partnerList, startDate, statusList]);
 
 	const onClickPartner = useCallback(
 		(partnerName: string) => {
-			const updatedPartnerName = {...partner};
+			let newPartnerList = [...partnerList];
 
-			if (updatedPartnerName[partnerName] !== undefined) {
-				delete updatedPartnerName[partnerName];
+			const isExist = newPartnerList.includes(partnerName);
+
+			if (isExist) {
+				newPartnerList = newPartnerList.filter((item) => item !== partnerName);
 			} else {
-				updatedPartnerName[partnerName] = partnerName;
+				newPartnerList.push(partnerName);
 			}
-			setPartner(updatedPartnerName);
+
+			setPartnerList(newPartnerList);
 		},
-		[partner],
+		[partnerList],
 	);
 
 	const onClickStatus = useCallback(
 		(filterStatus: string) => {
-			const updatedStatus = {...status};
+			let newStatusList = [...statusList];
 
-			if (updatedStatus[filterStatus] !== undefined) {
-				delete updatedStatus[filterStatus];
+			const isExist = newStatusList.includes(filterStatus);
+
+			if (isExist) {
+				newStatusList = newStatusList.filter((item) => item !== filterStatus);
 			} else {
-				updatedStatus[filterStatus] = filterStatus;
+				newStatusList.push(filterStatus);
 			}
-			setStatus(updatedStatus);
+			setStatusList(newStatusList);
 		},
-		[status],
+		[statusList],
 	);
 
 	const handleDateFrom = useCallback((evt: Date) => {
@@ -140,23 +145,41 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		fetchDataPartner();
 	}, [fetchDataApplicationStatus, fetchDataPartner]);
 
-	// useEffect(() => {
-	// 	const handleClick = (event: MouseEvent) => {
-	// 		if (
-	// 			dropdownRef.current &&
-	// 			!dropdownRef.current.contains(event.target as Element) &&
-	// 			dropdownMenuRef?.current?.classList.contains("active")
-	// 		) {
-	// 			setIsShowDropdownMenu(false);
-	// 		}
-	// 	};
+	useEffect(() => {
+		const handleClick = (event: MouseEvent) => {
+			if (
+				dropdownRef.current &&
+				!dropdownRef.current.contains(event.target as Element) &&
+				dropdownMenuRef?.current?.classList.contains("active")
+			) {
+				setIsShowDropdownMenu(false);
+			}
+		};
 
-	// 	document.addEventListener("click", handleClick);
+		document.addEventListener("click", handleClick);
 
-	// 	return () => {
-	// 		document.removeEventListener("click", handleClick);
-	// 	};
-	// }, []);
+		return () => {
+			document.removeEventListener("click", handleClick);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!params.status) {
+			setStatusList([]);
+			return;
+		}
+
+		setStatusList(params.status?.split(","));
+	}, [params.status]);
+
+	useEffect(() => {
+		if (!params.partnerName) {
+			setPartnerList([]);
+			return;
+		}
+
+		setPartnerList(params.partnerName?.split(","));
+	}, [params, params.partnerName]);
 
 	return (
 		<div
@@ -231,10 +254,11 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 											key={idx}
 											label={el?.name}
 											value={el?.name}
-											onClick={() => {
+											onChange={() => {
 												onClickPartner(el?.name);
 											}}
 											data-testid="end-user-checkbox"
+											checked={partnerList.includes(el.name)}
 										/>
 								  ))
 								: null}
@@ -252,9 +276,10 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 											label={item?.name}
 											value={item?.name}
 											data-testid="end-user-checkbox"
-											onClick={() => {
+											onChange={() => {
 												onClickStatus(item?.name);
 											}}
+											checked={statusList.includes(item.name)}
 										/>
 								  ))
 								: null}
