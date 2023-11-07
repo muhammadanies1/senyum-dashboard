@@ -4,6 +4,8 @@ import {NextRequest, NextResponse} from "next/server";
 import axiosInstance from "@/config/server/axios";
 import {PartnerCollectionResponse} from "@/types/PartnerCollectionResponse";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
 	let url = "/api/v1/users-dashboard/partner";
 
