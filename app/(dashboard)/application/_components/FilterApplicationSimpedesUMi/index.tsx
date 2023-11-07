@@ -46,8 +46,6 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 	const [status, setStatus] = useState<Record<string, string>>({});
 	const [startDate, setStartDate] = useState<string>("");
 	const [endDate, setEndDate] = useState<string>("");
-	const [filterParams, setFilterParams] =
-		useState<SimpedesUmiApplicationCollectionParams>();
 
 	const toggleDropdownMenu = useCallback(() => {
 		setIsShowDropdownMenu((state) => !state);
@@ -142,23 +140,6 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		fetchDataPartner();
 	}, [fetchDataApplicationStatus, fetchDataPartner]);
 
-	const checkedPartner = useCallback(
-		(partnerName: string) => {
-			const newParams = filterParams;
-
-			if (newParams?.partnerName) {
-				const isExist = newParams?.partnerName.includes(partnerName);
-				return isExist ? true : undefined;
-			}
-			return undefined;
-		},
-		[filterParams],
-	);
-
-	useEffect(() => {
-		setFilterParams(params);
-	}, [params]);
-
 	// useEffect(() => {
 	// 	const handleClick = (event: MouseEvent) => {
 	// 		if (
@@ -250,7 +231,6 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 											key={idx}
 											label={el?.name}
 											value={el?.name}
-											checked={checkedPartner(el?.name)}
 											onClick={() => {
 												onClickPartner(el?.name);
 											}}
