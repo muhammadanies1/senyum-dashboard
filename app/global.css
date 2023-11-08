@@ -548,7 +548,7 @@
 	}
 
 	.button-apply-filter {
-		@apply font-semibold text-base text-primary-80 cursor-pointer;
+		@apply font-semibold text-base cursor-pointer;
 	}
 
 	.label-date-range {
