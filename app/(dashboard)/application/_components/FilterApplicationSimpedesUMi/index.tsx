@@ -7,6 +7,7 @@ import {
 	ReactNode,
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
@@ -44,8 +45,8 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		useState<ApplicationStatusCollectionResponse>();
 	const [partnerList, setPartnerList] = useState<string[]>([]);
 	const [statusList, setStatusList] = useState<string[]>([]);
-	const [startDate, setStartDate] = useState<string>("");
-	const [endDate, setEndDate] = useState<string>("");
+	const [startDate, setStartDate] = useState<Date>();
+	const [endDate, setEndDate] = useState<Date>();
 
 	const toggleDropdownMenu = useCallback(() => {
 		setIsShowDropdownMenu((state) => !state);
@@ -76,11 +77,11 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		const filterByStatus = statusList.join(",");
 
 		const filter: SimpedesUmiApplicationCollectionParams = {
-			startDate: startDate,
-			endDate: endDate,
+			...params,
+			startDate: dayjs(startDate).format("YYYY-MM-DD"),
+			endDate: dayjs(endDate).format("YYYY-MM-DD"),
 			partnerName: filterByPartner,
 			status: filterByStatus,
-			...params,
 		};
 
 		if (filter.startDate === "" || filter.startDate === null) {
@@ -132,12 +133,12 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		[statusList],
 	);
 
-	const handleDateFrom = useCallback((evt: Date) => {
-		setStartDate(dayjs(evt).format("YYYY-MM-DD"));
+	const handleDateFrom = useCallback((date: Date) => {
+		setStartDate(date);
 	}, []);
 
-	const handleDateUntil = useCallback((evt: Date) => {
-		setEndDate(dayjs(evt).format("YYYY-MM-DD"));
+	const handleDateUntil = useCallback((date: Date) => {
+		setEndDate(date);
 	}, []);
 
 	useEffect(() => {
@@ -181,6 +182,42 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		setPartnerList(params.partnerName?.split(","));
 	}, [params, params.partnerName]);
 
+	useEffect(() => {
+		if (!params.status) {
+			setStatusList([]);
+			return;
+		}
+
+		setStatusList(params.status?.split(","));
+	}, [params.status]);
+
+	useEffect(() => {
+		if (!params.partnerName) {
+			setPartnerList([]);
+			return;
+		}
+
+		setPartnerList(params.partnerName?.split(","));
+	}, [params, params.partnerName]);
+
+	const validateDateRange = useMemo(() => {
+		if (startDate && endDate) {
+			const startDateObj = new Date(startDate);
+			const endDateObj = new Date(endDate);
+
+			const differenceInDays = Math.floor(
+				(endDateObj.getTime() - startDateObj.getTime()) / (1000 * 3600 * 24),
+			);
+
+			if (differenceInDays > 30) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		return true;
+	}, [endDate, startDate]);
+
 	return (
 		<div
 			className={"dropdown".concat(className ? ` ${className}` : "")}
@@ -204,7 +241,14 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 				<div className="container-filter-simpedes-umi">
 					<div className="flex justify-between">
 						<span className="label-filter"> Filter </span>
-						<button className="button-apply-filter" onClick={handleApplyFilter}>
+						<button
+							className={"button-apply-filter".concat(
+								validateDateRange
+									? " text-primary-80 cursor-pointer"
+									: " text-gray-500 cursor-not-allowed",
+							)}
+							onClick={validateDateRange ? handleApplyFilter : undefined}
+						>
 							Terapkan
 						</button>
 					</div>
@@ -219,9 +263,14 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 										showTodayButton={false}
 										showClearButton={false}
 										maxDate={new Date()}
-										onSelectedDateChanged={(evt) => {
-											handleDateFrom(evt);
-										}}
+										value={
+											startDate
+												? dayjs(startDate).format("DD/MM/YYYY")
+												: undefined
+										}
+										type="text"
+										placeholder="Pilih Tanggal"
+										onSelectedDateChanged={handleDateFrom}
 									/>
 								</Flowbite>
 							</div>
@@ -232,16 +281,23 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 										showTodayButton={false}
 										showClearButton={false}
 										maxDate={new Date()}
-										onSelectedDateChanged={(evt) => {
-											handleDateUntil(evt);
-										}}
+										value={
+											endDate ? dayjs(endDate).format("DD/MM/YYYY") : undefined
+										}
+										type="text"
+										placeholder="Pilih Tanggal"
+										onSelectedDateChanged={handleDateUntil}
 									/>
 								</Flowbite>
 							</div>
 						</div>
-						<span className="text-light-80 text-xs font-normal">
-							Data yang dapat ditampilkan maksimal adalah 90 hari
-						</span>
+						{validateDateRange ? (
+							false
+						) : (
+							<span className="text-light-80 text-xs font-normal">
+								Data yang dapat ditampilkan maksimal adalah 90 hari
+							</span>
+						)}
 					</div>
 					<hr className="w-full border border-[#EAEBEB]" />
 					<div className="flex flex-col gap-2">

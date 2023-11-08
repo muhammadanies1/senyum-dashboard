@@ -43,14 +43,10 @@ type InputSearch = {
 const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 	userTypeId,
 }) => {
-	const [isShowDropdown, setIsShowDropdown] = useState<boolean>(false);
 	const [isShowDetailModal, setIsShowDetailModal] = useState<boolean>(false);
 	const [isShowDownloadModal, setIsShowDownloadModal] =
 		useState<boolean>(false);
 	const [selectedApplication, setSelectedApplication] = useState<string>();
-	const [filter, setFilter] =
-		useState<SimpedesUmiApplicationCollectionParams>();
-
 	const [params, setParams] = useState<SimpedesUmiApplicationCollectionParams>({
 		page: 1,
 		limit: 10,
@@ -190,31 +186,12 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		[],
 	);
 
-	const deleteFilter = useCallback(
-		(filterName: string) => {
-			const newParams = {...params};
-
-			switch (filterName) {
-				case "date":
-					delete newParams?.startDate;
-					delete newParams?.endDate;
-					setParams(newParams);
-					break;
-				case "partner":
-					delete newParams?.partnerName;
-					setParams(newParams);
-					break;
-				case "status":
-					delete newParams?.status;
-					setParams(newParams);
-					break;
-
-				default:
-					break;
-			}
-		},
-		[params],
-	);
+	const deleteFilterDate = useCallback(() => {
+		const newParams = {...params};
+		delete newParams?.startDate;
+		delete newParams?.endDate;
+		setParams(newParams);
+	}, [params]);
 
 	const resetFilter = useCallback(() => {
 		const newParams = {...params};
@@ -226,6 +203,59 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 
 		setParams(newParams);
 	}, [params]);
+
+	const listFilterPartner = useMemo(() => {
+		if (!params?.partnerName) {
+			return;
+		}
+		const filterPartner = params?.partnerName;
+		const arrFilterPartner = filterPartner.split(",");
+
+		return arrFilterPartner;
+	}, [params?.partnerName]);
+
+	const filterStatusList = useMemo(() => {
+		if (!params?.status) {
+			return;
+		}
+		const filterStatus = params?.status;
+		const arrFilterStatus = filterStatus.split(",");
+
+		return arrFilterStatus;
+	}, [params?.status]);
+
+	const deleteFilterPartnerStatus = useCallback(
+		(filterName: string, valueFilter: string) => {
+			switch (filterName) {
+				case "partner":
+					if (params?.partnerName !== "") {
+						const partnerListFiltered = listFilterPartner?.filter(
+							(item) => item !== valueFilter,
+						);
+						const newFilterPartner = partnerListFiltered?.join(",");
+						const newParams = {...params, partnerName: newFilterPartner};
+						setParams(newParams);
+					} else {
+						delete params?.partnerName;
+					}
+
+					break;
+				case "status":
+					if (params?.status !== "") {
+						const statusListFiltered = filterStatusList?.filter(
+							(item) => item !== valueFilter,
+						);
+						const newFilterStatus = statusListFiltered?.join(",");
+						const newParamsStatus = {...params, status: newFilterStatus};
+						setParams(newParamsStatus);
+					} else {
+						delete params?.status;
+					}
+					break;
+			}
+		},
+		[filterStatusList, listFilterPartner, params],
+	);
 
 	return (
 		<Card
@@ -340,7 +370,7 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 			{(params?.startDate && params?.endDate) !== undefined ||
 			params?.partnerName !== undefined ||
 			params?.status !== undefined ? (
-				<div className="flex w-full gap-4">
+				<div className="flex flex-wrap gap-4">
 					{params?.startDate && params?.endDate !== "" ? (
 						<div className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center">
 							<span className="text-dark-10 text-sm font-semibold">{`${params?.startDate.replace(
@@ -349,27 +379,41 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 							)} - ${
 								params?.endDate ? params?.endDate.replace(/-/g, "/") : "-"
 							}`}</span>
-							<button onClick={() => deleteFilter("date")}>
+							<button onClick={deleteFilterDate}>
 								<i className="fa fa-circle-xmark text-light-80"></i>
 							</button>
 						</div>
 					) : null}
-					{params?.partnerName !== undefined ? (
-						<div className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center">
-							<span className="text-dark-10 text-sm font-semibold">{`${params?.partnerName}`}</span>
-							<button onClick={() => deleteFilter("partner")}>
-								<i className="fa fa-circle-xmark text-light-80"></i>
-							</button>
-						</div>
-					) : null}
-					{params?.status !== undefined ? (
-						<div className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center">
-							<span className="text-dark-10 text-sm font-semibold">{`${params?.status}`}</span>
-							<button onClick={() => deleteFilter("status")}>
-								<i className="fa fa-circle-xmark text-light-80"></i>
-							</button>
-						</div>
-					) : null}
+					{params?.partnerName !== undefined
+						? listFilterPartner?.map((item, index) => (
+								<div
+									key={index}
+									className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center"
+								>
+									<span className="text-dark-10 text-sm font-semibold">{`${item}`}</span>
+									<button
+										onClick={() => deleteFilterPartnerStatus("partner", item)}
+									>
+										<i className="fa fa-circle-xmark text-light-80"></i>
+									</button>
+								</div>
+						  ))
+						: null}
+					{params?.status !== undefined
+						? filterStatusList?.map((item, index) => (
+								<div
+									key={index}
+									className="px-2.5 py-2 rounded-lg bg-light-10 flex gap-2.5 items-center"
+								>
+									<span className="text-dark-10 text-sm font-semibold">{`${item}`}</span>
+									<button
+										onClick={() => deleteFilterPartnerStatus("status", item)}
+									>
+										<i className="fa fa-circle-xmark text-light-80"></i>
+									</button>
+								</div>
+						  ))
+						: null}
 					<button
 						className="text-blue-80 font-normal text-base"
 						onClick={resetFilter}
