@@ -235,8 +235,6 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 						const newFilterPartner = partnerListFiltered?.join(",");
 						const newParams = {...params, partnerName: newFilterPartner};
 						setParams(newParams);
-					} else {
-						delete params?.partnerName;
 					}
 
 					break;
@@ -248,8 +246,6 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 						const newFilterStatus = statusListFiltered?.join(",");
 						const newParamsStatus = {...params, status: newFilterStatus};
 						setParams(newParamsStatus);
-					} else {
-						delete params?.status;
 					}
 					break;
 			}
