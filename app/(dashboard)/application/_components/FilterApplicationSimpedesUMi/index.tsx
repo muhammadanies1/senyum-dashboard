@@ -38,14 +38,26 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 	...attrs
 }) => {
 	const dropdownRef = useRef<HTMLDivElement>(null);
+
 	const dropdownMenuRef = useRef<HTMLDivElement>(null);
+
+	const calendar1Ref = useRef<HTMLDivElement>(null);
+
+	const calendar2Ref = useRef<HTMLDivElement>(null);
+
 	const [isShowDropdownMenu, setIsShowDropdownMenu] = useState<boolean>(false);
+
 	const [dataPartner, setDataPartner] = useState<PartnerCollectionResponse>();
+
 	const [dataApplicationStatus, setDataApplicationStatus] =
 		useState<ApplicationStatusCollectionResponse>();
+
 	const [partnerList, setPartnerList] = useState<string[]>([]);
+
 	const [statusList, setStatusList] = useState<string[]>([]);
+
 	const [startDate, setStartDate] = useState<Date>();
+
 	const [endDate, setEndDate] = useState<Date>();
 
 	const toggleDropdownMenu = useCallback(() => {
@@ -78,8 +90,8 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 
 		const filter: SimpedesUmiApplicationCollectionParams = {
 			...params,
-			startDate: dayjs(startDate).format("YYYY-MM-DD"),
-			endDate: dayjs(endDate).format("YYYY-MM-DD"),
+			startDate: startDate ? dayjs(startDate).format("YYYY-MM-DD") : undefined,
+			endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
 			partnerName: filterByPartner,
 			status: filterByStatus,
 		};
@@ -148,10 +160,21 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 
 	useEffect(() => {
 		const handleClick = (event: MouseEvent) => {
-			if (
+			const isDropdownElementClicked =
 				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Element) &&
-				dropdownMenuRef?.current?.classList.contains("active")
+				dropdownRef.current.contains(event.target as Element);
+
+			const isDropdownMenuActive =
+				dropdownMenuRef?.current?.classList.contains("active");
+
+			const isCalendarItem = (event.target as Element).classList.contains(
+				"datepicker-item",
+			);
+
+			if (
+				!isDropdownElementClicked &&
+				isDropdownMenuActive &&
+				!isCalendarItem
 			) {
 				setIsShowDropdownMenu(false);
 			}
@@ -200,6 +223,22 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		setPartnerList(params.partnerName?.split(","));
 	}, [params, params.partnerName]);
 
+	useEffect(() => {
+		if (!params?.startDate) {
+			setStartDate(undefined);
+			return;
+		}
+		setStartDate(new Date(params?.startDate));
+	}, [params?.startDate]);
+
+	useEffect(() => {
+		if (!params?.endDate) {
+			setEndDate(undefined);
+			return;
+		}
+		setEndDate(new Date(params?.endDate));
+	}, [params?.endDate]);
+
 	const validateDateRange = useMemo(() => {
 		if (startDate && endDate) {
 			const startDateObj = new Date(startDate);
@@ -209,7 +248,7 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 				(endDateObj.getTime() - startDateObj.getTime()) / (1000 * 3600 * 24),
 			);
 
-			if (differenceInDays > 30) {
+			if (differenceInDays > 90) {
 				return false;
 			} else {
 				return true;
@@ -217,6 +256,19 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 		}
 		return true;
 	}, [endDate, startDate]);
+
+	const checkDate = useMemo(() => {
+		if (startDate && endDate) {
+			const isValidDateRange: boolean = startDate <= endDate ? true : false;
+			return isValidDateRange;
+		}
+	}, [endDate, startDate]);
+
+	const validateDate = useMemo(() => {
+		if (startDate && endDate && validateDateRange && checkDate) {
+			return true;
+		}
+	}, [checkDate, endDate, startDate, validateDateRange]);
 
 	return (
 		<div
@@ -243,11 +295,19 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 						<span className="label-filter"> Filter </span>
 						<button
 							className={"button-apply-filter".concat(
-								validateDateRange
+								validateDate
+									? " text-primary-80 cursor-pointer"
+									: !startDate && !endDate
 									? " text-primary-80 cursor-pointer"
 									: " text-gray-500 cursor-not-allowed",
 							)}
-							onClick={validateDateRange ? handleApplyFilter : undefined}
+							onClick={
+								validateDate
+									? handleApplyFilter
+									: !startDate && !endDate
+									? handleApplyFilter
+									: undefined
+							}
 						>
 							Terapkan
 						</button>
@@ -256,7 +316,7 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 					<div className="flex flex-col gap-2.5 ">
 						<span className="label-filter-by">Tanggal</span>
 						<div className="container-date-range">
-							<div className="date-range">
+							<div className="date-range" ref={calendar1Ref}>
 								<span className="label-date-range">Dari</span>
 								<Flowbite theme={{theme}}>
 									<Datepicker
@@ -264,9 +324,7 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 										showClearButton={false}
 										maxDate={new Date()}
 										value={
-											startDate
-												? dayjs(startDate).format("DD/MM/YYYY")
-												: undefined
+											startDate ? dayjs(startDate).format("DD/MM/YYYY") : ""
 										}
 										type="text"
 										placeholder="Pilih Tanggal"
@@ -274,19 +332,18 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 									/>
 								</Flowbite>
 							</div>
-							<div className="date-range">
+							<div className="date-range" ref={calendar2Ref}>
 								<span className="label-date-range">Hingga</span>
 								<Flowbite theme={{theme}}>
 									<Datepicker
 										showTodayButton={false}
 										showClearButton={false}
 										maxDate={new Date()}
-										value={
-											endDate ? dayjs(endDate).format("DD/MM/YYYY") : undefined
-										}
+										value={endDate ? dayjs(endDate).format("DD/MM/YYYY") : ""}
 										type="text"
 										placeholder="Pilih Tanggal"
 										onSelectedDateChanged={handleDateUntil}
+										disabled={!startDate ? true : false}
 									/>
 								</Flowbite>
 							</div>
