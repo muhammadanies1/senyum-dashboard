@@ -18,19 +18,16 @@ const schema = yup.object({
 		.required("Format file harus diisi."),
 });
 
-type DownloadApplicationProps = {
-	onSuccess: () => void;
+type DownloadApplicationDetailProps = {
 	selectedApplication?: string;
 	handleClose: () => void;
+	onSuccess: () => void;
 	isShow: boolean;
 };
 
-const DownloadApplication: FunctionComponent<DownloadApplicationProps> = ({
-	selectedApplication,
-	handleClose,
-	onSuccess,
-	isShow,
-}) => {
+const DownloadApplicationDetail: FunctionComponent<
+	DownloadApplicationDetailProps
+> = ({selectedApplication, handleClose, onSuccess, isShow}) => {
 	const {
 		control,
 		handleSubmit,
@@ -135,4 +132,4 @@ const DownloadApplication: FunctionComponent<DownloadApplicationProps> = ({
 	);
 };
 
-export default DownloadApplication;
+export default DownloadApplicationDetail;
