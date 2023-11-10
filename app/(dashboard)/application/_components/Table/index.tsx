@@ -31,7 +31,8 @@ import {SimpedesUmiApplicationCollectionResponse} from "@/types/SimpedesUmiAppli
 import {userTypeID} from "@/types/UserTypeID";
 
 import DetailApplicationModal from "../DetailApplicationModal";
-import DownloadApplicationModal from "../DownloadApplicationModal";
+import DownloadApplicationBulkModal from "../DownloadApplicationBulkModal";
+import DownloadApplicationDetailModal from "../DownloadApplicationDetailModal";
 
 type ApplicationTableProps = {
 	userTypeId: userTypeID;
@@ -44,7 +45,9 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 	userTypeId,
 }) => {
 	const [isShowDetailModal, setIsShowDetailModal] = useState<boolean>(false);
-	const [isShowDownloadModal, setIsShowDownloadModal] =
+	const [isShowDownloadBulkModal, setIsShowDownloadBulkModal] =
+		useState<boolean>(false);
+	const [isShowDownloadDetailModal, setIsShowDownloadDetailModal] =
 		useState<boolean>(false);
 	const [selectedApplication, setSelectedApplication] = useState<string>();
 	const [params, setParams] = useState<SimpedesUmiApplicationCollectionParams>({
@@ -264,7 +267,13 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 			<div className="flex justify-between items-center">
 				<PageTitle>Pengajuan Simpedes UMi</PageTitle>
 				{userTypeId !== "VIEWER" ? (
-					<Button variant="primary-outline" className="gap-2">
+					<Button
+						variant="primary-outline"
+						className="gap-2"
+						onClick={() => {
+							setIsShowDownloadBulkModal(true);
+						}}
+					>
 						<i className="fa fa-download"></i>
 						Download Data Pengajuan
 					</Button>
@@ -505,7 +514,7 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 														data-testid="show-download-modal-btn"
 														onClick={() => {
 															setSelectedApplication(item.id);
-															setIsShowDownloadModal(true);
+															setIsShowDownloadDetailModal(true);
 														}}
 														transparent
 													>
@@ -542,15 +551,24 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 				isShow={isShowDetailModal}
 				handleClose={() => setIsShowDetailModal(false)}
 				selectedApplication={selectedApplication}
-				handleShowDownloadModal={() => setIsShowDownloadModal(true)}
+				handleShowDownloadModal={() => setIsShowDownloadDetailModal(true)}
 			/>
 
-			<DownloadApplicationModal
-				isShow={isShowDownloadModal}
-				handleClose={() => setIsShowDownloadModal(false)}
+			<DownloadApplicationBulkModal
+				isShow={isShowDownloadBulkModal}
+				handleClose={() => setIsShowDownloadBulkModal(false)}
 				selectedApplication={selectedApplication}
 				onSuccess={() => {
-					setIsShowDownloadModal(false);
+					setIsShowDownloadBulkModal(false);
+				}}
+			/>
+
+			<DownloadApplicationDetailModal
+				isShow={isShowDownloadDetailModal}
+				handleClose={() => setIsShowDownloadDetailModal(false)}
+				selectedApplication={selectedApplication}
+				onSuccess={() => {
+					setIsShowDownloadDetailModal(false);
 				}}
 			/>
 		</Card>

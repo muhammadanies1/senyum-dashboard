@@ -3,29 +3,36 @@ import React from "react";
 import {render, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import DownloadApplication from "./";
+import DownloadApplicationDetail from "./";
 
 const handleClose = jest.fn();
+const onSuccess = jest.fn();
 
-window.alert = jest.fn();
-
-describe("DownloadApplication", () => {
+describe("DownloadApplicationDetail", () => {
 	it("opens the modal when the 'Download Data Pengajuan' button is clicked and submit button is disabled initially", async () => {
 		const {getByTestId} = render(
-			<DownloadApplication isShow handleClose={handleClose} />,
+			<DownloadApplicationDetail
+				handleClose={handleClose}
+				onSuccess={onSuccess}
+				isShow
+			/>,
 		);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
+		const pdfRadio = getByTestId("radio-pdf");
 		const xlsRadio = getByTestId("radio-xls");
-		const csvRadio = getByTestId("radio-csv");
 
+		expect(pdfRadio).not.toBeChecked();
 		expect(xlsRadio).not.toBeChecked();
-		expect(csvRadio).not.toBeChecked();
 		expect(submitModalButton).toBeDisabled();
 	});
 
 	it("closes the modal when the close button is clicked", async () => {
 		const {getByTestId, queryByTestId} = render(
-			<DownloadApplication isShow handleClose={handleClose} />,
+			<DownloadApplicationDetail
+				handleClose={handleClose}
+				onSuccess={onSuccess}
+				isShow
+			/>,
 		);
 		const modal = queryByTestId("modal-download-form");
 
@@ -44,7 +51,11 @@ describe("DownloadApplication", () => {
 
 	it("closes the modal when the background is clicked", async () => {
 		const {getByTestId} = render(
-			<DownloadApplication isShow handleClose={handleClose} />,
+			<DownloadApplicationDetail
+				handleClose={handleClose}
+				onSuccess={onSuccess}
+				isShow
+			/>,
 		);
 		const modal = getByTestId("modal-download-form");
 
@@ -63,39 +74,42 @@ describe("DownloadApplication", () => {
 
 	it("submits the form with valid data", async () => {
 		const {getByTestId} = render(
-			<DownloadApplication isShow handleClose={handleClose} />,
+			<DownloadApplicationDetail
+				handleClose={handleClose}
+				onSuccess={onSuccess}
+				isShow
+			/>,
 		);
 		const submitModalButton = getByTestId("submit-modal-download-btn");
+		const pdfRadio = getByTestId("radio-pdf");
 		const xlsRadio = getByTestId("radio-xls");
-		const csvRadio = getByTestId("radio-csv");
 
+		expect(pdfRadio).not.toBeChecked();
 		expect(xlsRadio).not.toBeChecked();
-		expect(csvRadio).not.toBeChecked();
 
-		userEvent.click(xlsRadio);
-		await waitFor(() => {
-			expect(csvRadio).not.toBeChecked();
-			expect(xlsRadio).toBeChecked();
-		});
-
-		userEvent.click(csvRadio);
+		userEvent.click(pdfRadio);
 		await waitFor(() => {
 			expect(xlsRadio).not.toBeChecked();
-			expect(csvRadio).toBeChecked();
+			expect(pdfRadio).toBeChecked();
 		});
 
 		userEvent.click(xlsRadio);
 		await waitFor(() => {
-			expect(csvRadio).not.toBeChecked();
+			expect(pdfRadio).not.toBeChecked();
 			expect(xlsRadio).toBeChecked();
+		});
+
+		userEvent.click(pdfRadio);
+		await waitFor(() => {
+			expect(xlsRadio).not.toBeChecked();
+			expect(pdfRadio).toBeChecked();
 		});
 
 		expect(submitModalButton).toBeEnabled();
 		userEvent.click(submitModalButton);
 
 		await waitFor(() => {
-			expect(window.alert).toHaveBeenCalledWith(`data: {"format":"xls"}`);
-			expect(window.alert).toHaveBeenCalledTimes(1);
+			expect(onSuccess).toHaveBeenCalledTimes(1);
 		});
 	});
 });

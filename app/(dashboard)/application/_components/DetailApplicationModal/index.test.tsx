@@ -25,6 +25,7 @@ describe("DetailApplication", () => {
 				isShow
 				handleClose={handleClose}
 				handleShowDownloadModal={handleShowDownloadModal}
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 	});
@@ -35,6 +36,7 @@ describe("DetailApplication", () => {
 				isShow
 				handleClose={handleClose}
 				handleShowDownloadModal={handleShowDownloadModal}
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 		const modalDetail = getByTestId("modal-detail-form");
@@ -78,6 +80,7 @@ describe("DetailApplication", () => {
 				handleClose={handleClose}
 				isShow={true}
 				handleShowDownloadModal={handleShowDownloadModal}
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 
@@ -153,6 +156,7 @@ describe("DetailApplication", () => {
 				isShow
 				handleClose={handleClose}
 				handleShowDownloadModal={handleShowDownloadModal}
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 		const modalDetail = queryByTestId("modal-detail-form");
@@ -183,6 +187,7 @@ describe("DetailApplication", () => {
 				isShow
 				handleClose={handleClose}
 				handleShowDownloadModal={handleShowDownloadModal}
+				userTypeId="SUPER_ADMIN"
 			/>,
 		);
 		const modalDetail = getByTestId("modal-detail-form");
