@@ -31,7 +31,7 @@ type DownloadApplicationBulkProps = {
 };
 
 const initialValue: yup.InferType<typeof schema> = {
-	format: {},
+	format: "",
 	startDate: "",
 	endDate: "",
 };
@@ -55,6 +55,7 @@ const DownloadApplicationBulk: FunctionComponent<
 	});
 
 	const watchStartDate = dayjs(watch("startDate")).toDate();
+	const watchEndDate = dayjs(watch("endDate")).toDate();
 
 	// const downloadBulk = useCallback(
 	// 	(data: yup.InferType<typeof schema>) => {
@@ -65,9 +66,33 @@ const DownloadApplicationBulk: FunctionComponent<
 	// 	[onSuccess, selectedApplication],
 	// );
 
-	// const dateLimit = useMemo(()=>{
-	// 	switch
-	// })
+	const handleStartDateChange = useCallback(
+		(value: string) => {
+			setValue("startDate", value);
+
+			if (
+				watchEndDate &&
+				dayjs(value).isBefore(dayjs(watchEndDate).subtract(29, "day"))
+			) {
+				const newEndDate = dayjs(value).add(29, "day").toDate();
+				setValue("endDate", newEndDate.toString());
+			}
+
+			if (watchEndDate && dayjs(value).isAfter(watchEndDate)) {
+				setValue("endDate", value);
+			}
+		},
+		[setValue, watchEndDate],
+	);
+
+	const maxEndDate = useMemo(() => {
+		if (watchStartDate) {
+			const endDate = dayjs(watchStartDate).add(29, "day");
+			return endDate.isAfter(new Date()) ? new Date() : endDate.toDate();
+		} else {
+			return new Date();
+		}
+	}, [watchStartDate]);
 
 	const submitForm = (data: yup.InferType<typeof schema>) => {
 		let timeout: NodeJS.Timeout | undefined = undefined;
@@ -127,7 +152,9 @@ const DownloadApplicationBulk: FunctionComponent<
 													showTodayButton={false}
 													showClearButton={false}
 													maxDate={new Date()}
-													onSelectedDateChanged={onChange}
+													onSelectedDateChanged={(date) =>
+														handleStartDateChange(date.toString())
+													}
 													type="text"
 													value={value ? dayjs(value).format("DD/MM/YY") : ""}
 													placeholder="Pilih Tanggal"
@@ -148,16 +175,8 @@ const DownloadApplicationBulk: FunctionComponent<
 												<Datepicker
 													showTodayButton={false}
 													showClearButton={false}
-													minDate={watchStartDate || new Date()}
-													maxDate={
-														watchStartDate
-															? dayjs(watchStartDate)
-																	.add(30, "day")
-																	.isAfter(new Date())
-																? new Date()
-																: dayjs(watchStartDate).add(30, "day").toDate()
-															: new Date()
-													}
+													minDate={watchStartDate ?? new Date()}
+													maxDate={maxEndDate}
 													onSelectedDateChanged={onChange}
 													type="text"
 													value={value ? dayjs(value).format("DD/MM/YY") : ""}
