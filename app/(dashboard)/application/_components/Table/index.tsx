@@ -25,6 +25,7 @@ import Pagination from "@/components/atoms/Pagination";
 import Table from "@/components/atoms/Table";
 import TableContainer from "@/components/atoms/TableContainer";
 import Dropdown from "@/components/molecules/Dropdown";
+import Toast from "@/components/molecules/Toast";
 import axiosInstance from "@/config/client/axios";
 import {SimpedesUmiApplicationCollectionParams} from "@/types/SimpedesUmiApplicationCollectionParams";
 import {SimpedesUmiApplicationCollectionResponse} from "@/types/SimpedesUmiApplicationCollectionResponse";
@@ -44,16 +45,21 @@ type InputSearch = {
 const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 	userTypeId,
 }) => {
+	const [params, setParams] = useState<SimpedesUmiApplicationCollectionParams>({
+		page: 1,
+		limit: 10,
+	});
+
+	const [isShowToast, setIsShowToast] = useState<boolean>(false);
+	const [toastStatus, setToastStatus] = useState<boolean>();
+	const [toastMessage, setToastMessage] = useState<string>();
+
 	const [isShowDetailModal, setIsShowDetailModal] = useState<boolean>(false);
 	const [isShowDownloadBulkModal, setIsShowDownloadBulkModal] =
 		useState<boolean>(false);
 	const [isShowDownloadDetailModal, setIsShowDownloadDetailModal] =
 		useState<boolean>(false);
 	const [selectedApplication, setSelectedApplication] = useState<string>();
-	const [params, setParams] = useState<SimpedesUmiApplicationCollectionParams>({
-		page: 1,
-		limit: 10,
-	});
 
 	const [searchBy, setSearchBy] = useState<string>();
 	const [data, setData] = useState<SimpedesUmiApplicationCollectionResponse>();
@@ -546,6 +552,18 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 				backward={handleBackward}
 			/>
 
+			<Toast
+				id="toast"
+				data-testid="toast"
+				status={toastStatus ? "success" : "error"}
+				isShow={isShowToast}
+				handleClose={() => {
+					setIsShowToast(false);
+				}}
+			>
+				{toastMessage}
+			</Toast>
+
 			<DetailApplicationModal
 				userTypeId={userTypeId}
 				isShow={isShowDetailModal}
@@ -557,8 +575,11 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 			<DownloadApplicationBulkModal
 				isShow={isShowDownloadBulkModal}
 				handleClose={() => setIsShowDownloadBulkModal(false)}
-				selectedApplication={selectedApplication}
-				onSuccess={() => {
+				onError={(error) => {
+					const errorMessage = new Error(error as any).message;
+					setToastStatus(false);
+					setIsShowToast(true);
+					setToastMessage(errorMessage);
 					setIsShowDownloadBulkModal(false);
 				}}
 			/>
