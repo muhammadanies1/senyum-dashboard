@@ -6,4 +6,5 @@ export type UserCollectionParams = {
 	userId?: string;
 	search?: string;
 	sortBy?: "asc" | "desc";
+	userTypeId?: string;
 };

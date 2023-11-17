@@ -1,8 +1,15 @@
 "use client";
 
+import axios from "axios";
 import dayjs from "dayjs";
 import {Datepicker, Flowbite} from "flowbite-react";
-import React, {FunctionComponent, useCallback, useEffect, useMemo} from "react";
+import React, {
+	FunctionComponent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
@@ -11,6 +18,7 @@ import FormGroup from "@/components/atoms/FormGroup";
 import Label from "@/components/atoms/Label";
 import Radio from "@/components/atoms/Radio";
 import Modal from "@/components/molecules/Modal";
+import axiosInstance from "@/config/client/axios";
 import {theme} from "@/config/theme";
 import {yupResolver} from "@hookform/resolvers/yup";
 
@@ -19,15 +27,15 @@ const schema = yup.object({
 		.mixed()
 		.oneOf(["pdf", "xls", "csv"], "Format file tidak valid.")
 		.required("Format file harus diisi."),
-	startDate: yup.string().required(),
-	endDate: yup.string().required(),
+	startDate: yup.string().optional(),
+	endDate: yup.string().optional(),
 });
 
 type DownloadApplicationBulkProps = {
-	selectedApplication?: string;
-	handleClose: () => void;
-	onSuccess: () => void;
 	isShow: boolean;
+	handleClose: () => void;
+	onSuccess?: () => Promise<void>;
+	onError: (error: unknown) => void;
 };
 
 const initialValue: yup.InferType<typeof schema> = {
@@ -38,7 +46,7 @@ const initialValue: yup.InferType<typeof schema> = {
 
 const DownloadApplicationBulk: FunctionComponent<
 	DownloadApplicationBulkProps
-> = ({selectedApplication, handleClose, onSuccess, isShow}) => {
+> = ({handleClose, onSuccess, onError, isShow}) => {
 	const {
 		control,
 		handleSubmit,
@@ -54,17 +62,91 @@ const DownloadApplicationBulk: FunctionComponent<
 		mode: "all",
 	});
 
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
 	const watchStartDate = dayjs(watch("startDate")).toDate();
 	const watchEndDate = dayjs(watch("endDate")).toDate();
 
-	// const downloadBulk = useCallback(
-	// 	(data: yup.InferType<typeof schema>) => {
-	// 		const url = `${process.env.NEXT_PUBLIC_API_BFF_URL}/api/v1/simpedes-umi/detail/${data.format}/${data.startDate}${data.endDate}`;
-	// 		window.open(url, "_blank");
-	// 		onSuccess();
-	// 	},
-	// 	[onSuccess, selectedApplication],
-	// );
+	const downloadBulk = useCallback(
+		async (data: yup.InferType<typeof schema>) => {
+			try {
+				setIsLoading(true);
+
+				const fileExtension = data.format === "xls" ? "xlsx" : data.format;
+
+				const newStartDate = data.startDate
+					? dayjs(data.startDate).format("YYYY-MM-DD")
+					: null;
+
+				const newEndDate = data.endDate
+					? dayjs(data.endDate).format("YYYY-MM-DD")
+					: null;
+
+				const response = await axiosInstance.get(
+					`/api/download/${data.format}`,
+					{
+						params: {
+							startDate: newStartDate,
+							endDate: newEndDate,
+						},
+					},
+				);
+
+				const downloadFile = async (url: string, fileName: string) => {
+					try {
+						const fileResponse = await axios.get(url, {
+							responseType: "blob",
+						});
+
+						const blob = new Blob([fileResponse.data], {
+							type: "application/octet-stream",
+						});
+
+						const link = document.createElement("a");
+						link.href = window.URL.createObjectURL(blob);
+						link.download = fileName;
+						link.style.display = "none";
+						document.body.appendChild(link);
+						link.click();
+						document.body.removeChild(link);
+						window.URL.revokeObjectURL(link.href);
+					} catch (error) {
+						onError("Maaf, terjadi error ketika download file.");
+						console.error("Error downloading file:", error);
+					}
+				};
+
+				if (
+					response.data.responseDescription === "SUCCESS" &&
+					response.data.data !== null
+				) {
+					response.data.data.link.map((item: string) => {
+						downloadFile(item, `application data.${fileExtension}`);
+					});
+
+					handleClose();
+					setIsLoading(false);
+					if (onSuccess) {
+						await onSuccess();
+					}
+				} else if (
+					response.data.responseDescription === "SUCCESS" &&
+					response.data.data === null
+				) {
+					handleClose();
+					setIsLoading(false);
+					onError("Maaf, tidak ada data pengajuan pada tanggal yang dipilih.");
+				}
+			} catch (error) {
+				setIsLoading(false);
+
+				if (axios.isAxiosError(error)) {
+					onError(error);
+				}
+			}
+		},
+		[handleClose, onError, onSuccess],
+	);
 
 	const handleStartDateChange = useCallback(
 		(value: string) => {
@@ -98,7 +180,7 @@ const DownloadApplicationBulk: FunctionComponent<
 		let timeout: NodeJS.Timeout | undefined = undefined;
 		timeout && clearTimeout(timeout);
 		setTimeout(() => {
-			// downloadBulk(data);
+			downloadBulk(data);
 		}, 200);
 	};
 
@@ -143,17 +225,19 @@ const DownloadApplicationBulk: FunctionComponent<
 							<Controller
 								control={control}
 								name="startDate"
-								render={({field: {value, onChange}, fieldState: {error}}) => (
+								render={({field: {value}, fieldState: {error}}) => (
 									<FormGroup>
 										<div className="date-range">
 											<span className="label-date-range">Dari</span>
 											<Flowbite theme={{theme}}>
 												<Datepicker
+													id="datepicker-startdate"
+													data-testid="datepicker-startdate"
 													showTodayButton={false}
 													showClearButton={false}
 													maxDate={new Date()}
-													onSelectedDateChanged={(date) =>
-														handleStartDateChange(date.toString())
+													onSelectedDateChanged={(value) =>
+														handleStartDateChange(value.toString())
 													}
 													type="text"
 													value={value ? dayjs(value).format("DD/MM/YY") : ""}
@@ -173,6 +257,8 @@ const DownloadApplicationBulk: FunctionComponent<
 											<span className="label-date-range">Hingga</span>
 											<Flowbite theme={{theme}}>
 												<Datepicker
+													id="datepicker-enddate"
+													data-testid="datepicker-enddate"
 													showTodayButton={false}
 													showClearButton={false}
 													minDate={watchStartDate ?? new Date()}
@@ -258,7 +344,7 @@ const DownloadApplicationBulk: FunctionComponent<
 						id="submit-modal-download-btn"
 						data-testid="submit-modal-download-btn"
 						className="w-full"
-						disabled={!isValid}
+						disabled={!isValid || isLoading}
 					>
 						Download
 					</Button>

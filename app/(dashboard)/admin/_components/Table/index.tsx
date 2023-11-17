@@ -2,10 +2,12 @@
 
 import {AxiosResponse} from "axios";
 import {
+	ChangeEvent,
 	FunctionComponent,
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -18,7 +20,6 @@ import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
 import FormGroup from "@/components/atoms/FormGroup";
 import FormIcon from "@/components/atoms/FormIcon";
-import FormMessage from "@/components/atoms/FormMessage";
 import Input from "@/components/atoms/Input";
 import Label from "@/components/atoms/Label";
 import PageTitle from "@/components/atoms/PageTitle";
@@ -58,14 +59,12 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 	const [selectedUser, setSelectedUser] = useState<User>();
 	const [isShowEditModal, setIsShowEditModal] = useState<boolean>(false);
 	const [isShowDeleteModal, setIsShowDeleteModal] = useState<boolean>(false);
+	const [searchBy, setSearchBy] = useState<string>();
+	const timeoutRef = useRef<NodeJS.Timeout>();
 
-	const {control, handleSubmit} = useForm({
+	const {control, handleSubmit, resetField, setValue} = useForm({
 		values: {
 			search: "",
-			filter: undefined,
-			isSuperAdmin: false,
-			isAdmin: false,
-			isViewer: false,
 		},
 		resolver: yupResolver(schema),
 	});
@@ -85,9 +84,13 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 		}
 	}, []);
 
-	const onSubmit = useCallback((data: yup.InferType<typeof schema>) => {
-		console.log(data);
-	}, []);
+	const onSubmit = useCallback(
+		(data: yup.InferType<typeof schema>) => {
+			const newParams = {...params, search: data?.search};
+			setParams(newParams);
+		},
+		[params],
+	);
 
 	const handlePageClick = useCallback(
 		(event: {selected: number}) => {
@@ -105,7 +108,13 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 	}, [data?.data.recordsFiltered]);
 
 	useEffect(() => {
-		fetchData(params);
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
+		timeoutRef.current = setTimeout(() => {
+			fetchData(params);
+		}, 1000);
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [params]);
 
@@ -128,6 +137,69 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 		const newParams = {...params, page: 1};
 		setParams(newParams);
 	}, [params]);
+
+	const clearFilter = useCallback(() => {
+		const resetParams: UserCollectionParams = {
+			page: 1,
+			limit: 10,
+		};
+		setSearchBy(undefined);
+		resetField("search");
+		setValue("search", "");
+		setParams(resetParams);
+	}, [resetField, setValue]);
+
+	const handleFilter = useCallback(
+		(filterName: string) => {
+			const newParams: UserCollectionParams = {...params};
+			if (!Object.keys(newParams).length) {
+				return;
+			}
+			if (!Object.keys(newParams).includes("userTypeId")) {
+				setParams({...newParams, userTypeId: filterName});
+				return;
+			}
+			let userTypeIdList = newParams.userTypeId?.split(",");
+
+			if (userTypeIdList?.includes(filterName)) {
+				userTypeIdList = userTypeIdList.filter((item) => item !== filterName);
+			} else {
+				userTypeIdList?.push(filterName);
+			}
+
+			Object.assign(newParams, {userTypeId: userTypeIdList?.join(",")});
+
+			setParams({...newParams, userTypeId: userTypeIdList?.join(",")});
+		},
+		[params],
+	);
+
+	useEffect(() => {
+		if (!isShowToast) {
+			return;
+		}
+
+		const timeoutId = setTimeout(() => {
+			setIsShowToast(false);
+		}, 5000);
+
+		return () => {
+			clearTimeout(timeoutId);
+		};
+	}, [isShowToast]);
+
+	const onChangeSearchInput = useCallback(
+		(val: string) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+			const newParams: UserCollectionParams = {...params, search: val};
+			timeoutRef.current = setTimeout(() => {
+				fetchData(newParams);
+			}, 1000);
+		},
+		[fetchData, params],
+	);
 
 	return (
 		<Card className="flex flex-col gap-6">
@@ -165,80 +237,79 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 					)}
 				</div>
 
-				<Controller
-					control={control}
-					name="search"
-					render={({field, fieldState: {error}}) => (
-						<FormGroup className="mb-0">
-							<FormIcon iconPosition="left">
-								<Input
-									placeholder="Cari Username/Nama/Email"
-									className="w-[25.875rem]"
-									variant={error ? "error" : undefined}
-									{...field}
-								/>
-								<i className="fa-solid fa-search icon pointer-events-none"></i>
-							</FormIcon>
-							{error ? <FormMessage>{error?.message}</FormMessage> : false}
-						</FormGroup>
-					)}
-				/>
-
-				<FormGroup className="flex gap-4 items-center">
-					<Label className="mb-0">Filter </Label>
+				<div className="flex justify-between items-center">
 					<Controller
 						control={control}
-						name="isSuperAdmin"
-						render={({field: {value, ...attrs}}) => (
-							<label
-								className={"checkbox-filter".concat(value ? " active" : "")}
-							>
-								<span>Super Admin</span>
-								<input
-									type="checkbox"
-									value="isSuperAdmin"
-									className="hidden"
-									{...attrs}
-								/>
-							</label>
+						name="search"
+						render={({field: {onChange, ...attrs}}) => (
+							<FormGroup className="mb-0">
+								<FormIcon iconPosition="right">
+									<Input
+										placeholder="Username/Nama/Email"
+										className="w-[25.875rem] pl-10"
+										onChange={(e: ChangeEvent<HTMLInputElement>) => {
+											onChange(e);
+											onChangeSearchInput(e.currentTarget.value);
+										}}
+										{...attrs}
+									/>
+									<i className="fa-solid fa-search icon pointer-events-none left-3"></i>
+									{attrs?.value ? (
+										<button
+											className="icon"
+											id="btn-clear-search"
+											data-testid="btn-clear-search"
+											type="button"
+											onClick={clearFilter}
+										>
+											<i className="fa-solid fa-circle-xmark text-light-40"></i>
+										</button>
+									) : (
+										false
+									)}
+								</FormIcon>
+							</FormGroup>
 						)}
 					/>
-					<Controller
-						control={control}
-						name="isAdmin"
-						render={({field: {value, ...attrs}}) => (
-							<label
-								className={"checkbox-filter".concat(value ? " active" : "")}
-							>
-								<span>Admin</span>
-								<input
-									type="checkbox"
-									value="isAdmin"
-									className="hidden"
-									{...attrs}
-								/>
-							</label>
-						)}
-					/>
-					<Controller
-						control={control}
-						name="isViewer"
-						render={({field: {value, ...attrs}}) => (
-							<label
-								className={"checkbox-filter".concat(value ? " active" : "")}
-							>
-								<span>Viewer</span>
-								<input
-									type="checkbox"
-									value="isViewer"
-									className="hidden"
-									{...attrs}
-								/>
-							</label>
-						)}
-					/>
-				</FormGroup>
+				</div>
 			</form>
+
+			<div className="flex gap-4 items-center">
+				<Label className="mb-0">Filter </Label>
+				<button
+					className={"checkbox-filter".concat(
+						params?.userTypeId &&
+							params?.userTypeId?.split(",").includes("SUPER_ADMIN")
+							? " active"
+							: "",
+					)}
+					onClick={() => handleFilter("SUPER_ADMIN")}
+				>
+					<span>Super Admin</span>
+				</button>
+				<button
+					className={"checkbox-filter".concat(
+						params?.userTypeId &&
+							params?.userTypeId?.split(",").includes("ADMIN")
+							? " active"
+							: "",
+					)}
+					onClick={() => handleFilter("ADMIN")}
+				>
+					<span>Admin</span>
+				</button>
+				<button
+					className={"checkbox-filter".concat(
+						params?.userTypeId &&
+							params?.userTypeId?.split(",").includes("VIEWER")
+							? " active"
+							: "",
+					)}
+					onClick={() => handleFilter("VIEWER")}
+				>
+					<span>Viewer</span>
+				</button>
+			</div>
 
 			<TableContainer>
 				<Table>
