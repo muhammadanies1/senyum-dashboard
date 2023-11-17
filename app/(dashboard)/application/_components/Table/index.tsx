@@ -59,6 +59,8 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		useState<boolean>(false);
 	const [isShowDownloadDetailModal, setIsShowDownloadDetailModal] =
 		useState<boolean>(false);
+
+	const [selectedName, setSelectedName] = useState<string>();
 	const [selectedApplication, setSelectedApplication] = useState<string>();
 
 	const [searchBy, setSearchBy] = useState<string>();
@@ -109,10 +111,6 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		},
 		[fetchData, params],
 	);
-
-	useEffect(() => {
-		fetchData(params);
-	}, [fetchData, params]);
 
 	const pageCount = useMemo(() => {
 		const total = data?.data.recordsFiltered || 0;
@@ -261,6 +259,10 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		},
 		[filterStatusList, listFilterPartner, params],
 	);
+
+	useEffect(() => {
+		fetchData(params);
+	}, [fetchData, params]);
 
 	return (
 		<Card
@@ -507,6 +509,7 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 													id="show-detail-modal-btn"
 													data-testid="show-detail-modal-btn"
 													onClick={() => {
+														setSelectedName(item.custName);
 														setSelectedApplication(item.id);
 														setIsShowDetailModal(true);
 													}}
@@ -519,6 +522,7 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 														id="show-download-modal-btn"
 														data-testid="show-download-modal-btn"
 														onClick={() => {
+															setSelectedName(item.custName);
 															setSelectedApplication(item.id);
 															setIsShowDownloadDetailModal(true);
 														}}
@@ -587,8 +591,13 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 			<DownloadApplicationDetailModal
 				isShow={isShowDownloadDetailModal}
 				handleClose={() => setIsShowDownloadDetailModal(false)}
+				selectedName={selectedName}
 				selectedApplication={selectedApplication}
-				onSuccess={() => {
+				onError={(error) => {
+					const errorMessage = new Error(error as any).message;
+					setToastStatus(false);
+					setIsShowToast(true);
+					setToastMessage(errorMessage);
 					setIsShowDownloadDetailModal(false);
 				}}
 			/>

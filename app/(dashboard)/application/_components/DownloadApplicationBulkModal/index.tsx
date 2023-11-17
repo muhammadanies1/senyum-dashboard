@@ -1,6 +1,6 @@
 "use client";
 
-import axios, {AxiosResponse} from "axios";
+import axios from "axios";
 import dayjs from "dayjs";
 import {Datepicker, Flowbite} from "flowbite-react";
 import React, {
@@ -20,7 +20,6 @@ import Radio from "@/components/atoms/Radio";
 import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
 import {theme} from "@/config/theme";
-import {SimpedesUmiApplicationDownloadTableResponse} from "@/types/SimpedesUmiApplicationDownloadTableResponse";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 const schema = yup.object({
@@ -73,6 +72,8 @@ const DownloadApplicationBulk: FunctionComponent<
 			try {
 				setIsLoading(true);
 
+				const fileExtension = data.format === "xls" ? "xlsx" : data.format;
+
 				const newStartDate = data.startDate
 					? dayjs(data.startDate).format("YYYY-MM-DD")
 					: null;
@@ -81,37 +82,60 @@ const DownloadApplicationBulk: FunctionComponent<
 					? dayjs(data.endDate).format("YYYY-MM-DD")
 					: null;
 
-				const res: AxiosResponse<SimpedesUmiApplicationDownloadTableResponse> =
-					await axiosInstance.get(`/api/download/${data.format}`, {
+				const response = await axiosInstance.get(
+					`/api/download/${data.format}`,
+					{
 						params: {
 							startDate: newStartDate,
 							endDate: newEndDate,
 						},
-					});
+					},
+				);
+
+				const downloadFile = async (url: string, fileName: string) => {
+					try {
+						const fileResponse = await axios.get(url, {
+							responseType: "blob",
+						});
+
+						const blob = new Blob([fileResponse.data], {
+							type: "application/octet-stream",
+						});
+
+						const link = document.createElement("a");
+						link.href = window.URL.createObjectURL(blob);
+						link.download = fileName;
+						link.style.display = "none";
+						document.body.appendChild(link);
+						link.click();
+						document.body.removeChild(link);
+						window.URL.revokeObjectURL(link.href);
+					} catch (error) {
+						onError("Maaf, terjadi error ketika download file.");
+						console.error("Error downloading file:", error);
+					}
+				};
 
 				if (
-					res.data.responseDescription === "SUCCESS" &&
-					res.data.data === null
+					response.data.responseDescription === "SUCCESS" &&
+					response.data.data !== null
 				) {
-					console.log(res);
-					handleClose();
-					setIsLoading(false);
-					onError("Maaf, tidak ada data pengajuan pada tanggal yang dipilih.");
-				}
-
-				if (
-					res.data.responseDescription === "SUCCESS" &&
-					res.data.data !== null
-				) {
-					res.data.data.link.map((item) => {
-						window.open(item, "_blank");
+					response.data.data.link.map((item: string) => {
+						downloadFile(item, `application data.${fileExtension}`);
 					});
-					console.log(res);
+
 					handleClose();
 					setIsLoading(false);
 					if (onSuccess) {
 						await onSuccess();
 					}
+				} else if (
+					response.data.responseDescription === "SUCCESS" &&
+					response.data.data === null
+				) {
+					handleClose();
+					setIsLoading(false);
+					onError("Maaf, tidak ada data pengajuan pada tanggal yang dipilih.");
 				}
 			} catch (error) {
 				setIsLoading(false);
@@ -121,7 +145,6 @@ const DownloadApplicationBulk: FunctionComponent<
 				}
 			}
 		},
-
 		[handleClose, onError, onSuccess],
 	);
 

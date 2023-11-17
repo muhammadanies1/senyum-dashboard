@@ -1,6 +1,12 @@
 "use client";
 
-import React, {FunctionComponent, useCallback} from "react";
+import axios from "axios";
+import React, {
+	FunctionComponent,
+	useCallback,
+	useEffect,
+	useState,
+} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
@@ -20,18 +26,28 @@ const schema = yup.object({
 
 type DownloadApplicationDetailProps = {
 	selectedApplication?: string;
+	selectedName?: string;
 	handleClose: () => void;
-	onSuccess: () => void;
+	onSuccess?: () => void;
+	onError: (error: unknown) => void;
 	isShow: boolean;
 };
 
 const DownloadApplicationDetail: FunctionComponent<
 	DownloadApplicationDetailProps
-> = ({selectedApplication, handleClose, onSuccess, isShow}) => {
+> = ({
+	selectedApplication,
+	selectedName,
+	handleClose,
+	onSuccess,
+	onError,
+	isShow,
+}) => {
 	const {
 		control,
 		handleSubmit,
 		formState: {isValid},
+		reset,
 	} = useForm({
 		values: {
 			format: {},
@@ -40,13 +56,47 @@ const DownloadApplicationDetail: FunctionComponent<
 		mode: "all",
 	});
 
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
 	const downloadDetail = useCallback(
-		(data: yup.InferType<typeof schema>) => {
-			const url = `${process.env.NEXT_PUBLIC_API_BFF_URL}/api/v1/simpedes-umi/detail/${data.format}/${selectedApplication}`;
-			window.open(url, "_blank");
-			onSuccess();
+		async (data: yup.InferType<typeof schema>) => {
+			try {
+				setIsLoading(true);
+
+				const fileExtension = data.format === "xls" ? "xlsx" : data.format;
+
+				const fileName = selectedName
+					? `${selectedName}.${fileExtension}`
+					: `application detail.${fileExtension}`;
+
+				const url = `${process.env.NEXT_PUBLIC_API_BFF_URL}/api/v1/simpedes-umi/detail/${data.format}/${selectedApplication}`;
+
+				const fileResponse = await axios.get(url, {responseType: "blob"});
+
+				const blob = new Blob([fileResponse.data], {
+					type: "application/octet-stream",
+				});
+
+				const link = document.createElement("a");
+				link.href = window.URL.createObjectURL(blob);
+				link.download = fileName;
+				link.style.display = "none";
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				window.URL.revokeObjectURL(link.href);
+
+				handleClose();
+				setIsLoading(false);
+				if (onSuccess) {
+					onSuccess();
+				}
+			} catch (error) {
+				setIsLoading(false);
+				onError("Maaf, terjadi error ketika download file.");
+			}
 		},
-		[onSuccess, selectedApplication],
+		[handleClose, onError, onSuccess, selectedApplication, selectedName],
 	);
 
 	const submitForm = (data: yup.InferType<typeof schema>) => {
@@ -56,6 +106,11 @@ const DownloadApplicationDetail: FunctionComponent<
 			downloadDetail(data);
 		}, 200);
 	};
+
+	useEffect(() => {
+		reset({format: ""});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isShow]);
 
 	return (
 		<Modal
@@ -122,7 +177,7 @@ const DownloadApplicationDetail: FunctionComponent<
 						id="submit-modal-download-btn"
 						data-testid="submit-modal-download-btn"
 						className="w-full"
-						disabled={!isValid}
+						disabled={!isValid || isLoading}
 					>
 						Download
 					</Button>
