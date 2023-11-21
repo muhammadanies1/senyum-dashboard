@@ -1,12 +1,7 @@
 "use client";
 
 import axios from "axios";
-import React, {
-	FunctionComponent,
-	useCallback,
-	useEffect,
-	useState,
-} from "react";
+import React, {FunctionComponent, useCallback, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
@@ -25,11 +20,11 @@ const schema = yup.object({
 });
 
 type DownloadApplicationDetailProps = {
-	selectedApplication?: string;
-	selectedName?: string;
+	onError: (error: unknown) => void;
 	handleClose: () => void;
 	onSuccess?: () => void;
-	onError: (error: unknown) => void;
+	selectedApplication?: string;
+	selectedName?: string;
 	isShow: boolean;
 };
 
@@ -44,16 +39,18 @@ const DownloadApplicationDetail: FunctionComponent<
 	isShow,
 }) => {
 	const {
-		control,
-		handleSubmit,
 		formState: {isValid},
-		reset,
+		handleSubmit,
+		resetField,
+		setValue,
+		control,
 	} = useForm({
-		values: {
-			format: {},
+		defaultValues: {
+			format: "",
 		},
 		resolver: yupResolver(schema),
 		mode: "all",
+		shouldUnregister: true,
 	});
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -99,18 +96,18 @@ const DownloadApplicationDetail: FunctionComponent<
 		[handleClose, onError, onSuccess, selectedApplication, selectedName],
 	);
 
-	const submitForm = (data: yup.InferType<typeof schema>) => {
-		let timeout: NodeJS.Timeout | undefined = undefined;
-		timeout && clearTimeout(timeout);
-		setTimeout(() => {
-			downloadDetail(data);
-		}, 200);
+	const submitForm = async (data: yup.InferType<typeof schema>) => {
+		await downloadDetail(data);
+		resetField("format");
 	};
 
-	useEffect(() => {
-		reset({format: ""});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isShow]);
+	const closeHandler = useCallback(() => {
+		// Reset form
+		resetField("format");
+
+		// Invoke handleClose props
+		handleClose();
+	}, [handleClose, resetField]);
 
 	return (
 		<Modal
@@ -119,14 +116,14 @@ const DownloadApplicationDetail: FunctionComponent<
 			isShow={isShow}
 			className="w-[482px]"
 			containerClassName="z-20"
-			onClickBackground={handleClose}
+			onClickBackground={closeHandler}
 		>
 			<form className="flex flex-col" onSubmit={handleSubmit(submitForm)}>
 				<Modal.Header
 					id="modal-download-header"
 					data-testid="modal-download-header"
 					dismissable
-					handleClose={handleClose}
+					handleClose={closeHandler}
 				>
 					Download Data Pengajuan
 				</Modal.Header>
@@ -134,7 +131,7 @@ const DownloadApplicationDetail: FunctionComponent<
 					<Controller
 						control={control}
 						name="format"
-						render={({field: {value, onChange}, fieldState: {error}}) => (
+						render={({field: {value, name, ...attrs}}) => (
 							<FormGroup>
 								<Label
 									htmlFor="format-file"
@@ -152,7 +149,13 @@ const DownloadApplicationDetail: FunctionComponent<
 										className="w-full"
 										value="pdf"
 										checked={value === "pdf"}
-										onChange={onChange}
+										onClick={(e) => {
+											setValue("format", e.currentTarget.value, {
+												shouldValidate: true,
+											});
+										}}
+										disabled={isLoading}
+										{...attrs}
 									/>
 									<Radio
 										id="radio-xls"
@@ -162,7 +165,13 @@ const DownloadApplicationDetail: FunctionComponent<
 										className="w-full"
 										value="xls"
 										checked={value === "xls"}
-										onChange={onChange}
+										onClick={(e) => {
+											setValue("format", e.currentTarget.value, {
+												shouldValidate: true,
+											});
+										}}
+										disabled={isLoading}
+										{...attrs}
 									/>
 								</div>
 							</FormGroup>
