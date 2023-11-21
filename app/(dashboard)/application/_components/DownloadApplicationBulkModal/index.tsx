@@ -32,26 +32,26 @@ const schema = yup.object({
 });
 
 type DownloadApplicationBulkProps = {
-	isShow: boolean;
-	handleClose: () => void;
-	onSuccess?: () => Promise<void>;
 	onError: (error: unknown) => void;
+	onSuccess?: () => Promise<void>;
+	handleClose: () => void;
+	isShow: boolean;
 };
 
 const initialValue: yup.InferType<typeof schema> = {
-	format: "",
 	startDate: "",
 	endDate: "",
+	format: "",
 };
 
 const DownloadApplicationBulk: FunctionComponent<
 	DownloadApplicationBulkProps
 > = ({handleClose, onSuccess, onError, isShow}) => {
 	const {
-		control,
-		handleSubmit,
 		formState: {isValid},
+		handleSubmit,
 		setValue,
+		control,
 		watch,
 		reset,
 	} = useForm({
@@ -177,17 +177,14 @@ const DownloadApplicationBulk: FunctionComponent<
 	}, [watchStartDate]);
 
 	const submitForm = (data: yup.InferType<typeof schema>) => {
-		let timeout: NodeJS.Timeout | undefined = undefined;
-		timeout && clearTimeout(timeout);
-		setTimeout(() => {
-			downloadBulk(data);
-		}, 200);
+		downloadBulk(data);
+		reset();
 	};
 
-	useEffect(() => {
-		reset(initialValue);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isShow]);
+	const closeHandler = useCallback(() => {
+		reset();
+		handleClose();
+	}, [handleClose, reset]);
 
 	return (
 		<Modal
@@ -196,14 +193,14 @@ const DownloadApplicationBulk: FunctionComponent<
 			isShow={isShow}
 			className="w-[482px]"
 			containerClassName="z-20"
-			onClickBackground={handleClose}
+			onClickBackground={closeHandler}
 		>
 			<form className="flex flex-col" onSubmit={handleSubmit(submitForm)}>
 				<Modal.Header
 					id="modal-download-header"
 					data-testid="modal-download-header"
 					dismissable
-					handleClose={handleClose}
+					handleClose={closeHandler}
 				>
 					Download Data Pengajuan
 				</Modal.Header>
@@ -281,7 +278,7 @@ const DownloadApplicationBulk: FunctionComponent<
 					<Controller
 						control={control}
 						name="format"
-						render={({field: {value, onChange}, fieldState: {error}}) => (
+						render={({field: {value, name, ...attrs}}) => (
 							<FormGroup>
 								<Label
 									htmlFor="format-file"
@@ -300,10 +297,13 @@ const DownloadApplicationBulk: FunctionComponent<
 										className="w-full"
 										value="pdf"
 										checked={value === "pdf"}
-										onChange={onChange}
-										onClick={() => {
-											setValue("format", "pdf");
+										onClick={(e) => {
+											setValue("format", e.currentTarget.value, {
+												shouldValidate: true,
+											});
 										}}
+										disabled={isLoading}
+										{...attrs}
 									/>
 									<Radio
 										id="radio-xls"
@@ -313,10 +313,13 @@ const DownloadApplicationBulk: FunctionComponent<
 										className="w-full"
 										value="xls"
 										checked={value === "xls"}
-										onChange={onChange}
-										onClick={() => {
-											setValue("format", "xls");
+										onClick={(e) => {
+											setValue("format", e.currentTarget.value, {
+												shouldValidate: true,
+											});
 										}}
+										disabled={isLoading}
+										{...attrs}
 									/>
 									<Radio
 										id="radio-csv"
@@ -326,10 +329,13 @@ const DownloadApplicationBulk: FunctionComponent<
 										className="w-full"
 										value="csv"
 										checked={value === "csv"}
-										onChange={onChange}
-										onClick={() => {
-											setValue("format", "csv");
+										onClick={(e) => {
+											setValue("format", e.currentTarget.value, {
+												shouldValidate: true,
+											});
 										}}
+										disabled={isLoading}
+										{...attrs}
 									/>
 								</div>
 							</FormGroup>
