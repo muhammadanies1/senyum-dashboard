@@ -3,13 +3,7 @@
 import axios from "axios";
 import dayjs from "dayjs";
 import {Datepicker, Flowbite} from "flowbite-react";
-import React, {
-	FunctionComponent,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+import React, {FunctionComponent, useCallback, useMemo, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
@@ -20,6 +14,7 @@ import Radio from "@/components/atoms/Radio";
 import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
 import {theme} from "@/config/theme";
+import {SimpedesUmiApplicationDownloadTableResponse} from "@/types/SimpedesUmiApplicationDownloadTableResponse";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 const schema = yup.object({
@@ -65,14 +60,53 @@ const DownloadApplicationBulk: FunctionComponent<
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const watchStartDate = dayjs(watch("startDate")).toDate();
+
 	const watchEndDate = dayjs(watch("endDate")).toDate();
+
+	const format = watch("format");
+
+	const downloadFile = useCallback(
+		async (url: string, fileName: string) => {
+			try {
+				const fileResponse = await axios.get(url, {
+					responseType: "blob",
+				});
+
+				const blob = new Blob([fileResponse.data], {
+					type: "application/octet-stream",
+				});
+
+				const link = document.createElement("a");
+				link.href = window.URL.createObjectURL(blob);
+				link.download = fileName;
+				link.style.display = "none";
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				window.URL.revokeObjectURL(link.href);
+			} catch (error) {
+				onError("Maaf, terjadi error ketika download file.");
+			}
+		},
+		[onError],
+	);
+
+	const singleFileDownloadHandler = useCallback(
+		async (links: string[]) => {
+			const fileExtension = format === "xls" ? "xlsx" : format;
+
+			for (let i = 0; i < links.length; i++) {
+				const filename = `application data.${fileExtension}`;
+				await downloadFile(links[i], filename);
+			}
+		},
+		[downloadFile, format],
+	);
 
 	const downloadBulk = useCallback(
 		async (data: yup.InferType<typeof schema>) => {
 			try {
 				setIsLoading(true);
-
-				const fileExtension = data.format === "xls" ? "xlsx" : data.format;
 
 				const newStartDate = data.startDate
 					? dayjs(data.startDate).format("YYYY-MM-DD")
@@ -82,50 +116,23 @@ const DownloadApplicationBulk: FunctionComponent<
 					? dayjs(data.endDate).format("YYYY-MM-DD")
 					: null;
 
-				const response = await axiosInstance.get(
-					`/api/download/${data.format}`,
-					{
-						params: {
-							startDate: newStartDate,
-							endDate: newEndDate,
+				const response =
+					await axiosInstance.get<SimpedesUmiApplicationDownloadTableResponse>(
+						`/api/download/${data.format}`,
+						{
+							params: {
+								startDate: newStartDate,
+								endDate: newEndDate,
+							},
 						},
-					},
-				);
-
-				const downloadFile = async (url: string, fileName: string) => {
-					try {
-						const fileResponse = await axios.get(url, {
-							responseType: "blob",
-						});
-
-						const blob = new Blob([fileResponse.data], {
-							type: "application/octet-stream",
-						});
-
-						const link = document.createElement("a");
-						link.href = window.URL.createObjectURL(blob);
-						link.download = fileName;
-						link.style.display = "none";
-						document.body.appendChild(link);
-						link.click();
-						document.body.removeChild(link);
-						window.URL.revokeObjectURL(link.href);
-					} catch (error) {
-						onError("Maaf, terjadi error ketika download file.");
-						console.error("Error downloading file:", error);
-					}
-				};
+					);
 
 				if (
 					response.data.responseDescription === "SUCCESS" &&
 					response.data.data !== null
 				) {
-					response.data.data.link.map((item: string) => {
-						downloadFile(item, `application data.${fileExtension}`);
-					});
+					await singleFileDownloadHandler(response.data.data.link);
 
-					handleClose();
-					setIsLoading(false);
 					if (onSuccess) {
 						await onSuccess();
 					}
@@ -133,10 +140,11 @@ const DownloadApplicationBulk: FunctionComponent<
 					response.data.responseDescription === "SUCCESS" &&
 					response.data.data === null
 				) {
-					handleClose();
-					setIsLoading(false);
 					onError("Maaf, tidak ada data pengajuan pada tanggal yang dipilih.");
 				}
+
+				handleClose();
+				setIsLoading(false);
 			} catch (error) {
 				setIsLoading(false);
 
@@ -145,7 +153,7 @@ const DownloadApplicationBulk: FunctionComponent<
 				}
 			}
 		},
-		[handleClose, onError, onSuccess],
+		[handleClose, onError, onSuccess, singleFileDownloadHandler],
 	);
 
 	const handleStartDateChange = useCallback(
