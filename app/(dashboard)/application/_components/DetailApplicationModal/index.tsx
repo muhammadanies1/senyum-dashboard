@@ -73,18 +73,6 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 		}
 	}, [data?.data.status]);
 
-	const gender = useMemo(() => {
-		const sex = (data?.data.sex ?? "").toUpperCase();
-		switch (sex) {
-			case "M":
-				return "Laki-laki";
-			case "F":
-				return "Perempuan";
-			default:
-				return "-";
-		}
-	}, [data?.data.sex]);
-
 	const placeDateOfBirth = useMemo(() => {
 		if (!data?.data.placeOfBirth || !data?.data.dateOfBirth) {
 			return "-";
@@ -257,7 +245,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-gender"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {gender}
+									: {useDataProperty(data?.data.jenisKelamin)}
 								</span>
 							</div>
 							<div className="flex">
@@ -293,7 +281,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-marital-status"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {useDataProperty(data?.data.maritalStatus)}
+									: {useDataProperty(data?.data.statusPerkawinan)}
 								</span>
 							</div>
 							<div className="flex">
@@ -319,7 +307,7 @@ const DetailApplication: FunctionComponent<DetailApplicationProps> = ({
 									data-testid="value-education"
 									className="w-2/3 font-semibold text-base capitalize"
 								>
-									: {useDataProperty(data?.data.education)}
+									: {useDataProperty(data?.data.pendidikan)}
 								</span>
 							</div>
 							<div className="flex">

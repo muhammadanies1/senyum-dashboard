@@ -6,10 +6,13 @@ export type SimpedesUmiApplicationDetail = {
 	dateOfBirth: string;
 	placeOfBirth: string;
 	sex: string;
+	jenisKelamin: string;
 	religion: string;
 	maritalStatus: string;
+	statusPerkawinan: string;
 	motherName: string;
 	education: string;
+	pendidikan: string;
 	workTypeId: string;
 	workPositionId: string;
 	workingPosition: string;
