@@ -23,7 +23,11 @@ const schema = yup.object({
 		.oneOf(["pdf", "xls", "csv"], "Format file tidak valid.")
 		.required("Format file harus diisi."),
 	startDate: yup.string().optional(),
-	endDate: yup.string().optional(),
+	endDate: yup.string().when("startDate", {
+		is: (startDate: string) => startDate && startDate.length > 0,
+		then: () => yup.string().required(),
+		otherwise: () => yup.string().optional(),
+	}),
 });
 
 type DownloadApplicationBulkProps = {
@@ -63,7 +67,7 @@ const DownloadApplicationBulk: FunctionComponent<
 
 	const watchEndDate = dayjs(watch("endDate")).toDate();
 
-	const format = watch("format");
+	const watchFormat = watch("format");
 
 	const downloadFile = useCallback(
 		async (url: string, fileName: string) => {
@@ -93,14 +97,14 @@ const DownloadApplicationBulk: FunctionComponent<
 
 	const singleFileDownloadHandler = useCallback(
 		async (links: string[]) => {
-			const fileExtension = format === "xls" ? "xlsx" : format;
+			const fileExtension = watchFormat === "xls" ? "xlsx" : watchFormat;
 
 			for (let i = 0; i < links.length; i++) {
 				const filename = `application data.${fileExtension}`;
 				await downloadFile(links[i], filename);
 			}
 		},
-		[downloadFile, format],
+		[downloadFile, watchFormat],
 	);
 
 	const downloadBulk = useCallback(
@@ -158,7 +162,7 @@ const DownloadApplicationBulk: FunctionComponent<
 
 	const handleStartDateChange = useCallback(
 		(value: string) => {
-			setValue("startDate", value);
+			setValue("startDate", value, {shouldValidate: true});
 
 			if (
 				watchEndDate &&
@@ -230,7 +234,7 @@ const DownloadApplicationBulk: FunctionComponent<
 							<Controller
 								control={control}
 								name="startDate"
-								render={({field: {value}, fieldState: {error}}) => (
+								render={({field: {value}}) => (
 									<FormGroup>
 										<div className="date-range">
 											<span className="label-date-range">Dari</span>
@@ -256,7 +260,7 @@ const DownloadApplicationBulk: FunctionComponent<
 							<Controller
 								control={control}
 								name="endDate"
-								render={({field: {value, onChange}, fieldState: {error}}) => (
+								render={({field: {value, onChange}}) => (
 									<FormGroup>
 										<div className="date-range">
 											<span className="label-date-range">Hingga</span>
