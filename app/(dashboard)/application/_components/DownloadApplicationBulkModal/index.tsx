@@ -2,18 +2,17 @@
 
 import axios from "axios";
 import dayjs from "dayjs";
-import {Datepicker, Flowbite} from "flowbite-react";
 import React, {FunctionComponent, useCallback, useMemo, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
 import Button from "@/components/atoms/Button";
+import DatePicker from "@/components/atoms/Datepicker";
 import FormGroup from "@/components/atoms/FormGroup";
 import Label from "@/components/atoms/Label";
 import Radio from "@/components/atoms/Radio";
 import Modal from "@/components/molecules/Modal";
 import axiosInstance from "@/config/client/axios";
-import {theme} from "@/config/theme";
 import {SimpedesUmiApplicationDownloadTableResponse} from "@/types/SimpedesUmiApplicationDownloadTableResponse";
 import {yupResolver} from "@hookform/resolvers/yup";
 
@@ -43,6 +42,10 @@ const initialValue: yup.InferType<typeof schema> = {
 	format: "",
 };
 
+type ValuePiece = Date | null;
+
+type Value = ValuePiece | [ValuePiece, ValuePiece];
+
 const DownloadApplicationBulk: FunctionComponent<
 	DownloadApplicationBulkProps
 > = ({handleClose, onSuccess, onError, isShow}) => {
@@ -61,11 +64,16 @@ const DownloadApplicationBulk: FunctionComponent<
 		mode: "all",
 	});
 
+	const [isShowStartCalendar, setIsShowStartCalendar] =
+		useState<boolean>(false);
+
+	const [isShowEndCalendar, setIsShowEndCalendar] = useState<boolean>(false);
+
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const watchStartDate = dayjs(watch("startDate")).toDate();
+	const watchStartDate = watch("startDate");
 
-	const watchEndDate = dayjs(watch("endDate")).toDate();
+	const watchEndDate = watch("endDate");
 
 	const watchFormat = watch("format");
 
@@ -160,27 +168,26 @@ const DownloadApplicationBulk: FunctionComponent<
 		[handleClose, onError, onSuccess, singleFileDownloadHandler],
 	);
 
-	const handleStartDateChange = useCallback(
-		(value: string) => {
-			setValue("startDate", value, {shouldValidate: true});
+	const handleStartDateChange = (value: Value | null) => {
+		const selectedDate = value ? value.toString() : "";
 
-			if (
-				watchEndDate &&
-				dayjs(value).isBefore(dayjs(watchEndDate).subtract(29, "day"))
-			) {
-				const newEndDate = dayjs(value).add(29, "day").toDate();
-				setValue("endDate", newEndDate.toString());
-			}
+		setValue("startDate", selectedDate, {shouldValidate: true});
 
-			if (watchEndDate && dayjs(value).isAfter(watchEndDate)) {
-				setValue("endDate", value);
-			}
-		},
-		[setValue, watchEndDate],
-	);
+		if (
+			watchEndDate &&
+			dayjs(selectedDate).isBefore(dayjs(watchEndDate).subtract(29, "day"))
+		) {
+			const newEndDate = dayjs(selectedDate).add(29, "day").toDate();
+			setValue("endDate", newEndDate.toString());
+		}
+
+		if (watchEndDate && dayjs(selectedDate).isAfter(watchEndDate)) {
+			setValue("endDate", selectedDate);
+		}
+	};
 
 	const maxEndDate = useMemo(() => {
-		if (watchStartDate) {
+		if (watchStartDate !== "") {
 			const endDate = dayjs(watchStartDate).add(29, "day");
 			return endDate.isAfter(new Date()) ? new Date() : endDate.toDate();
 		} else {
@@ -196,6 +203,8 @@ const DownloadApplicationBulk: FunctionComponent<
 	const closeHandler = useCallback(() => {
 		reset();
 		handleClose();
+		setIsShowEndCalendar(false);
+		setIsShowStartCalendar(false);
 	}, [handleClose, reset]);
 
 	return (
@@ -238,21 +247,21 @@ const DownloadApplicationBulk: FunctionComponent<
 									<FormGroup>
 										<div className="date-range">
 											<span className="label-date-range">Dari</span>
-											<Flowbite theme={{theme}}>
-												<Datepicker
-													id="datepicker-startdate"
-													data-testid="datepicker-startdate"
-													showTodayButton={false}
-													showClearButton={false}
-													maxDate={new Date()}
-													onSelectedDateChanged={(value) =>
-														handleStartDateChange(value.toString())
-													}
-													type="text"
-													value={value ? dayjs(value).format("DD/MM/YY") : ""}
-													placeholder="Pilih Tanggal"
-												/>
-											</Flowbite>
+											<DatePicker
+												isShow={isShowStartCalendar}
+												calendarToggle={() =>
+													setIsShowStartCalendar(!isShowStartCalendar)
+												}
+												onChange={(selectedDate) => {
+													handleStartDateChange(selectedDate);
+												}}
+												maxDate={new Date()}
+												placeholder="Pilih Tanggal"
+												value={value}
+												inputValue={
+													value ? dayjs(value).format("DD/MM/YY") : ""
+												}
+											/>
 										</div>
 									</FormGroup>
 								)}
@@ -264,20 +273,25 @@ const DownloadApplicationBulk: FunctionComponent<
 									<FormGroup>
 										<div className="date-range">
 											<span className="label-date-range">Hingga</span>
-											<Flowbite theme={{theme}}>
-												<Datepicker
-													id="datepicker-enddate"
-													data-testid="datepicker-enddate"
-													showTodayButton={false}
-													showClearButton={false}
-													minDate={watchStartDate ?? new Date()}
-													maxDate={maxEndDate}
-													onSelectedDateChanged={onChange}
-													type="text"
-													value={value ? dayjs(value).format("DD/MM/YY") : ""}
-													placeholder="Pilih Tanggal"
-												/>
-											</Flowbite>
+											<DatePicker
+												isShow={isShowEndCalendar}
+												calendarToggle={() =>
+													setIsShowEndCalendar(!isShowEndCalendar)
+												}
+												onChange={onChange}
+												minDate={
+													watchStartDate ? new Date(watchStartDate) : new Date()
+												}
+												maxDate={maxEndDate}
+												placeholder={
+													watchStartDate === "" ? "" : "Pilih Tanggal"
+												}
+												value={value}
+												inputValue={
+													value ? dayjs(value).format("DD/MM/YY") : ""
+												}
+												inputDisabled={watchStartDate === ""}
+											/>
 										</div>
 									</FormGroup>
 								)}
