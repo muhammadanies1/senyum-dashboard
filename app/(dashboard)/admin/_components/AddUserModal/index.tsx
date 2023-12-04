@@ -49,7 +49,7 @@ const schema = yup.object({
 	email: yup
 		.string()
 		.required("Email harus diisi.")
-		.max(255, "Email maksimal 255 karakter")
+		.max(50, "Email maksimal 50 karakter")
 		.matches(
 			/^[\w.]+@(bri\.co\.id|work\.bri\.co\.id|corp\.bri\.co\.id)$/,
 			"Email hanya bisa memiliki kombinasi huruf, angka, simbol underscore dan titik dengan domain yang valid.",
