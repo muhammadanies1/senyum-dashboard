@@ -1,5 +1,3 @@
-import "./index.css";
-
 import {FunctionComponent, useEffect, useRef} from "react";
 import Calendar, {CalendarProps} from "react-calendar";
 
@@ -55,7 +53,7 @@ const DatePicker: FunctionComponent<DatePickerProps> = ({
 					data-testid="datepicker-input"
 					className="react-calendar__input"
 					placeholder={placeholder}
-					value={inputValue}
+					defaultValue={inputValue}
 					disabled={inputDisabled}
 				/>
 			</div>

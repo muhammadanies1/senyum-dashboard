@@ -55,3 +55,4 @@ Thumbs.db
 .env.development.example
 .env.production.example
 .vscode/
+.env*.local
