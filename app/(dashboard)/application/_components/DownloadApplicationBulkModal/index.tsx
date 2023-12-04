@@ -7,7 +7,7 @@ import {Controller, useForm} from "react-hook-form";
 import * as yup from "yup";
 
 import Button from "@/components/atoms/Button";
-import DatePicker from "@/components/atoms/Datepicker";
+import DatePicker from "@/components/atoms/DatePicker";
 import FormGroup from "@/components/atoms/FormGroup";
 import Label from "@/components/atoms/Label";
 import Radio from "@/components/atoms/Radio";
