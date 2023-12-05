@@ -6,6 +6,7 @@ import React, {
 	FunctionComponent,
 	HTMLAttributes,
 	useCallback,
+	useEffect,
 	useState,
 } from "react";
 import {Controller, useForm} from "react-hook-form";
@@ -97,6 +98,20 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 			fetchLogin(data);
 		}, 200);
 	};
+
+	useEffect(() => {
+		if (!isShowToast) {
+			return;
+		}
+
+		const timeoutId = setTimeout(() => {
+			setIsShowToast(false);
+		}, 3000);
+
+		return () => {
+			clearTimeout(timeoutId);
+		};
+	}, [isShowToast]);
 
 	return (
 		<div

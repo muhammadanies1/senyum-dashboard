@@ -264,6 +264,20 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		fetchData(params);
 	}, [fetchData, params]);
 
+	useEffect(() => {
+		if (!isShowToast) {
+			return;
+		}
+
+		const timeoutId = setTimeout(() => {
+			setIsShowToast(false);
+		}, 3000);
+
+		return () => {
+			clearTimeout(timeoutId);
+		};
+	}, [isShowToast]);
+
 	return (
 		<Card
 			className={"flex flex-col gap-6".concat(
