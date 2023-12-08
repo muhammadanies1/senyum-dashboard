@@ -6,12 +6,14 @@ type ImageContainerProps = {
 	alt: string;
 	src: string | undefined;
 	"data-testid"?: string;
+	onClick?: () => void;
 };
 
 const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 	id,
 	alt,
 	src,
+	onClick,
 	"data-testid": dataTestId,
 	...attrs
 }) => {
@@ -31,9 +33,10 @@ const ImageContainer: FunctionComponent<ImageContainerProps> = ({
 					alt={alt}
 					width={100}
 					height={100}
-					className="w-full rounded-xl"
+					className="w-full rounded-xl hover:cursor-zoom-in"
 					onLoad={() => setImageLoaded(true)}
 					{...attrs}
+					onClick={onClick}
 				/>
 			) : (
 				false

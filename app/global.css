@@ -526,7 +526,6 @@
 	}
 
 	/* ========= FILTER APPLICATION ========= */
-
 	.dropdown .dropdown-toggler-filter-application {
 		@apply flex items-center gap-2;
 	}
@@ -569,6 +568,19 @@
 
 	.container-filter-simpedes-umi {
 		@apply flex flex-col gap-4;
+	}
+
+	/* ========= ZOOM IMAGE ========= */
+	.zoom-image-bg {
+		@apply fixed inset-0 z-10 bg-black/40 px-4 lg:px-0;
+	}
+
+	.zoom-image-container {
+		@apply flex justify-center items-center w-full h-full overflow-hidden;
+	}
+
+	.zoom-image {
+		@apply w-auto h-auto max-w-[27rem] rounded-xl;
 	}
 }
 
