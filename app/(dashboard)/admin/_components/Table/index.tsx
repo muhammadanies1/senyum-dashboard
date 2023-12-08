@@ -156,7 +156,7 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 				return;
 			}
 			if (!Object.keys(newParams).includes("userTypeId")) {
-				setParams({...newParams, userTypeId: filterName});
+				setParams({...newParams, userTypeId: filterName, page: 1});
 				return;
 			}
 			let userTypeIdList = newParams.userTypeId?.split(",");
@@ -167,9 +167,12 @@ const UserTable: FunctionComponent<UserTableProps> = ({userTypeId}) => {
 				userTypeIdList?.push(filterName);
 			}
 
-			Object.assign(newParams, {userTypeId: userTypeIdList?.join(",")});
+			Object.assign(newParams, {
+				userTypeId: userTypeIdList?.join(","),
+				page: 1,
+			});
 
-			setParams({...newParams, userTypeId: userTypeIdList?.join(",")});
+			setParams({...newParams, userTypeId: userTypeIdList?.join(","), page: 1});
 		},
 		[params],
 	);
