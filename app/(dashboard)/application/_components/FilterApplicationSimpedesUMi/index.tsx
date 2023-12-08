@@ -94,6 +94,7 @@ const FilterApplicationSimpedesUMi: FunctionComponent<DropdownProps> = ({
 			endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
 			partnerName: filterByPartner,
 			status: filterByStatus,
+			page: 1,
 		};
 
 		if (filter.startDate === "" || filter.startDate === null) {
