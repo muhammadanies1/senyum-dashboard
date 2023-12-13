@@ -32,6 +32,7 @@ const schema = yup.object({
 		.string()
 		.required("Password harus diisi.")
 		.min(6, "Password minimal 6 karakter."),
+	deviceId: yup.string().required(),
 });
 
 const LoginForm: FunctionComponent<LoginFormProps> = ({
@@ -46,6 +47,9 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 
 	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
 
+	const device = navigator.userAgent;
+	const userDevice = device.replace(/\s/g, "");
+
 	const {
 		control,
 		handleSubmit,
@@ -54,6 +58,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 		values: {
 			username: "",
 			password: "",
+			deviceId: userDevice,
 		},
 		resolver: yupResolver(schema),
 		mode: "all",
@@ -82,7 +87,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 					case "FREEZE":
 						setIsShowToast(true);
 						setToastMessage(
-							"Anda salah menginputkan password sebanyak 5x. Silakan coba lagi setelah 3 menit",
+							"Anda salah menginputkan username atau password sebanyak 5x. Silakan coba lagi setelah 3 menit.",
 						);
 						break;
 				}
