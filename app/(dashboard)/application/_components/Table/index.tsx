@@ -260,6 +260,19 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 		[filterStatusList, listFilterPartner, params],
 	);
 
+	const getStatusBadge = useCallback((status: string) => {
+		switch (status) {
+			case "DONE_SUCCESS":
+				return "success";
+			case "CANCELED":
+			case "PENDING_ESB":
+			case "PRIVY_REGISTER_FAILED":
+				return "error";
+			default:
+				return "pending";
+		}
+	}, []);
+
 	useEffect(() => {
 		fetchData(params);
 	}, [fetchData, params]);
@@ -504,16 +517,7 @@ const ApplicationTable: FunctionComponent<ApplicationTableProps> = ({
 										<td>
 											<Badge
 												className="truncate"
-												status={
-													item?.status === "DONE_SUCCESS"
-														? "success"
-														: item?.status ===
-														  ("CANCELED" ||
-																"PENDING_ESB" ||
-																"PRIVY_REGISTER_FAILED")
-														? "error"
-														: "pending"
-												}
+												status={getStatusBadge(item?.status)}
 												text={item?.status}
 											/>
 										</td>

@@ -47,8 +47,11 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 
 	const [isUnmaskPassword, setIsUnmaskPassword] = useState<boolean>(false);
 
-	const device = navigator.userAgent;
-	const userDevice = device.replace(/\s/g, "");
+	const [userAgent, setUserAgent] = useState<string>("");
+
+	useEffect(() => {
+		setUserAgent(window.navigator.userAgent.replace(/\s+/g, ""));
+	}, []);
 
 	const {
 		control,
@@ -58,7 +61,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({
 		values: {
 			username: "",
 			password: "",
-			deviceId: userDevice,
+			deviceId: userAgent,
 		},
 		resolver: yupResolver(schema),
 		mode: "all",
